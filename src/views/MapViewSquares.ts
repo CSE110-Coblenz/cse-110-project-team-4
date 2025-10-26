@@ -205,7 +205,7 @@ export default class MapViewSquares {
                     duration: 0.08
                 });
             });
-
+            
             group.on("mouseleave", () => {
                 this.stage.container().style.cursor = "default";
                 group.to({ scaleX: 1, scaleY: 1, duration: 0.08 });
@@ -214,7 +214,7 @@ export default class MapViewSquares {
                     shadowOpacity: 0,
                     duration: 0.08
                 });
-        });
+            });
 
             // Click: bubble state back to outside (Passive View + DI)
             group.on("click", () => {
