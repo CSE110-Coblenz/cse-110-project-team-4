@@ -60,6 +60,7 @@ export class QuestionToggleView {
 
     saveOptions(): void {
         // update the Question.ts model
+        console.log(this.currentToggled);
     }
 
     show(): void {
