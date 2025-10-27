@@ -1,0 +1,14 @@
+{
+    "capitalQuestions": {
+        "Alabama": "Montgomery",
+        "Alaska": "Juneau"
+    },
+    "flowerQuestions": {
+        "Alabama": ["alabama flower name", "path/to/alabama"],
+        "Alaska": ["alaska flower name", "path/to/alaska"]
+    },
+    "abbreviationQuestions": {
+        "Alabama": "AL",
+        "Alaska": "AK"
+    }   
+}
