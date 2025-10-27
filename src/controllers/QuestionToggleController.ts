@@ -1,55 +1,44 @@
-import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
-import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
-import { ALL_STATES } from "../utils/constants";
+import { QuestionToggleView, Toggles } from "src/views/QuestionToggle";
+import { QuestionBankModel, BankJSON } from "src/models/Questions"
 
-export class QuestionToggleController {
+class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
     // potentially might use a screenSwitcher?
 
     constructor() {
+        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions);
+        this.model = new QuestionBankModel();
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
-        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions);
-        this.model = new QuestionBankModel();
     }
 
-    handleBack = () => {
-        console.log("!!!! we should try to go back screens here... for now here's a random question");
-        // swap to menu screen, for now for testing purposes i made this button just print a sample question
-        let result = this.getNextQuestion();
-        if (result == null) {
-            console.log("question list null or empty");
-        } else {
-            console.log("remaining states:", this.model.getRemainingStates());
-            console.log("state:", result["state"]);
-            console.log("type:", result["type"]);
-            console.log("answer:", result["answer"]);
-            console.log("incorrect:", result["incorrect"]);
-        }
+    handleBack(): void {
+        // swap to menu screen
     }
 
-    toggleOption = (key: keyof Toggles) => {
+    toggleOption(key: keyof Toggles): void {
         this.currentToggled[key] = !this.currentToggled[key];
-        console.log("curr options", this.currentToggled)
     }
 
-    saveOptions = () => {
+    saveOptions(): void {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
         this.model.setQuestions(options);
-        console.log(this.model.getQuestions());
+        console.log(this.currentToggled);
+        console.log(options);
     }
 
     getNextQuestion(): {state: string, type: string, 
             answer: string, incorrect: string[]} | null {
         let questions: BankJSON = this.model.getQuestions();
-        if (Object.keys(questions).length == 0 || this.model.getRemainingStates().length == 0) {
+        if (questions == null) {
             return null;
         }
+
 
         let incorrectAnswers: string[] = [];
 
@@ -65,7 +54,8 @@ export class QuestionToggleController {
         out["type"] = randomType;
         out["answer"] = questions[randomType][randomState];
 
-        let tempStates: string[] = [...ALL_STATES];
+        let tempStates: string[] = ["Alaska", "Alabama"]; // dummy until constant of 50 states array is defined
+            // instead this should be a copy of that constant
         tempStates.splice(tempStates.indexOf(randomState), 1);
 
         incorrectAnswers = [];

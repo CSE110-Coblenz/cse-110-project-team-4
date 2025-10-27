@@ -2,21 +2,39 @@ interface TypeJSON {
     [key: string]: string
 }
 
-interface BankJSON {
+export interface BankJSON {
     [key: string]: TypeJSON
 }
 
-export default class QuestionBank {
-    private currQuestionBank: BankJSON;
+export class QuestionBankModel {
     public static allQuestions: BankJSON;
+
+    private currQuestionBank: BankJSON;
     private remainingStates: string[];
 
     constructor() {
         this.currQuestionBank = {};
-        this.remainingStates = []; // should be an array of all states, preferrably defined by some constant
+        this.remainingStates = []; // should be an array of all states, preferrably copying some constant
     }
 
-    public setQuestions(options: string[]): void {
+    getRemainingStates(): string[] {
+        return this.remainingStates;
+    }
+
+    removeRemainingStates(idx: number): string {
+        if (idx < 0 || idx > this.remainingStates.length) {
+            return "";
+        }
+        let out: string = this.remainingStates[idx];
+        this.remainingStates.splice(idx, 1);
+        return out;
+    }
+
+    getQuestions(): BankJSON {
+        return this.currQuestionBank;
+    }
+
+    setQuestions(options: string[]): void {
         let totalQuestions = this.getAllQuestions();
         if (totalQuestions == null) {
             console.log("WARNING WARNING TOTAL QUESTIONS IS NULL");
@@ -28,55 +46,18 @@ export default class QuestionBank {
         console.log(this.currQuestionBank);
     }
 
-    public getNextQuestion(): {state: string, type: string, 
-            answer: string, incorrect: string[]} | null {
-        if (this.currQuestionBank == null) {
-            return null;
-        }
-
-        let incorrectAnswers: string[] = [];
-
-        let out = {state: "", type: "", 
-            answer: "", incorrect: incorrectAnswers}
-        let randomIndex: number = Math.floor(Math.random() * Object.keys(this.questionBank).length);
-        let randomStateIndex: number = Math.floor(Math.random() * this.remainingStates.length);
-        let randomType: string = Object.keys(this.currQuestionBank)[randomIndex];
-        let randomState: string = this.remainingStates[randomStateIndex];
-        this.remainingStates.splice(randomStateIndex, 1);
-
-        out["state"] = randomState;
-        out["type"] = randomType;
-        out["answer"] = this.currQuestionBank[randomType][randomState];
-
-        let tempStates: string[] = [] // dummy until constant of 50 states is defined
-            // instead this should be a copy of that constant
-        tempStates.splice(tempStates.indexOf(randomState), 1);
-
-        incorrectAnswers = []
-        for (let i = 0; i < 3; i++) {
-            let idx: number = Math.floor(Math.random() * tempStates.length);
-            let stateName: string = tempStates[idx];
-            tempStates.splice(idx, 1);
-            incorrectAnswers.push(this.currQuestionBank[randomType][stateName]);
-        }
-
-        out["incorrect"] = incorrectAnswers;
-
-        return out;
-    }
-
-    public getAllQuestions() {
-        if (QuestionBank.allQuestions == null) {
+    getAllQuestions() {
+        if (QuestionBankModel.allQuestions == null) {
             fetch("../fullQuestionData.json")
             .then((res) => {
                 return res.json();
             })
             .then((jsonData) => {
-                QuestionBank.allQuestions = jsonData;
-                return QuestionBank.allQuestions;
+                QuestionBankModel.allQuestions = jsonData;
+                return QuestionBankModel.allQuestions;
             })
         } else {
-            return QuestionBank.allQuestions;
+            return QuestionBankModel.allQuestions;
         }
     }
 }
