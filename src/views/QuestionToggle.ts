@@ -3,21 +3,21 @@ import Konva from "konva";
 export class QuestionToggleView {
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
-    private currentToggled: { "capi": boolean, "flow": boolean, "abbr": boolean };
+    private currentToggled: { "capitalQuestions": boolean, "flowerQuestions": boolean, "abbreviationQuestions": boolean };
 
-    constructor(containerId: string) {
+    constructor() {
         this.layer = new Konva.Layer({ visible: false });
         this.toggleButtonGroup = new Konva.Group();
         this.currentToggled = { 
-            "capi": false, 
-            "flow": false, 
-            "abbr": false 
+            "capitalQuestions": false, 
+            "flowerQuestions": false, 
+            "abbreviationQuestions": false 
         }
 
         const backLabel = this.simpleLabelFactory(100, 100, "Go Back", this.saveOptions); // dummy until controller is better implemented
-        const capitalToggle = this.simpleLabelFactory(100, 200, "Toggle Capitals", () => this.toggleOption("capi"));
-        const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => this.toggleOption("flow"));
-        const abbrevationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => this.toggleOption("abbr"));
+        const capitalToggle = this.simpleLabelFactory(100, 200, "Toggle Capitals", () => this.toggleOption("capitalQuestions"));
+        const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => this.toggleOption("flowerQuestions"));
+        const abbrevationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => this.toggleOption("abbreviationQuestions"));
         const saveButton = this.simpleLabelFactory(100, 500, "Save", this.saveOptions);
 
         // TODO: 
@@ -27,7 +27,6 @@ export class QuestionToggleView {
 
 
         this.layer.add(this.toggleButtonGroup);
-        this.layer.draw();
     }
 
     simpleLabelFactory(xPos: number, yPos: number, labelText: string, handler: () => void): Konva.Label {
@@ -36,7 +35,6 @@ export class QuestionToggleView {
             y: yPos,
             opacity: 0.75
         });
-
         out.add(
             new Konva.Tag({
                 fill: "gray"
@@ -50,7 +48,6 @@ export class QuestionToggleView {
         );
 
         out.on("click", handler);
-
         return out;
     }
 
@@ -59,7 +56,7 @@ export class QuestionToggleView {
     }
 
     saveOptions(): void {
-        // update the Question.ts model
+        // TODO: update the Question.ts model
         console.log(this.currentToggled);
     }
 
