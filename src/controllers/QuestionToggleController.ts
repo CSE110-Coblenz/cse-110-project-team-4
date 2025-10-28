@@ -1,35 +1,36 @@
-import { QuestionToggleView, Toggles } from "src/views/QuestionToggle";
-import { QuestionBankModel, BankJSON } from "src/models/Questions"
+import { QuestionToggleView, Toggles } from "../views/QuestionToggle";
+import { QuestionBankModel, BankJSON } from "../models/Questions"
 
-class QuestionToggleController {
+export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
     // potentially might use a screenSwitcher?
 
     constructor() {
-        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions);
-        this.model = new QuestionBankModel();
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
+        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions);
+        this.model = new QuestionBankModel();
     }
 
-    handleBack(): void {
+    handleBack = () => {
+        console.log("we should try to go back screens here...");
         // swap to menu screen
     }
 
-    toggleOption(key: keyof Toggles): void {
+    toggleOption = (key: keyof Toggles) => {
         this.currentToggled[key] = !this.currentToggled[key];
+        console.log("curr options", this.currentToggled)
     }
 
-    saveOptions(): void {
+    saveOptions = () => {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
         this.model.setQuestions(options);
-        console.log(this.currentToggled);
-        console.log(options);
+        console.log(this.model.getQuestions());
     }
 
     getNextQuestion(): {state: string, type: string, 

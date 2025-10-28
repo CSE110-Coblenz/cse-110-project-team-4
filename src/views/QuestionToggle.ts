@@ -16,7 +16,13 @@ export class QuestionToggleView {
         const capitalToggle = this.simpleLabelFactory(100, 200, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
         const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
         const abbrevationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = this.simpleLabelFactory(100, 500, "Save", saveHandler);
+        const saveButton = this.simpleLabelFactory(100, 500, "Save", () => saveHandler());
+
+        this.toggleButtonGroup.add(backLabel);
+        this.toggleButtonGroup.add(capitalToggle);
+        this.toggleButtonGroup.add(flowersToggle);
+        this.toggleButtonGroup.add(abbrevationToggle);
+        this.toggleButtonGroup.add(saveButton);
 
         // TODO: 
         // make buttons have "feeling"
