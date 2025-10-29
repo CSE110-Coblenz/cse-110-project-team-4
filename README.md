@@ -8,6 +8,7 @@ Fresh repository with main branch.
     -(open the shown localhost URL)
 
 # US Map – Stage 2 (TopoJSON View) — 10/28/2025 Dennis
+    branch: feature/us-map-topo-#302
     Topo-based US map rendered with **Konva Paths** using **TopoJSON to GeoJSON** and **d3-geo**’s AlbersUSA projection. Replaces the Stage-1 tile demo while keeping the same MVC wiring.
 
     Features
@@ -19,6 +20,7 @@ Fresh repository with main branch.
         -Territories skipped (AS/GU/MP/PR/VI) to reduce console noise
 
 # US Map – Stage 1 (Tile square Demo) 10/26/2025 Dennis
+    branch: feature/us-map-topo-#301
     Tile-based US map prototype using **Konva + TypeScript**.  
     Goal: fast, testable UI for hover/click interactions and quiz status coloring.
     
