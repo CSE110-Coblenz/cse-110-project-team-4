@@ -18,8 +18,18 @@ export class QuestionToggleController {
     }
 
     handleBack = () => {
-        console.log("we should try to go back screens here...");
+        console.log("!!!! we should try to go back screens here... for now here's a random question");
         // swap to menu screen
+        let result = this.getNextQuestion();
+        if (result == null) {
+            console.log("question list null");
+        } else {
+            console.log("remaining states:", this.model.getRemainingStates());
+            console.log("state:", result["state"]);
+            console.log("type:", result["type"]);
+            console.log("answer:", result["answer"]);
+            console.log("incorrect:", result["incorrect"]);
+        }
     }
 
     toggleOption = (key: keyof Toggles) => {
@@ -36,10 +46,9 @@ export class QuestionToggleController {
     getNextQuestion(): {state: string, type: string, 
             answer: string, incorrect: string[]} | null {
         let questions: BankJSON = this.model.getQuestions();
-        if (questions == null) {
+        if (Object.keys(questions).length == 0 || this.model.getRemainingStates().length == 0) {
             return null;
         }
-
 
         let incorrectAnswers: string[] = [];
 
@@ -55,7 +64,7 @@ export class QuestionToggleController {
         out["type"] = randomType;
         out["answer"] = questions[randomType][randomState];
 
-        let tempStates: string[] = ["Alaska", "Alabama"]; // dummy until constant of 50 states array is defined
+        let tempStates: string[] = ["Alabama", "Alaska", "Arizona", "Arkansas", "California"]; // dummy until constant of 50 states array is defined
             // instead this should be a copy of that constant
         tempStates.splice(tempStates.indexOf(randomState), 1);
 
