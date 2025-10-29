@@ -14,7 +14,7 @@ export class QuestionBankModel {
 
     constructor() {
         this.currQuestionBank = {};
-        this.remainingStates = []; // should be an array of all states, preferrably copying some constant
+        this.remainingStates = ["Alabama", "Alaska", "Arizona", "Arkansas", "California"]; // should be an array of all states, preferrably copying some constant
 
         this.getAllQuestions();
     }
