@@ -24,11 +24,6 @@ export class QuestionToggleView {
         this.toggleButtonGroup.add(abbrevationToggle);
         this.toggleButtonGroup.add(saveButton);
 
-        // TODO: 
-        // make buttons have "feeling"
-        // get the actual UI nice looking
-        // ...test the actual UI, and well, everything else
-
         this.layer.add(this.toggleButtonGroup);
     }
 

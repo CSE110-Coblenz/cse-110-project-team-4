@@ -1,4 +1,5 @@
-import { allQuestions } from "../fullQuestions"
+import { allQuestions } from "../utils/fullQuestions"
+import { ALL_STATES } from "../utils/constants"
 
 interface TypeJSON {
     [key: string]: string
@@ -16,7 +17,7 @@ export class QuestionBankModel {
 
     constructor() {
         this.currQuestionBank = {};
-        this.remainingStates = ["Alabama", "Alaska", "Arizona", "Arkansas", "California"]; // should be an array of all states, preferrably copying some constant
+        this.remainingStates = [...ALL_STATES];
     }
 
     getRemainingStates(): string[] {
