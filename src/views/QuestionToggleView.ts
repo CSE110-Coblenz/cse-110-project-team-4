@@ -8,6 +8,9 @@ export class QuestionToggleView {
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
 
+    // backHandler should be a handler for the back button
+    // toggleHandler should be a handler for the toggle question buttons
+    // saveHandler should be a handler for the save options button
     constructor(backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void) {
         this.layer = new Konva.Layer({ visible: false });
         this.toggleButtonGroup = new Konva.Group();
@@ -27,7 +30,10 @@ export class QuestionToggleView {
         this.layer.add(this.toggleButtonGroup);
     }
 
+    // temporary, may be replaced depending on how UI components factories shape up
+    // for now, produces a button given a position, text, and a handler function
     private simpleLabelFactory(xPos: number, yPos: number, labelText: string, handler: () => void): Konva.Label {
+        // add a basic checkbox character for toggle buttons
         let newLabel: string = labelText;
         if (labelText.includes("Toggle")) {
             newLabel += ": \u2610";
@@ -61,6 +67,7 @@ export class QuestionToggleView {
         });
 
         out.on("click", (e) => {
+            // toggle the checkbox if the button text has one
             let txt: string = e.target.attrs.text;
             if (txt.includes("\u2611")) {
                 e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});

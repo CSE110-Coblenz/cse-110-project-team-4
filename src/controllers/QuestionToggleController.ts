@@ -5,7 +5,6 @@ export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
-    // potentially might use a screenSwitcher?
 
     constructor() {
         this.currentToggled = { 
@@ -17,9 +16,10 @@ export class QuestionToggleController {
         this.model = new QuestionBankModel();
     }
 
+    // handler function when a back button is clicked
+    // it should route back to the main, startup screen
     handleBack = () => {
-        console.log("!!!! we should try to go back screens here... for now here's a random question");
-        // swap to menu screen, for now for testing purposes i made this button just print a sample question
+        // for the time being, serve as a caller to simulate getting the next question form the question bank
         let result = this.getNextQuestion();
         if (result == null) {
             console.log("question list null or empty");
@@ -32,26 +32,34 @@ export class QuestionToggleController {
         }
     }
 
+    // handler function to update when a toggle button is clicked, updates options
     toggleOption = (key: keyof Toggles) => {
         this.currentToggled[key] = !this.currentToggled[key];
         console.log("curr options", this.currentToggled)
     }
 
+    // sends the model the selected options to save
     saveOptions = () => {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
         this.model.setQuestions(options);
         console.log(this.model.getQuestions());
     }
 
+    /** gets and returns info necessary for one question, removing that state from the pool
+     * return format:
+     * {question state name, question type, correct answer, [wrong ans, wrong ans, wrong ans]}
+     */
     getNextQuestion(): {state: string, type: string, 
             answer: string, incorrect: string[]} | null {
         let questions: BankJSON = this.model.getQuestions();
+        // check that questions have been initialized + at least 1 state remains
         if (Object.keys(questions).length == 0 || this.model.getRemainingStates().length == 0) {
             return null;
         }
 
         let incorrectAnswers: string[] = [];
 
+        // choose random state name + question type
         let out = {state: "", type: "", 
             answer: "", incorrect: incorrectAnswers}
         let randomIndex: number = Math.floor(Math.random() * Object.keys(questions).length);
@@ -68,6 +76,7 @@ export class QuestionToggleController {
             // instead this should be a copy of that constant
         tempStates.splice(tempStates.indexOf(randomState), 1);
 
+        // choose 3 of the 49 non-correct states to grab fake answers from
         incorrectAnswers = [];
         for (let i = 0; i < 3; i++) {
             let idx: number = Math.floor(Math.random() * tempStates.length);
@@ -83,5 +92,9 @@ export class QuestionToggleController {
 
     getView(): QuestionToggleView {
         return this.view;
+    }
+
+    getModel(): QuestionBankModel {
+        return this.model;
     }
 }

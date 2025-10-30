@@ -8,19 +8,23 @@
     "predev": "node ./scripts/ensure-install.cjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
     "konva": "^9.3.16",
     "topojson-client": "^3.1.0",
-    "us-atlas": "^3.0.1"
+    "us-atlas": "^3.0.1",
+    "npm-test": "^0.0.1"
   },
   "devDependencies": {
+    "canvas": "^3.2.0",
     "@types/d3-geo": "^3.1.0",
     "@types/geojson": "^7946.0.14",
     "@types/topojson-client": "^3.1.4",
     "typescript": "^5.5.4",
-    "vite": "^7.1.12"
+    "vite": "^7.1.12",
+    "vitest": "^4.0.5"
   }
 }
