@@ -33,6 +33,11 @@ export class QuestionToggleView {
     }
 
     private simpleLabelFactory(xPos: number, yPos: number, labelText: string, handler: () => void): Konva.Label {
+        let newLabel: string = labelText;
+        if (labelText.includes("Toggle")) {
+            newLabel += ": \u2610";
+        }
+
         const out = new Konva.Label({
             x: xPos,
             y: yPos,
@@ -40,17 +45,35 @@ export class QuestionToggleView {
         });
         out.add(
             new Konva.Tag({
-                fill: "gray"
+                fill: "lightblue",
+                border: "1px solid black"
             })
         );
         out.add(
             new Konva.Text({
-                text: labelText,
-                fill: 'black'
+                text: newLabel,
+                fill: 'black',
+                fontSize: 20,
+                padding: 4
             })
         );
 
-        out.on("click", handler);
+        out.on('mouseover', function (e) {
+            e.target.getStage()!.container().style.cursor = 'pointer';
+        });
+        out.on('mouseout', function (e) {
+            e.target.getStage()!.container().style.cursor = 'default';
+        });
+
+        out.on("click", (e) => {
+            let txt: string = e.target.attrs.text;
+            if (txt.includes("\u2611")) {
+                e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});
+            } else if (txt.includes("\u2610")) {
+                e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
+            }
+            handler();
+        });
         return out;
     }
 

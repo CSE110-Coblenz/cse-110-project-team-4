@@ -19,10 +19,10 @@ export class QuestionToggleController {
 
     handleBack = () => {
         console.log("!!!! we should try to go back screens here... for now here's a random question");
-        // swap to menu screen
+        // swap to menu screen, for now for testing purposes i made this button just print a sample question
         let result = this.getNextQuestion();
         if (result == null) {
-            console.log("question list null");
+            console.log("question list null or empty");
         } else {
             console.log("remaining states:", this.model.getRemainingStates());
             console.log("state:", result["state"]);
