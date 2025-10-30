@@ -15,7 +15,7 @@ export enum QuestionStatus {
     Unanswered = "Unanswered", 
     Correct    = "Correct",
     Incorrect  = "Incorrect"
-    // Skipped = "Skipped"  ...  If we want to give players the power to skip certain questions entirely, e.g. like a skip "power-up".
+    // Skipped = "Skipped"  ...  If we want to let players skip certain questions entirely, e.g. like a skip "power-up".
 }
 
 export enum QuestionType {
@@ -26,11 +26,11 @@ export enum QuestionType {
 
 // Domain object for a single question.
 export class Question {
-    public readonly state: USState;                // the US state this question is about.
-    public readonly which: QuestionType;           // Can be capital, flower, history. Check enum above.
-    status: QuestionStatus;                        // Current question state.
-    public readonly questionText: string;          // The question being asked.
-    correctAnswer: Answer;                         // The correct answer. 
+    readonly state: USState;                // the US state this question is about.
+    readonly which: QuestionType;           // Can be capital, flower, history. Check enum above.
+    status: QuestionStatus;                 // Current question state.
+    readonly questionText: string;          // The question being asked.
+    correctAnswer: Answer;                  // The correct answer. 
 
     constructor (
         state: USState, 
