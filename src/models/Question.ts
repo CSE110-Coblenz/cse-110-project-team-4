@@ -73,3 +73,30 @@ export type Answer = {                   // For flexibility, correctness is not 
     answerText: string;
     status: AnswerStatus;
 }
+
+/*
+export class QuestionBox {
+    question: Question;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color: string;
+
+    constructor(question: Question, 
+        x: number, 
+        y: number, 
+        width: number, 
+        height: number, 
+        color: string
+    ) {
+        this.question = question;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+}
+*/

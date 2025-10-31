@@ -12,7 +12,6 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
-import askQuestion from "./views/QuestionCardView";
 
 /**
  * seed: minimal demo data for all 50 states. Replace with persisted data late
@@ -38,4 +37,4 @@ map.mount("map-container");
 // Testing state color
 setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
 setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
-askQuestion();
+map.showQuestionCard();

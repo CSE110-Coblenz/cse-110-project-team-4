@@ -229,4 +229,9 @@ export default class MapViewSquares {
 
         this.layer.draw();
     }
+
+    public getStage(): Konva.Stage {
+        return this.stage;
+    }
+
 }
