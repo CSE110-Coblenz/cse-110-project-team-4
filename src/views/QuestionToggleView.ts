@@ -5,14 +5,26 @@ export interface Toggles {
 }
 
 export class QuestionToggleView {
+    private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
+    private id: string;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
-    constructor(backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void) {
-        this.layer = new Konva.Layer({ visible: false });
+    constructor(backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, id: string) {
+        this.id = id;
+        this.stage = new Konva.Stage({
+            container: id,
+            width: this.getDims()[0],
+            height: this.getDims()[1],
+            visible: false
+        })
+        // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
+        // code to deal with dynamic resizing...
+
+        this.layer = new Konva.Layer();
         this.toggleButtonGroup = new Konva.Group();
 
         const backLabel = this.simpleLabelFactory(100, 100, "Go Back", backHandler); // should do something w/ screenswitcher
@@ -28,6 +40,7 @@ export class QuestionToggleView {
         this.toggleButtonGroup.add(saveButton);
 
         this.layer.add(this.toggleButtonGroup);
+        this.stage.add(this.layer);
     }
 
     // temporary, may be replaced depending on how UI components factories shape up
@@ -80,16 +93,27 @@ export class QuestionToggleView {
     }
 
     show(): void {
-        this.layer.visible(true);
-        this.layer.draw();
+        this.stage.visible(true);
+        this.stage.draw();
     }
 
     hide(): void {
-        this.layer.visible(false);
-        this.layer.draw();
+        this.stage.visible(false);
+        this.stage.draw();
     }
 
     getLayer(): Konva.Layer {
         return this.layer;
+    }
+
+    getStage(): Konva.Stage {
+        return this.stage;
+    }
+
+    getDims(): number[] {
+        let containerEl = document.getElementById(this.id)!;
+        const width  = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
+        const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
+        return [width, height];
     }
 }

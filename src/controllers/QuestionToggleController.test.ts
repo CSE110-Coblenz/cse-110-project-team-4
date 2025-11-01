@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest";
 import { QuestionToggleController } from "./QuestionToggleController";
 
 describe("question toggle controller", () => {
-    let QTC = new QuestionToggleController();
+    const mockEl = document.createElement("div");
+    mockEl.id = "container";
+    document.body.appendChild(mockEl);
+    let QTC = new QuestionToggleController("container");
 
     it("should initialize a view and model", () => {
         expect(QTC.getView()).toBeDefined();

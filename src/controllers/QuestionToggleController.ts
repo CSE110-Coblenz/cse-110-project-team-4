@@ -1,18 +1,18 @@
-import { QuestionToggleView, Toggles } from "../views/QuestionToggle";
-import { QuestionBankModel, BankJSON } from "../models/Questions"
+import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
+import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
 
 export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
 
-    constructor() {
+    constructor(container: string) {
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
-        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions);
+        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions, container);
         this.model = new QuestionBankModel();
     }
 
@@ -42,6 +42,7 @@ export class QuestionToggleController {
     saveOptions = () => {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
         this.model.setQuestions(options);
+        this.model.resetRemainingStates();
         console.log(this.model.getQuestions());
     }
 

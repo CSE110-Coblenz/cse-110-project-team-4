@@ -25,6 +25,11 @@ export class QuestionBankModel {
         return this.remainingStates;
     }
 
+    // reset remaining states to full
+    resetRemainingStates(): void {
+        this.remainingStates = [...ALL_STATES];
+    }
+
     // remove the states at idx from the remaining states array
     removeRemainingStates(idx: number): string {
         if (idx < 0 || idx > this.remainingStates.length) {
