@@ -28,9 +28,9 @@ export enum QuestionType {
 export class Question {
     readonly state: USState;                // the US state this question is about.
     readonly which: QuestionType;           // Can be capital, flower, history. Check enum above.
-    status: QuestionStatus;                 // Current question state.
+    private status: QuestionStatus;                 // Current question state.
     readonly questionText: string;          // The question being asked.
-    correctAnswer: Answer;                  // The correct answer. 
+    private correctAnswer: Answer;                  // The correct answer. 
 
     constructor (
         state: USState, 
@@ -73,30 +73,3 @@ export type Answer = {                   // For flexibility, correctness is not 
     answerText: string;
     status: AnswerStatus;
 }
-
-/*
-export class QuestionBox {
-    question: Question;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    color: string;
-
-    constructor(question: Question, 
-        x: number, 
-        y: number, 
-        width: number, 
-        height: number, 
-        color: string
-    ) {
-        this.question = question;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.color = color;
-    }
-
-}
-*/

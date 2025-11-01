@@ -15,6 +15,7 @@
 
 import Konva from "konva";
 import { StateStatus, USState } from "../models/State";
+import { QuestionCard } from "../views/QuestionCardView";
 
 //testing squre, just for view test.
 const TILE = {
@@ -122,6 +123,7 @@ MapViewSquares：Default export class: the module's main export.
 export default class MapViewSquares {
     private stage: Konva.Stage; // Konva Stage (root)
     private layer: Konva.Layer; // single Layer (extensible)
+    private questionCard = new QuestionCard();
 
     /*
     * constructor：Canvas size
@@ -136,6 +138,7 @@ export default class MapViewSquares {
 
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
+        this.stage.add(this.questionCard.getLayer());
         this.drawAll(); //first render
     }
 

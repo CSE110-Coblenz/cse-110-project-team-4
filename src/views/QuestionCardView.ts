@@ -10,9 +10,46 @@
 
 import Konva from "konva";
 // import { MCQ, MCQStatus } from "../models/Question";
-import { Question } from "../models/Question"
+import { Answer, Question } from "../models/Questions"
 
-export function drawQuestionCard(question: Question): Konva.Layer {
+export class QuestionCard {
+  private layer: Konva.Layer;
+  private currentAnswers: Answer[] = [];
+
+  constructor() {
+    this.layer = drawQuestionCard();
+  }
+
+  getLayer(): Konva.Layer {
+    return this.layer;
+  }
+
+  hide() {
+    this.layer.hide();
+  }
+
+  show() {
+    this.layer.show();
+  }
+
+  setQuestion(question: Question, wrongAnswers: Answer[]) {
+    const answers = [question.getCorrectAnswer(), ...wrongAnswers]
+    const shuffled = answers.sort(() => Math.random() - 0.5);
+
+    const questionText = this.layer.findOne('.questionText') as Konva.Text;
+    questionText.text(question.questionText);
+
+    for (let i = 0; i < 4; i++) {
+      const answerText = this.layer.findOne(`.answerText${i}`) as Konva.Text;
+      answerText.text(shuffled[i].answerText);
+    }
+
+    this.layer.draw();
+    this.currentAnswers = shuffled;
+  }
+}
+
+export function drawQuestionCard(): Konva.Layer {
   const questionLayer = new Konva.Layer();
 
   // question card constants:
@@ -32,14 +69,15 @@ export function drawQuestionCard(question: Question): Konva.Layer {
 
   // answer card constants:
     // box size
-    const WIDTH_A = (WIDTH_Q / 2) - 30;
+    const SPACING = 30;
+    const WIDTH_A = (WIDTH_Q / 2) - SPACING;
     const HEIGHT_A = 70;
     const RAD_A = 10;
 
     // box positioning
     const RIGHT_X_A = (X_Q + (X_Q + WIDTH_Q)) / 2;  // Get center of the question box
     const LEFT_X_A = RIGHT_X_A - WIDTH_A;
-    const TOP_Y_A =  (Y_Q + HEIGHT_Q) - (2 * HEIGHT_A) - 30;
+    const TOP_Y_A =  (Y_Q + HEIGHT_Q) - (2 * HEIGHT_A) - SPACING;
     const BOTTOM_Y_A = TOP_Y_A + HEIGHT_A;
 
     // extra constants
@@ -59,6 +97,9 @@ export function drawQuestionCard(question: Question): Konva.Layer {
     stroke: black,
     strokeWidth: STROKEWIDTH,
     cornerRadius: RAD_Q,
+    shadowEnabled: true,
+    shadowBlur: 0,
+    shadowOpacity: 0.5,
   });
   questionLayer.add(rectQuestion);
 
@@ -66,16 +107,18 @@ export function drawQuestionCard(question: Question): Konva.Layer {
     x: X_T,
     y: Y_T,
     width: WIDTH_Q - 60,
-    text: 'What is the capital of California? (dummy text)',
+    text: 'This is the dummy text. Have you set a question?',
     fontSize: 25,
+    fontStyle: "bold",
     fill: black,
     align: 'center',
+    name: 'questionText'
   })
   textQuestion.offsetX(textQuestion.width() / 2);
   questionLayer.add(textQuestion);
 
   // draw all the answer cards
-  for (let i = 0; i <= 3; i++) {
+  for (let i = 0; i < 4; i++) {
     const rect = new Konva.Rect({
       x: xPositions[i % 2],
       y: yPositions[Math.floor(i / 2)],
@@ -91,27 +134,53 @@ export function drawQuestionCard(question: Question): Konva.Layer {
       x: xPositions[i % 2] + (WIDTH_A / 2),
       y: yPositions[Math.floor(i / 2)] + (HEIGHT_A / 3),
       width: WIDTH_A + 20,
-      text: `${i + 1}`,                 // DUMMY ANSWERS, TO BE REPLACED.
+      text: `${i + 1}`,                 // DUMMY ANSWERS. REPLACE.
       fontSize: FONTSIZE_A,
       fill: black,
       align: 'center',
-      name: `answer${i + 1}`
+      name: `answerText${i}`
     })
     text.offsetX(text.width() / 2);
 
+    // answer card group: rect + text
+    const centerX = xPositions[i % 2] + WIDTH_A / 2;
+    const centerY = yPositions[Math.floor(i / 2)] + HEIGHT_A / 2;
+
     const group = new Konva.Group({
-      name: `answerCard${i + 1}`
+      name: `answerCard${i}`,
+      // Move group's origin to its center
+      offsetX: WIDTH_A / 2,
+      offsetY: HEIGHT_A / 2,
+      // Set group's position to the visual center
+      x: centerX,
+      y: centerY
     })
 
+    // Move rect and text so they align relative to the group's center
+    rect.x(0);
+    rect.y(0);
+    text.x(WIDTH_A / 2);
+    text.y(-HEIGHT_A + WIDTH_A / 1.9); 
+
     group.add(rect, text);
+
+    // Mouse hovering
+    group.on('mouseenter', () => {
+      group.scale({ x: 1.05, y: 1.05 });
+      group.moveToTop();
+      questionLayer.draw();
+      questionLayer.getStage().container().style.cursor = 'pointer';
+    })
+
+    group.on('mouseleave', () => {
+      group.scale({ x: 1, y: 1 });
+      questionLayer.draw();
+      questionLayer.getStage().container().style.cursor = 'default';
+    })
+
     questionLayer.add(group);
   }
 
-  // add 
-  const answerCardBucket = new Konva.Group({
-    name: 'answerCardBucket'
-  })
-  // answerCardBucket.add(answerCard1, answerCard2, answerCard3, answerCard4);
 
   questionLayer.draw();
   return questionLayer;
