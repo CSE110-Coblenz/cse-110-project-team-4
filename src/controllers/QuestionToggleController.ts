@@ -1,5 +1,6 @@
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
 import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
+import { ALL_STATES } from "../utils/constants";
 
 export class QuestionToggleController {
     private model: QuestionBankModel;
@@ -73,8 +74,7 @@ export class QuestionToggleController {
         out["type"] = randomType;
         out["answer"] = questions[randomType][randomState];
 
-        let tempStates: string[] = ["Alabama", "Alaska", "Arizona", "Arkansas", "California"]; // dummy until constant of 50 states array is defined
-            // instead this should be a copy of that constant
+        let tempStates: string[] = [...ALL_STATES];
         tempStates.splice(tempStates.indexOf(randomState), 1);
 
         // choose 3 of the 49 non-correct states to grab fake answers from
