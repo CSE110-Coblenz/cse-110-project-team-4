@@ -32,7 +32,7 @@ export class QuestionBankModel {
 
     // remove the states at idx from the remaining states array
     removeRemainingStates(idx: number): string {
-        if (idx < 0 || idx > this.remainingStates.length) {
+        if (idx < 0 || idx >= this.remainingStates.length) {
             return "";
         }
         let out: string = this.remainingStates[idx];

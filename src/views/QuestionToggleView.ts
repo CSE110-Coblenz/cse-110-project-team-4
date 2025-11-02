@@ -60,7 +60,8 @@ export class QuestionToggleView {
         out.add(
             new Konva.Tag({
                 fill: "lightblue",
-                border: "1px solid black"
+                stroke: "black", 
+                strokeWidth: 1
             })
         );
         out.add(
@@ -81,8 +82,8 @@ export class QuestionToggleView {
 
         out.on("click", (e) => {
             // toggle the checkbox if the button text has one
-            let txt: string = e.target.attrs.text;
-            if (txt.includes("\u2611")) {
+            let txt: string = e.target?.attrs?.text ?? "";
+            if (txt.endsWith("\u2611")) {
                 e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});
             } else if (txt.includes("\u2610")) {
                 e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
