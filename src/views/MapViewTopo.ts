@@ -262,4 +262,9 @@ export default class MapViewTopo {
         this.updateProjection(); //Reproject the AlbersUSA image using the current container's width and height
         this.drawAll(false);
     }
+
+    public getStage(): Konva.Stage {
+        return this.stage;
+    }
+    
 }

@@ -29,6 +29,8 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
+import GameStatsLightbox from "./ui/game-stats-lightbox";
+
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -76,6 +78,25 @@ const map = new MapController(store, ui);
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-container");
 
+// Create and add GameStatsLightbox
+import Konva from "konva";
+
+const layer = new Konva.Layer();
+const lightbox = new GameStatsLightbox({
+  greyCount: 10,
+  greenCount: 5,
+  redCount: 2,
+});
+
+// Add lightbox to the layer
+layer.add(lightbox.getGroup());
+
+// Add layer to the main stage (map)
+const stage = map.getStage();
+if (stage) {
+  stage.add(layer);
+  layer.draw();
+}
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
