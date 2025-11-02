@@ -9,7 +9,6 @@
 
 
 import Konva from "konva";
-// import { MCQ, MCQStatus } from "../models/Question";
 import { Answer, Question } from "../models/Questions"
 
 export class QuestionCard {
@@ -113,54 +112,43 @@ export function drawQuestionCard(): Konva.Layer {
     fill: black,
     align: 'center',
     name: 'questionText'
-  })
+  });
   textQuestion.offsetX(textQuestion.width() / 2);
   questionLayer.add(textQuestion);
 
   // draw all the answer cards
   for (let i = 0; i < 4; i++) {
+    // answer card group: rect + text
+    const centerX = xPositions[i % 2] + WIDTH_A / 2;
+    const centerY = yPositions[Math.floor(i / 2)] + HEIGHT_A / 2;
+    const group = new Konva.Group({
+      name: `answerCard${i}`,
+      x: centerX,
+      y: centerY
+    });
+
+    // rect positioned relative to group center
     const rect = new Konva.Rect({
-      x: xPositions[i % 2],
-      y: yPositions[Math.floor(i / 2)],
+      x:-WIDTH_A / 2,
+      y: -HEIGHT_A / 2,
       width: WIDTH_A,
       height: HEIGHT_A,
       fill: COLORS_A[i],
       stroke: black,
       strokeWidth: STROKEWIDTH,
-      cornerRadius: RAD_A
-    })
+      cornerRadius: RAD_A,
+    });
 
     const text = new Konva.Text({
-      x: xPositions[i % 2] + (WIDTH_A / 2),
-      y: yPositions[Math.floor(i / 2)] + (HEIGHT_A / 3),
-      width: WIDTH_A + 20,
-      text: `${i + 1}`,                 // DUMMY ANSWERS. REPLACE.
+      x: -WIDTH_A / 2,
+      y: -HEIGHT_A / 2 + HEIGHT_A / 3,
+      width: WIDTH_A,
+      text: `${i + 1}`,  // placeholder
       fontSize: FONTSIZE_A,
       fill: black,
       align: 'center',
-      name: `answerText${i}`
-    })
-    text.offsetX(text.width() / 2);
-
-    // answer card group: rect + text
-    const centerX = xPositions[i % 2] + WIDTH_A / 2;
-    const centerY = yPositions[Math.floor(i / 2)] + HEIGHT_A / 2;
-
-    const group = new Konva.Group({
-      name: `answerCard${i}`,
-      // Move group's origin to its center
-      offsetX: WIDTH_A / 2,
-      offsetY: HEIGHT_A / 2,
-      // Set group's position to the visual center
-      x: centerX,
-      y: centerY
-    })
-
-    // Move rect and text so they align relative to the group's center
-    rect.x(0);
-    rect.y(0);
-    text.x(WIDTH_A / 2);
-    text.y(-HEIGHT_A + WIDTH_A / 1.9); 
+      name: `answerText${i}`,
+    });
 
     group.add(rect, text);
 
@@ -170,13 +158,13 @@ export function drawQuestionCard(): Konva.Layer {
       group.moveToTop();
       questionLayer.draw();
       questionLayer.getStage().container().style.cursor = 'pointer';
-    })
+    });
 
     group.on('mouseleave', () => {
       group.scale({ x: 1, y: 1 });
       questionLayer.draw();
       questionLayer.getStage().container().style.cursor = 'default';
-    })
+    });
 
     questionLayer.add(group);
   }
