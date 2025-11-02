@@ -39,13 +39,14 @@ const RIGHT_X_A = (X_Q + (X_Q + WIDTH_Q)) / 2;  // Get center of the question bo
 const LEFT_X_A = RIGHT_X_A - WIDTH_A;
 const TOP_Y_A = (Y_Q + HEIGHT_Q) - (2 * HEIGHT_A) - VERTICAL_SPACING;
 const BOTTOM_Y_A = TOP_Y_A + HEIGHT_A;
-
-// extra constants
 const xPositions = [LEFT_X_A, RIGHT_X_A];
 const yPositions = [TOP_Y_A, BOTTOM_Y_A];
+
+// colors and fontsize
+const COLOR_Q = '#f5f0e0d5';
 const COLORS_A = ['#ff6767ff', '#6a6cffff', '#62ff6aff', '#fdf66aff'];
 const black = '#000000ff';
-const CONFIRM_TRUE = '#ebffb6ff';
+const CONFIRM_TRUE = '#ffffffff';
 const CONFIRM_FALSE = '#585858ff';
 const FONTSIZE_A = 25;
 
@@ -115,7 +116,7 @@ export class QuestionCard {
       y: Y_Q,
       width: WIDTH_Q,
       height: HEIGHT_Q,
-      fill: '#f5f0e0d5',
+      fill: COLOR_Q,
       stroke: black,
       strokeWidth: STROKEWIDTH,
       cornerRadius: RAD_Q,
@@ -187,14 +188,14 @@ export class QuestionCard {
       layer.getStage().container().style.cursor = 'default';
     });
 
-    // update confirm button functionality on click
+    // update selected answer and confirm button functionality on click
     group.on('click', () => {
       this.selectedAnswerIndex = i;
 
       group.scale({ x: 1, y: 1 });
 
       const confirmCircle = layer.findOne('.confirm-circle') as Konva.Circle;
-      confirmCircle.fill('#ffffffff');
+      confirmCircle.fill(CONFIRM_TRUE);
       layer.draw();
     });
 
