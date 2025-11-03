@@ -13,6 +13,7 @@ describe("question toggle controller", () => {
         expect(QTC.getModel()).toBeDefined();
     })
 
+    // this should eventually be moved to a question bank....
     it("should be able to properly get questions", () => {
         let selectedStates: string[] = [];
         let opts = ["capitalQuestions", "abbreviationQuestions"];

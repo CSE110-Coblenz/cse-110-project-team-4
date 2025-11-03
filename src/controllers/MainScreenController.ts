@@ -19,7 +19,8 @@ export class MainScreenController {
         if (inputEl) {
             let name = (<HTMLInputElement>inputEl).value;
             console.log("we should save this name:", name);
-            // save value to quiz model
+            // validate the user's name
+            // call an init function on the quiz manager, with the user's name
         }
         this.switcher.switchToScreen(Screens.Map);
     }

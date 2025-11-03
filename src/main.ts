@@ -33,7 +33,6 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
-import { QuestionToggleController } from "./controllers/QuestionToggleController";
 import { GameStatsController } from "./controllers/GameStatsController";
 import './styles/app.css';
 import { TimerModel } from "./models/TimerModel";
@@ -41,6 +40,7 @@ import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
 import { MainScreenController } from "./controllers/MainScreenController";
+import Konva from "konva";
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -56,39 +56,6 @@ import { MainScreenController } from "./controllers/MainScreenController";
 /* TEST-seed: minimal demo data for all 50 states. 
  * Replace with persisted data if we finish the data part. */
 
-class Application extends ScreenSwitcher {
-    private ui: UIController;
-    private map: MapController;
-    private menu: MainScreenController;
-
-
-    constructor(store: StateStore) {
-        super();
-        this.map = new MapController(store, { goToQuestionsFor: (_s: USState) => {} });
-        this.ui = new UIController(this.map);
-        this.menu = new MainScreenController("welcome-root", this);
-    }
-
-    init() {
-        this.map.mount("map-container");
-        this.map.getView()?.hide();
-        this.menu.getView().show();
-    }
-
-    public switchToScreen(screen: Screens): void {
-        // hide map
-        this.map.getView()!.hide();
-        this.menu.getView().hide();
-
-        switch (screen) {
-            case Screens.Map:
-                this.map.getView()!.show();
-            default: 
-        }
-    }
-}
-
-
 const seed: USState[] = Object.keys({
 	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
 	MT:1, WY:1, ND:1, SD:1, NE:1, KS:1, OK:1, TX:1,
@@ -102,7 +69,7 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-
+const container = "map-container";
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -112,13 +79,75 @@ const store = new StateStore(seed);
 //		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
 //		  const minigame = new MinigameController(cardState);
 
-const map = new MapController(
-	store,
-	{ goToQuestionsFor: (_s: USState) => {} } // temp no-op bus
-);
+class Application extends ScreenSwitcher {
+    private ui: UIController;
+    private map: MapController;
+    private menu: MainScreenController;
+
+    constructor(store: StateStore) {
+        super();
+        this.map = new MapController(
+            store,
+            { goToQuestionsFor: (_s: USState) => {} }
+        );
+        this.ui = new UIController(this.map);
+        this.menu = new MainScreenController("welcome-root", this);
+        this.stats = new GameStatsController(this.map);
+    }
+
+    init() {
+        this.map.mount("map-root");
+        this.map.getView()?.hide();
+        this.menu.getView().show();
+        let stageForUI = this.map.getStage();
+        if (stageForUI) {
+            this.ui.init(stageForUI);   // build overlay layer on top of the map
+            this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
+            const timerView = new TimerViewCorner(stageForUI);
+            const timerCtrl = new TimerController(new TimerModel(300), timerView);
+            timerCtrl.start();
+        }
+        setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
+        setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
+
+        window.addEventListener("keydown", (ev) => {
+            if (ev.key.toLowerCase() === "f") {
+                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
+            }
+            if (ev.key.toLowerCase() === "r") {
+                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
+            }
+        });
+        this.stats;
+    }
+
+    public switchToScreen(screen: Screens): void {
+        // hide map
+        this.map.getView()!.hide();
+        this.menu.getView().hide();
+
+        switch (screen) {
+            case Screens.Map:
+                this.map.getView()!.show();
+                break;
+            case Screens.MainMenu:
+                this.menu.getView().show();
+                break;
+            default: 
+        }
+    }
+}
+
+
+//=================    3) Compose Controllers
+//	  Put: business controllers that connect model and view (no rendering details).
+//	  Where teammates should add later:
+//		- Quiz flow: `import { QuizManager } from "./controllers/QuizManager";`
+//		  const quiz = new QuizManager(questionBank, leaderBoard);
+//		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
+//		  const minigame = new MinigameController(cardState);
 const app = new Application(store);
 app.init();
-
 
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
