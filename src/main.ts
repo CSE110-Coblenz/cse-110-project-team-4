@@ -39,6 +39,9 @@ import './styles/app.css';
 import { TimerModel } from "./models/TimerModel";
 import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
+import { ScreenSwitcher, Screens } from "./utils/types";
+import { MainScreenController } from "./controllers/MainScreenController";
+
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -52,6 +55,40 @@ import { TimerController } from "./controllers/TimerController";
 
 /* TEST-seed: minimal demo data for all 50 states. 
  * Replace with persisted data if we finish the data part. */
+
+class Application extends ScreenSwitcher {
+    private ui: UIController;
+    private map: MapController;
+    private menu: MainScreenController;
+
+
+    constructor(store: StateStore) {
+        super();
+        this.map = new MapController(store, { goToQuestionsFor: (_s: USState) => {} });
+        this.ui = new UIController(this.map);
+        this.menu = new MainScreenController("welcome-root", this);
+    }
+
+    init() {
+        this.map.mount("map-container");
+        this.map.getView()?.hide();
+        this.menu.getView().show();
+    }
+
+    public switchToScreen(screen: Screens): void {
+        // hide map
+        this.map.getView()!.hide();
+        this.menu.getView().hide();
+
+        switch (screen) {
+            case Screens.Map:
+                this.map.getView()!.show();
+            default: 
+        }
+    }
+}
+
+
 const seed: USState[] = Object.keys({
 	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
 	MT:1, WY:1, ND:1, SD:1, NE:1, KS:1, OK:1, TX:1,
@@ -79,6 +116,8 @@ const map = new MapController(
 	store,
 	{ goToQuestionsFor: (_s: USState) => {} } // temp no-op bus
 );
+const app = new Application(store);
+app.init();
 
 
 //=================    4) Mount Views

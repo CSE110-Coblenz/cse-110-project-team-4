@@ -1,26 +1,35 @@
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
 import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
 import { ALL_STATES } from "../utils/constants";
+import Konva from "konva";
 
 export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
 
-    constructor(container: string) {
+    constructor(stage: Konva.Stage) {
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
-        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions, container);
+        this.view = new QuestionToggleView(this.tempHandler, this.handleBack, this.toggleOption, this.saveOptions, stage);
+        // eventually, once we make a quizmanager or whatever, we should pass in the model created from there instead of initializing it here
         this.model = new QuestionBankModel();
     }
 
-    // handler function when a back button is clicked
-    // it should route back to the main, startup screen
+    // handler function when a back button is clicked to hide popup
     handleBack = () => {
-        // for the time being, serve as a caller to simulate getting the next question form the question bank
+        let inputEl = document.getElementById("nameInput");
+        if (inputEl) {
+            inputEl.style.display = "block";
+        }
+        this.view.hide();
+    }
+
+    // temporary function handler to demonstrate question getting
+    tempHandler = () => {
         let result = this.getNextQuestion();
         if (result == null) {
             console.log("question list null or empty");

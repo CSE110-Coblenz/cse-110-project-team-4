@@ -5,26 +5,19 @@ export interface Toggles {
 }
 
 export class QuestionToggleView {
-    private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
-    private id: string;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
-    constructor(backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, id: string) {
-        this.id = id;
-        this.stage = new Konva.Stage({
-            container: id,
-            width: this.getDims()[0],
-            height: this.getDims()[1],
-            visible: false
-        })
+    constructor(temphandler: () => void, backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, stage: Konva.Stage) {
         // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
         // code to deal with dynamic resizing...
 
-        this.layer = new Konva.Layer();
+        this.layer = new Konva.Layer({
+            visible: false
+        });
         this.toggleButtonGroup = new Konva.Group();
 
         const backLabel = this.simpleLabelFactory(100, 100, "Go Back", backHandler); // should do something w/ screenswitcher
@@ -32,15 +25,28 @@ export class QuestionToggleView {
         const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
         const abbreviationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
         const saveButton = this.simpleLabelFactory(100, 500, "Save", () => saveHandler());
+        const tempLabel = this.simpleLabelFactory(100, 600, "Get Question", temphandler);
 
+        const rect = new Konva.Rect({
+            x: 50,
+            y: 50,
+            width: this.getDims()[0] * 0.8,
+            height: this.getDims()[1] * 0.8,
+            fill: 'gray',
+            stroke: 'black',
+            strokeWidth: 1
+        })
+
+        this.toggleButtonGroup.add(rect);
         this.toggleButtonGroup.add(backLabel);
         this.toggleButtonGroup.add(capitalToggle);
         this.toggleButtonGroup.add(flowersToggle);
         this.toggleButtonGroup.add(abbreviationToggle);
         this.toggleButtonGroup.add(saveButton);
+        this.toggleButtonGroup.add(tempLabel);
 
         this.layer.add(this.toggleButtonGroup);
-        this.stage.add(this.layer);
+        stage.add(this.layer);
     }
 
     // temporary, may be replaced depending on how UI components factories shape up
@@ -94,26 +100,23 @@ export class QuestionToggleView {
     }
 
     show(): void {
-        this.stage.visible(true);
-        this.stage.draw();
+        this.layer.visible(true);
+        this.layer.draw();
     }
 
     hide(): void {
-        this.stage.visible(false);
-        this.stage.draw();
+        this.layer.visible(false);
+        this.layer.draw();
     }
 
     getLayer(): Konva.Layer {
         return this.layer;
     }
 
-    getStage(): Konva.Stage {
-        return this.stage;
-    }
-
+    // once again temp until we have it in utils
     getDims(): number[] {
-        let containerEl = document.getElementById(this.id)!;
-        const width  = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
+        let containerEl = document.getElementById("main-menu-container")!;
+        const width = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
         const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
         return [width, height];
     }

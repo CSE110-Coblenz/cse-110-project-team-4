@@ -108,5 +108,7 @@ export class MapController {
         return this.selectedState;
     }    
     
+    public getView() {
+        return this.view;
+    }
 }
-

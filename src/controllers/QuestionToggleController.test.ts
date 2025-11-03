@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { QuestionToggleController } from "./QuestionToggleController";
+import Konva from "konva";
 
 describe("question toggle controller", () => {
     const mockEl = document.createElement("div");
-    mockEl.id = "container";
+    mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
-    let QTC = new QuestionToggleController("container");
+    let QTC = new QuestionToggleController(new Konva.Stage({container: mockEl.id}));
 
     it("should initialize a view and model", () => {
         expect(QTC.getView()).toBeDefined();
