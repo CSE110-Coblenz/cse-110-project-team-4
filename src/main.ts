@@ -25,10 +25,12 @@ BOOT ORDER — Application Startup Sequence
 //		- State/Map: StateStore, MapController, UIController
 //		- Quiz: (later) QuizManager, QuestionBank
 //		- Score: (later) LeaderBoardService
+import Konva from "konva";
 import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
+import { QuestionToggleController } from "./controllers/QuestionToggleController";
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -56,7 +58,7 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-
+const container = "map-container";
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -67,6 +69,7 @@ const store = new StateStore(seed);
 //		  const minigame = new MinigameController(cardState);
 const ui = new UIController();
 const map = new MapController(store, ui);
+const qToggle = new QuestionToggleController("map-container");
 
 
 //=================    4) Mount Views
@@ -75,6 +78,7 @@ const map = new MapController(store, ui);
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-container");
+qToggle.getView().show();
 
 
 //=================    5) Seed / Demo Hooks (removable)
