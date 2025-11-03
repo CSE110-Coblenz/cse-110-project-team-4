@@ -25,12 +25,13 @@ BOOT ORDER — Application Startup Sequence
 //		- State/Map: StateStore, MapController, UIController
 //		- Quiz: (later) QuizManager, QuestionBank
 //		- Score: (later) LeaderBoardService
+import Konva from "konva";
 import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import GameStatsLightbox from "./ui/game-stats-lightbox";
-
+import { QuestionToggleController } from "./controllers/QuestionToggleController";
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -43,7 +44,7 @@ import GameStatsLightbox from "./ui/game-stats-lightbox";
 //		- Card matching (minigame): `import { CardStateManager } from "./models/CardStateManager";`
 //		  const cardState = new CardStateManager();
 
-/* seed: minimal demo data for all 50 states. 
+/* TEST-seed: minimal demo data for all 50 states. 
  * Replace with persisted data if we finish the data part. */
 const seed: USState[] = Object.keys({
 	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
@@ -58,7 +59,7 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-
+const container = "map-container";
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -69,6 +70,7 @@ const store = new StateStore(seed);
 //		  const minigame = new MinigameController(cardState);
 const ui = new UIController();
 const map = new MapController(store, ui);
+const qToggle = new QuestionToggleController("map-container");
 
 
 //=================    4) Mount Views
@@ -77,6 +79,7 @@ const map = new MapController(store, ui);
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-container");
+qToggle.getView().show();
 
 // Create and add GameStatsLightbox
 import Konva from "konva";
