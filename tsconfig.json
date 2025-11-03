@@ -12,5 +12,5 @@
     "baseUrl": ".",
     "paths": { "*": ["./*"] }
   },
-  "include": ["src"]
+  "include": ["src", "index.html"]
 }

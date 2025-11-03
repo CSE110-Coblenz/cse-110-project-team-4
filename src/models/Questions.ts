@@ -8,7 +8,16 @@
       Type: 
 */
 
-import { USState } from "./State";
+export enum AnswerStatus {
+    NotSelected = "NotSelected",
+    Selected    = "Selected"
+}
+
+// Domain object for a single answer.
+export type Answer = {                   // For flexibility, correctness is not stored in the Answer object itself.
+    answerText: string;
+    status: AnswerStatus;
+}
 
 // Exposed so controllers/views can import and use them.
 export enum QuestionStatus {
@@ -19,57 +28,56 @@ export enum QuestionStatus {
 }
 
 export enum QuestionType {
-    Capital = "Capital", 
-    Flower  = "Flower",
-    History = "History"
+    Capital = "capital", 
+    Flower  = "flower",
+    Abbreviation = "abbreviation"
 }
 
 // Domain object for a single question.
 export class Question {
-    readonly state: USState;                // the US state this question is about.
-    readonly which: QuestionType;           // Can be capital, flower, history. Check enum above.
-    private status: QuestionStatus;                 // Current question state.
-    readonly questionText: string;          // The question being asked.
-    private correctAnswer: Answer;                  // The correct answer. 
+    public readonly state: string;                // the US state this question is about.
+    public readonly type: QuestionType;            // Can be capital, flower, history. Check enum above.
+    public readonly questionText: string;          // The question being asked.
+
+    private status: QuestionStatus;                // Current question state.
+    private correctAnswer: Answer;                 // The correct answer. 
+    private incorrectAnswers: Answer[] = [];
 
     constructor (
-        state: USState, 
-        which: QuestionType, 
+        state: string, 
+        type: QuestionType, 
         questionText: string, 
         correctAnswer: Answer,                      
     ) {         
         this.state = state;                                    
-        this.which = which;  
-        this.status = QuestionStatus.Unanswered;
+        this.type = type;  
         this.questionText = questionText;
+        this.status = QuestionStatus.Unanswered;
         this.correctAnswer = correctAnswer;                     
     }
 
-    getUSState(): USState {
-        return this.state;
-    }
-
     getWhichType(): QuestionType {
-        return this.which;
+        return this.type;
     }
 
     getStatus(): QuestionStatus {
         return this.status;
     }
 
-    getCorrectAnswer(): Answer {
-        return this.correctAnswer;
+    getShuffledAnswers(): Answer[] {
+        const answers = [this.correctAnswer, ...this.incorrectAnswers];  
+        return answers.sort(() => Math.random() - 0.5);
     }
-}
 
+    setIncorrectAnswers(incorrect: Answer[]) {
+        this.incorrectAnswers = incorrect;
+    }
 
-export enum AnswerStatus {
-    NotSelected = "NotSelected",
-    Selected    = "Selected"
-}
+    setStatus(newStatus: QuestionStatus): void {
+        this.status = newStatus;
+    }
 
-// Domain object for a single answer.
-export type Answer = {                   // For flexibility, correctness is not stored in the Answer object itself.
-    answerText: string;
-    status: AnswerStatus;
+    isCorrect(givenAnswer: Answer): boolean {
+        return givenAnswer.answerText === this.correctAnswer.answerText;
+    }
 }

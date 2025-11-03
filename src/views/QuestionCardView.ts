@@ -16,11 +16,11 @@ import { Answer, Question } from "../models/Questions"
 const WIDTH_Q = 400;
 const HEIGHT_Q = 420;
 const RAD_Q = 10;
-const STROKEWIDTH = 4;
+const STROKEWIDTH = 3;
 
 // box positioning
-const X_Q = 550;
-const Y_Q = 200;
+const X_Q = 250;
+const Y_Q = 50;
 
 // text params
 const X_T = X_Q + (WIDTH_Q / 2);
@@ -71,9 +71,8 @@ export class QuestionCard {
     this.layer.show();
   }
 
-  setQuestion(question: Question, wrongAnswers: Answer[]) {
-    const answers = [question.getCorrectAnswer(), ...wrongAnswers]
-    const shuffled = answers.sort(() => Math.random() - 0.5);
+  setQuestion(question: Question) {
+    const answers = question.getShuffledAnswers();
 
     // update the question
     const questionText = this.layer.findOne(`.question-text`) as Konva.Text;
@@ -82,12 +81,13 @@ export class QuestionCard {
     // update answers
     for (let i = 0; i < 4; i++) {
       const answerText = this.layer.findOne(`.answer-text-${i}`) as Konva.Text;
-      answerText.text(shuffled[i].answerText);
+      answerText.text(answers[i].answerText);
     }
 
     // redraw and update parameters
     this.layer.draw();
-    this.currentAnswers = shuffled;
+    this.currentAnswers = answers;
+
   }
 
   private drawQuestionCard(): Konva.Layer {
