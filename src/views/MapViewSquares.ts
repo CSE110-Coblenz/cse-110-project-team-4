@@ -122,6 +122,7 @@ MapViewSquares：Default export class: the module's main export.
 export default class MapViewSquares {
     private stage: Konva.Stage; // Konva Stage (root)
     private layer: Konva.Layer; // single Layer (extensible)
+    
 
     /*
     * constructor：Canvas size
@@ -137,6 +138,10 @@ export default class MapViewSquares {
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
         this.drawAll(); //first render
+    }
+
+    public getStage(): Konva.Stage {
+        return this.stage;
     }
 
     /*

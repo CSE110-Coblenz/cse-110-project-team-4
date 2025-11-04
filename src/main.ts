@@ -12,6 +12,10 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
+import { TimerModel } from "./models/TimerModel";
+import TimerViewCorner from "./views/TimerDisplayView";
+import { TimerController } from "./controllers/TimerController";    
+import MapViewSquares from "./views/MapViewSquares";
 
 /**
  * seed: minimal demo data for all 50 states. Replace with persisted data late
@@ -37,3 +41,15 @@ map.mount("map-container");
 // Testing state color
 setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
 setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
+
+
+
+// To run timer on page load
+const timerModel = new TimerModel();
+const mapView = new MapViewSquares({ containerId: "map-container", states: seed });
+const timerView = new TimerViewCorner(mapView.getStage());
+const timerController = new TimerController(timerModel, timerView);
+
+if (!timerModel.isRunning) timerController.start();
+
+
