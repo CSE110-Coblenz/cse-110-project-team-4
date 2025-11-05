@@ -11,7 +11,7 @@ export class TimerModel {
     this.timerId = null;
     this.endAt = 0;
   }
-
+  
   public get isRunning(): boolean { // Checks if timerId is active, otherwise it is null
     return this.timerId !== null;
   }

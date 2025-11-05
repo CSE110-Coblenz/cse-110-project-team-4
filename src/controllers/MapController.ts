@@ -22,6 +22,11 @@ import Konva from "konva";
 export class MapController {
     // Hold view instance after mount to allow redraws.
     private view?: MapViewTopo;
+    private mapLayer?: Konva.Layer;          // was: Konva.Layer
+
+    public setUIBus(bus: { goToQuestionsFor: (s: USState) => void }) {
+        this.uiBus = bus; // allow late wiring
+    }
 
     constructor(
         private store: StateStore,
@@ -34,12 +39,13 @@ export class MapController {
     */
     public mount(containerId: string) {
         // First render the View with data and click handler.
+        console.log("Mounting MapController to:", containerId);
         this.view = new MapViewTopo({
             containerId,
             states: this.store.getAll(),
 
             onStateClick: (s) => {
-                // Demo: 
+                // Demo:================================== 
                 // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
                 const next =
                     s.status === StateStatus.NotStarted ? StateStatus.Partial :
@@ -48,8 +54,11 @@ export class MapController {
                 // update the store; subscribers (e.g., the View) will redraw with new fills.
                 this.store.setStatus(s.code, next);
 
-                // Delegate navigation to UI; controller does not touch router/DOM.
-                this.uiBus.goToQuestionsFor(s); //UIController.ts
+                if (this.uiBus && this.uiBus.goToQuestionsFor) {
+                    this.uiBus.goToQuestionsFor(s);
+                } else {
+                    console.error("UI Bus not properly initialized!");
+                }
 
                 // Emit a global CustomEvent
                 window.dispatchEvent(new CustomEvent("usmap:stateClick", {
@@ -58,10 +67,23 @@ export class MapController {
             }
         });
         
+        this.mapLayer = this.view?.getLayer?.();
+
         // Subscribe to Model: whenever data changes, redraw the View (one-way data flow).
         this.store.subscribe(() => {
             this.view?.redraw(this.store.getAll());
         });
+    }
+
+    public setInteractive(enabled: boolean) {
+        const layer = this.mapLayer ?? this.view?.getLayer?.();
+        if (layer) {
+            layer.listening(enabled);           // only map layer
+            layer.opacity(enabled ? 1 : 0.9);
+        } else {
+            const st = this.view?.getStage();   // fallback: freeze whole stage
+            if (st) st.listening(enabled);
+        }
     }
 
     public getStage(): Konva.Stage | undefined {
@@ -69,3 +91,4 @@ export class MapController {
     }
     
 }
+

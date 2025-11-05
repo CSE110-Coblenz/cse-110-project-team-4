@@ -1,4 +1,5 @@
-// Move to src/views/GameStatsLightbox.ts
+// src/views/GameStatsLightbox.ts
+
 import Konva from "konva";
 import {MAX_ERRORS} from "../utils/constants";
 
@@ -74,7 +75,7 @@ export default class GameStatsLightbox {
   public updateCounts(grey: number, green: number, red: number): void {
     this.textGrey.text(`Grey States: ${grey}`);
     this.textGreen.text(`Green States: ${green}`);
-    this.textRed.text(`Red States: ${red}/3`);
+    this.textRed.text(`Red States: ${red}/${MAX_ERRORS} `);
 
     // safely trigger redraw if the group is in a layer
     const layer = this.group.getLayer();

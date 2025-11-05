@@ -25,13 +25,16 @@ BOOT ORDER — Application Startup Sequence
 //		- State/Map: StateStore, MapController, UIController
 //		- Quiz: (later) QuizManager, QuestionBank
 //		- Score: (later) LeaderBoardService
-import Konva from "konva";
 import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import { QuestionToggleController } from "./controllers/QuestionToggleController";
-import GameStatsController from "./controllers/GameStatsController";
+import { GameStatsController } from "./controllers/GameStatsController";
+import './styles/app.css';
+import { TimerModel } from "./models/TimerModel";
+import TimerViewCorner from "./views/TimerDisplayView";
+import { TimerController } from "./controllers/TimerController";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -58,7 +61,7 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-const container = "map-container";
+
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -67,25 +70,62 @@ const container = "map-container";
 //		  const quiz = new QuizManager(questionBank, leaderBoard);
 //		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
 //		  const minigame = new MinigameController(cardState);
-const ui = new UIController();
-const map = new MapController(store, ui);
-const qToggle = new QuestionToggleController("map-container");
+
+const map = new MapController(
+	store,
+	{ goToQuestionsFor: (_s: USState) => {} } // temp no-op bus
+);
 
 
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
+//  Why: keep main.ts focused on composition/boot order (SRP).
+//
+//  Where teammates should add later (IDs are already reserved in index.html):
+//  - Map view (center canvas):
+//      mapView.mount(ensureEl("map-root"))
+//  - Questions panel (center overlay Q&A box):
+//      questionsView.mount(ensureEl("qa-box"))
+//  - Leaderboard view (separate view/page):
+//      leaderboardView.mount(ensureEl("leaderboard-root"))
+//  - Welcome/Home view (separate view/page):
+//      welcomeView.mount(ensureEl("welcome-root"))
+//  - Settings view (separate view/page):
+//      settingsView.mount(ensureEl("settings-root"))
+//  - HUD (bottom-left: score/progress/timer):
+//      hudView.mount(ensureEl("hud"))
+//  - Toolbar (top-left: back/home/help/settings buttons):
+//      toolbarView.mount(ensureEl("toolbar"))
+//
+//  Functional overlay layers (singletons; mount render roots or controllers):
+//  - Modal/Drawer portal:
+//      modalManager.mount(ensureEl("portal-root"))
+//  - Toast/Notifications:
+//      toastService.mount(ensureEl("toast-root"))
+//  - Full-screen overlay (loading/route guard):
+//      overlayService.mount(ensureEl("overlay-root"))
+
 //	  Where teammates should add later:
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
-map.mount("map-container");
-qToggle.getView().show();
+map.mount("map-root");
+//map.mount("qa-box");
 
-// GameStatslightbox
-const stage = map.getStage();
-if (stage) {
-	const stats = new GameStatsController(store, stage);
-	stats.mount();
+const ui = new UIController(map);
+const stageForUI = map.getStage();
+if (stageForUI) {
+	ui.init(stageForUI);   // build overlay layer on top of the map
+	map.setUIBus(ui);      // hand real UI bus back to MapController
+	const timerView = new TimerViewCorner(stageForUI);
+	const timerCtrl = new TimerController(new TimerModel(300), timerView);
+	timerCtrl.start();
+
 }
+const qToggle = new QuestionToggleController("tool-bar");
+qToggle.getView().show?.();
+
+// GameStats lightbox (unchanged)
+new GameStatsController(map);
 
 
 //=================    5) Seed / Demo Hooks (removable)
