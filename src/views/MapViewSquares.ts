@@ -159,6 +159,10 @@ export default class MapViewSquares {
         this.statsLayer.draw();
     }
 
+    public getStage(): Konva.Stage {
+        return this.stage;
+    }
+
     /*
     * Redraw entry: re-render with new states; View keeps no business state.
     */
