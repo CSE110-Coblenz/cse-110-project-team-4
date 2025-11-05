@@ -81,25 +81,6 @@ const qToggle = new QuestionToggleController("map-container");
 map.mount("map-container");
 qToggle.getView().show();
 
-// Create and add GameStatsLightbox
-import Konva from "konva";
-
-const layer = new Konva.Layer();
-const lightbox = new GameStatsLightbox({
-  greyCount: 10,
-  greenCount: 5,
-  redCount: 2,
-});
-
-// Add lightbox to the layer
-layer.add(lightbox.getGroup());
-
-// Add layer to the main stage (map)
-const stage = map.getStage();
-if (stage) {
-  stage.add(layer);
-  layer.draw();
-}
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
