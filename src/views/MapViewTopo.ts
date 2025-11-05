@@ -468,4 +468,7 @@ export default class MapViewTopo {
         return this.stage;
     }
     
+    public getLayer(): Konva.Layer {
+        return this.baseLayer;
+    }
 }

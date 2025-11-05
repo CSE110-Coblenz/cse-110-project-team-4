@@ -53,4 +53,3 @@ export class GameStatsController {
         this.lightbox.updateCounts(grey, green, red);
     }
 }
-export default GameStatsController; // ADDED: Default export for convenience in main.ts

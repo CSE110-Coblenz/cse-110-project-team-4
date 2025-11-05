@@ -25,15 +25,16 @@ BOOT ORDER — Application Startup Sequence
 //		- State/Map: StateStore, MapController, UIController
 //		- Quiz: (later) QuizManager, QuestionBank
 //		- Score: (later) LeaderBoardService
-import Konva from "konva";
 import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import { QuestionToggleController } from "./controllers/QuestionToggleController";
-import GameStatsController from "./controllers/GameStatsController";
+import { GameStatsController } from "./controllers/GameStatsController";
 import './styles/app.css';
-
+import { TimerModel } from "./models/TimerModel";
+import TimerViewCorner from "./views/TimerDisplayView";
+import { TimerController } from "./controllers/TimerController";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -60,7 +61,7 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-const container = "map-container";
+
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -69,9 +70,11 @@ const container = "map-container";
 //		  const quiz = new QuizManager(questionBank, leaderBoard);
 //		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
 //		  const minigame = new MinigameController(cardState);
-const ui = new UIController();
-const map = new MapController(store, ui);
-const qToggle = new QuestionToggleController("map-container");
+
+const map = new MapController(
+	store,
+	{ goToQuestionsFor: (_s: USState) => {} } // temp no-op bus
+);
 
 
 //=================    4) Mount Views
@@ -106,14 +109,23 @@ const qToggle = new QuestionToggleController("map-container");
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-root");
-qToggle.getView().show();
+//map.mount("qa-box");
 
-// GameStatslightbox
-const stage = map.getStage();
-if (stage) {
-	const stats = new GameStatsController(store, stage);
-	stats.mount();
+const ui = new UIController(map);
+const stageForUI = map.getStage();
+if (stageForUI) {
+	ui.init(stageForUI);   // build overlay layer on top of the map
+	map.setUIBus(ui);      // hand real UI bus back to MapController
+	const timerView = new TimerViewCorner(stageForUI);
+	const timerCtrl = new TimerController(new TimerModel(300), timerView);
+	timerCtrl.start();
+
 }
+const qToggle = new QuestionToggleController("tool-bar");
+qToggle.getView().show?.();
+
+// GameStats lightbox (unchanged)
+new GameStatsController(map);
 
 
 //=================    5) Seed / Demo Hooks (removable)

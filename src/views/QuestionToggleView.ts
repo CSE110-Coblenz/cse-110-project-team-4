@@ -30,13 +30,13 @@ export class QuestionToggleView {
         const backLabel = this.simpleLabelFactory(100, 100, "Go Back", backHandler); // should do something w/ screenswitcher
         const capitalToggle = this.simpleLabelFactory(100, 200, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
         const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
-        const abbrevationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
+        const abbreviationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
         const saveButton = this.simpleLabelFactory(100, 500, "Save", () => saveHandler());
 
         this.toggleButtonGroup.add(backLabel);
         this.toggleButtonGroup.add(capitalToggle);
         this.toggleButtonGroup.add(flowersToggle);
-        this.toggleButtonGroup.add(abbrevationToggle);
+        this.toggleButtonGroup.add(abbreviationToggle);
         this.toggleButtonGroup.add(saveButton);
 
         this.layer.add(this.toggleButtonGroup);
@@ -117,4 +117,5 @@ export class QuestionToggleView {
         const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
         return [width, height];
     }
+
 }

@@ -1,4 +1,4 @@
-// src/views/QuestionBox.ts
+// src/views/QuestionCardView.ts
 // 
 // 
 /*=============================
@@ -50,7 +50,7 @@ const CONFIRM_TRUE = '#ffffffff';
 const CONFIRM_FALSE = '#585858ff';
 const FONTSIZE_A = 25;
 
-export class QuestionCard {
+export class QuestionCardView {
   private layer: Konva.Layer;
   private currentAnswers: Answer[] = [];
   private selectedAnswerIndex: number | null = null;
