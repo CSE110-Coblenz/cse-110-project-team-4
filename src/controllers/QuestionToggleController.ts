@@ -1,8 +1,6 @@
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
 import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
 import { ALL_STATES } from "../utils/constants";
-import { Question, QuestionType, Answer, AnswerStatus } from "../models/Questions";
-import { QuestionCard } from "../views/QuestionCardView";
 
 export class QuestionToggleController {
     private model: QuestionBankModel;
@@ -30,8 +28,8 @@ export class QuestionToggleController {
             console.log("remaining states:", this.model.getRemainingStates());
             console.log("state:", result["state"]);
             console.log("type:", result["type"]);
-            console.log("answer:", result["correctAnswer"]);
-            console.log("incorrect:", result["incorrectAnswers"]);
+            console.log("answer:", result["answer"]);
+            console.log("incorrect:", result["incorrect"]);
         }
     }
 
@@ -50,72 +48,48 @@ export class QuestionToggleController {
     }
 
     /** gets and returns info necessary for one question, removing that state from the pool
-     * Step by step: Randomly select a state, question type, incorrect answers, to compile into a Question object
      * return format:
      * {question state name, question type, correct answer, [wrong ans, wrong ans, wrong ans]}
      */
-    getNextQuestion(): Question | null {
+    getNextQuestion(): {state: string, type: string, 
+            answer: string, incorrect: string[]} | null {
         let questions: BankJSON = this.model.getQuestions();
-        const remainingStates = this.model.getRemainingStates();
-
         // check that questions have been initialized + at least 1 state remains
         if (Object.keys(questions).length == 0 || this.model.getRemainingStates().length == 0) {
             return null;
         }
 
-        // start building Question object (choose state & question type, write text, identify correct answer)
-        const randomStateIndex = Math.floor(Math.random() * remainingStates.length); 
-        const randomState = remainingStates[randomStateIndex]; 
+        let incorrectAnswers: string[] = [];
+
+        // choose random state name + question type
+        let out = {state: "", type: "", 
+            answer: "", incorrect: incorrectAnswers}
+        let randomIndex: number = Math.floor(Math.random() * Object.keys(questions).length);
+        let randomStateIndex: number = Math.floor(Math.random() * this.model.getRemainingStates().length);
+        let randomType: string = Object.keys(questions)[randomIndex];
+        let randomState: string = this.model.getRemainingStates()[randomStateIndex];
         this.model.removeRemainingStates(randomStateIndex);
 
-        const questionTypes = Object.keys(questions) as QuestionType[];
-        const randomTypeIndex = Math.floor(Math.random() * questionTypes.length); 
-        const randomType = questionTypes[randomTypeIndex];
-
-        const questionText = `What is the ${randomType} of ${randomState}?`;
-
-        const correctAnswer: Answer = {
-            answerText: questions[randomType][randomState],
-            status: AnswerStatus.NotSelected
-        }
-
-        const question = new Question(randomState, randomType, questionText, correctAnswer);
+        out["state"] = randomState;
+        out["type"] = randomType;
+        out["answer"] = questions[randomType][randomState];
 
         let tempStates: string[] = [...ALL_STATES];
         tempStates.splice(tempStates.indexOf(randomState), 1);
 
         // choose 3 of the 49 non-correct states to grab fake answers from
-        let incorrect: Answer[] = [];
-
+        incorrectAnswers = [];
         for (let i = 0; i < 3; i++) {
             let idx: number = Math.floor(Math.random() * tempStates.length);
             let stateName: string = tempStates[idx];
             tempStates.splice(idx, 1);
-            incorrect.push({
-                answerText: questions[randomType][stateName],
-                status: AnswerStatus.NotSelected
-            });
+            incorrectAnswers.push(questions[randomType][stateName]);
         }
 
-        question.setIncorrectAnswers(incorrect);
-        //return question; //Dennis: 
-        return { state: randomState, type: randomType, answer: correctAnswer.answerText, incorrect: incorrect.map(a => a.answerText) } as any;
+        out["incorrect"] = incorrectAnswers;
+
+        return out;
     }
-
-    showNextQuestion(questionCard: QuestionCard): void {
-        const nextQuestion = this.getNextQuestion();
-
-        if (nextQuestion) { 
-            questionCard.setQuestion(nextQuestion); 
-        } else {
-            return;
-        }
-    }
-
-    handleConfirm(questionCard: QuestionCard): void {
-
-    }
-
 
     getView(): QuestionToggleView {
         return this.view;

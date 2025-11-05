@@ -31,7 +31,7 @@ import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import { QuestionToggleController } from "./controllers/QuestionToggleController";
-
+import GameStatsController from "./controllers/GameStatsController";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -43,7 +43,7 @@ import { QuestionToggleController } from "./controllers/QuestionToggleController
 //		- Card matching (minigame): `import { CardStateManager } from "./models/CardStateManager";`
 //		  const cardState = new CardStateManager();
 
-/* seed: minimal demo data for all 50 states. 
+/* TEST-seed: minimal demo data for all 50 states. 
  * Replace with persisted data if we finish the data part. */
 const seed: USState[] = Object.keys({
 	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
@@ -71,6 +71,7 @@ const ui = new UIController();
 const map = new MapController(store, ui);
 const qToggle = new QuestionToggleController("map-container");
 
+
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
 //	  Where teammates should add later:
@@ -78,6 +79,13 @@ const qToggle = new QuestionToggleController("map-container");
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-container");
 qToggle.getView().show();
+
+// GameStatslightbox
+const stage = map.getStage();
+if (stage) {
+	const stats = new GameStatsController(store, stage);
+	stats.mount();
+}
 
 
 //=================    5) Seed / Demo Hooks (removable)
@@ -107,4 +115,3 @@ window.addEventListener("keydown", (ev) => {
 //		  const modal = new ModalService(); ui.setModal(modal);
 //	  Example: in UIController.goToQuestionsFor(...), open a modal or navigate:
 //		- modal.open(<QuestionsView code={state.code} />)  OR  router.push(`/questions/${state.code}`)
-
