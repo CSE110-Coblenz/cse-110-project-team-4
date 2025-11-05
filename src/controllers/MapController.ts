@@ -13,6 +13,7 @@
 import MapViewTopo from "../views/MapViewTopo";
 import { StateStatus, USState } from "../models/State";
 import { StateStore } from "../models/StateStore";
+import Konva from "konva";
 
 /**
 * MapController: Map page controller.
@@ -62,4 +63,9 @@ export class MapController {
             this.view?.redraw(this.store.getAll());
         });
     }
+
+    public getStage(): Konva.Stage | undefined {
+        return this.view?.getStage();
+    }
+    
 }
