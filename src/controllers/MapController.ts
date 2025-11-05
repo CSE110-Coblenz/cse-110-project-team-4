@@ -1,16 +1,19 @@
 // src/controllers/MapController.ts
 /*=============================
   CONTROLLER LAYER:
-  Orchestrates interactions between View and Model.
+    Orchestrates interactions between View and Model.
     Mounts tile map view
     On click: cycles status + triggers UI navigation
-    //Subscribes to store changes and redraws view
+    Subscribes to store changes and redraws view
+    
+    Controller: bridges UI and Model; translates user interactions into business calls.
 ==============================*/
-// Controller: bridges UI and Model; translates user interactions into business calls.
 
-import MapViewSquares from "../views/MapViewSquares";
+//import MapViewSquares from "../views/MapViewSquares";
+import MapViewTopo from "../views/MapViewTopo";
 import { StateStatus, USState } from "../models/State";
 import { StateStore } from "../models/StateStore";
+import Konva from "konva";
 
 /**
 * MapController: Map page controller.
@@ -18,7 +21,7 @@ import { StateStore } from "../models/StateStore";
 */
 export class MapController {
     // Hold view instance after mount to allow redraws.
-    private view?: MapViewSquares;
+    private view?: MapViewTopo;
 
     constructor(
         private store: StateStore,
@@ -31,16 +34,27 @@ export class MapController {
     */
     public mount(containerId: string) {
         // First render the View with data and click handler.
-        this.view = new MapViewSquares({
+        this.view = new MapViewTopo({
             containerId,
             states: this.store.getAll(),
+
             onStateClick: (s) => {
-                // Demo: first click promotes NotStarted to Partial
-                if (s.status === StateStatus.NotStarted) {
-                    this.store.setStatus(s.code, StateStatus.Partial);
-                }
+                // Demo: 
+                // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
+                const next =
+                    s.status === StateStatus.NotStarted ? StateStatus.Partial :
+                    s.status === StateStatus.Partial    ? StateStatus.Complete : 
+                                                            StateStatus.NotStarted;
+                // update the store; subscribers (e.g., the View) will redraw with new fills.
+                this.store.setStatus(s.code, next);
+
                 // Delegate navigation to UI; controller does not touch router/DOM.
                 this.uiBus.goToQuestionsFor(s); //UIController.ts
+
+                // Emit a global CustomEvent
+                window.dispatchEvent(new CustomEvent("usmap:stateClick", {
+                    detail: { code: s.code, nextStatus: next }
+                }));
             }
         });
         
@@ -49,4 +63,9 @@ export class MapController {
             this.view?.redraw(this.store.getAll());
         });
     }
+
+    public getStage(): Konva.Stage | undefined {
+        return this.view?.getStage();
+    }
+    
 }

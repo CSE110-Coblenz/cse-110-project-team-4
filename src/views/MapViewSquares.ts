@@ -15,6 +15,7 @@
 
 import Konva from "konva";
 import { StateStatus, USState } from "../models/State";
+import GameStatsLightbox from "../ui/game-stats-lightbox";
 
 //testing squre, just for view test.
 const TILE = {
@@ -122,7 +123,9 @@ MapViewSquares：Default export class: the module's main export.
 export default class MapViewSquares {
     private stage: Konva.Stage; // Konva Stage (root)
     private layer: Konva.Layer; // single Layer (extensible)
-    
+    private statsLayer: Konva.Layer; // separate layer for the lightbox
+    private stats: GameStatsLightbox; // reference to the lightbox
+
 
     /*
     * constructor：Canvas size
@@ -137,7 +140,23 @@ export default class MapViewSquares {
 
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
+        this.stage.add(this.questionCard.getLayer());
         this.drawAll(); //first render
+
+        // create a separate layer for the lightbox
+        this.statsLayer = new Konva.Layer();
+        this.stage.add(this.statsLayer);
+
+        // instantiate lightbox
+        this.stats = new GameStatsLightbox({
+            greyCount: 48,
+            greenCount: 1,
+            redCount: 1,
+        });
+
+        // add lightbox to its own layer
+        this.statsLayer.add(this.stats.getGroup());
+        this.statsLayer.draw();
     }
 
     public getStage(): Konva.Stage {
@@ -234,4 +253,9 @@ export default class MapViewSquares {
 
         this.layer.draw();
     }
+
+    public getStage(): Konva.Stage {
+        return this.stage;
+    }
+
 }
