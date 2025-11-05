@@ -140,6 +140,7 @@ export default class MapViewSquares {
 
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
+        this.stage.add(this.questionCard.getLayer());
         this.drawAll(); //first render
 
         // create a separate layer for the lightbox
@@ -248,4 +249,9 @@ export default class MapViewSquares {
 
         this.layer.draw();
     }
+
+    public getStage(): Konva.Stage {
+        return this.stage;
+    }
+
 }
