@@ -98,7 +98,8 @@ export class QuestionToggleController {
         }
 
         question.setIncorrectAnswers(incorrect);
-        return question;
+        //return question; //Dennis: 
+        return { state: randomState, type: randomType, answer: correctAnswer.answerText, incorrect: incorrect.map(a => a.answerText) } as any;
     }
 
     showNextQuestion(questionCard: QuestionCard): void {
