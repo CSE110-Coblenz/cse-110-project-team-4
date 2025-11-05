@@ -30,9 +30,8 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
-import GameStatsLightbox from "./ui/game-stats-lightbox";
 import { QuestionToggleController } from "./controllers/QuestionToggleController";
-
+import GameStatsController from "./controllers/GameStatsController";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -80,6 +79,13 @@ const qToggle = new QuestionToggleController("map-container");
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-container");
 qToggle.getView().show();
+
+// GameStatslightbox
+const stage = map.getStage();
+if (stage) {
+	const stats = new GameStatsController(store, stage);
+	stats.mount();
+}
 
 
 //=================    5) Seed / Demo Hooks (removable)
