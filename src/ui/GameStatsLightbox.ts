@@ -1,4 +1,6 @@
+// Move to src/views/GameStatsLightbox.ts
 import Konva from "konva";
+import {MAX_ERRORS} from "../utils/constants";
 
 export type GameStatsLightboxOptions = {
   greyCount: number;
@@ -19,6 +21,7 @@ export default class GameStatsLightbox {
     this.group = new Konva.Group({
       x: 10,
       y: 10,
+      listening: false  //Avoid obstructing map interaction,(Dennis
     });
 
     const boxWidth = 160;
@@ -53,7 +56,7 @@ export default class GameStatsLightbox {
     this.textRed = new Konva.Text({
       x: 10,
       y: 50,
-      text: `Red States: ${redCount}/3`,
+      text: `Red States: ${redCount}/${MAX_ERRORS}`, // from utils/constants, easier to edit.
       fontSize: 14,
       fill: "red",
     });
