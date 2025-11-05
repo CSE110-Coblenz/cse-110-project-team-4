@@ -1,3 +1,5 @@
+// src/utils/constants.ts
+export const MAX_ERRORS = 3; //src/views/GameStatsLightbox.ts 
 export const ALL_STATES: string[] = ["Alabama", "Alaska","Arizona", "Arkansas", "California", 
         "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
         "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 

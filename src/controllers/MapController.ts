@@ -39,7 +39,7 @@ export class MapController {
             states: this.store.getAll(),
 
             onStateClick: (s) => {
-                // Demo: 
+                // Demo:================================== 
                 // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
                 const next =
                     s.status === StateStatus.NotStarted ? StateStatus.Partial :

@@ -32,6 +32,8 @@ import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import { QuestionToggleController } from "./controllers/QuestionToggleController";
 import GameStatsController from "./controllers/GameStatsController";
+import './styles/app.css';
+
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -74,10 +76,36 @@ const qToggle = new QuestionToggleController("map-container");
 
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
+//  Why: keep main.ts focused on composition/boot order (SRP).
+//
+//  Where teammates should add later (IDs are already reserved in index.html):
+//  - Map view (center canvas):
+//      mapView.mount(ensureEl("map-root"))
+//  - Questions panel (center overlay Q&A box):
+//      questionsView.mount(ensureEl("qa-box"))
+//  - Leaderboard view (separate view/page):
+//      leaderboardView.mount(ensureEl("leaderboard-root"))
+//  - Welcome/Home view (separate view/page):
+//      welcomeView.mount(ensureEl("welcome-root"))
+//  - Settings view (separate view/page):
+//      settingsView.mount(ensureEl("settings-root"))
+//  - HUD (bottom-left: score/progress/timer):
+//      hudView.mount(ensureEl("hud"))
+//  - Toolbar (top-left: back/home/help/settings buttons):
+//      toolbarView.mount(ensureEl("toolbar"))
+//
+//  Functional overlay layers (singletons; mount render roots or controllers):
+//  - Modal/Drawer portal:
+//      modalManager.mount(ensureEl("portal-root"))
+//  - Toast/Notifications:
+//      toastService.mount(ensureEl("toast-root"))
+//  - Full-screen overlay (loading/route guard):
+//      overlayService.mount(ensureEl("overlay-root"))
+
 //	  Where teammates should add later:
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
-map.mount("map-container");
+map.mount("map-root");
 qToggle.getView().show();
 
 // GameStatslightbox
