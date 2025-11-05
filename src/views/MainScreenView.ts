@@ -90,12 +90,14 @@ export class MainScreenView {
 
     show(): void {
         this.stage.visible(true);
+        document.getElementById(this.id)!.style.display = "block";
         this.inputEl.style.display = "block";
         this.stage.draw();
     }
 
     hide(): void {
         this.stage.visible(false);
+        document.getElementById(this.id)!.style.display = "none";
         this.inputEl.style.display = "none";
         this.stage.draw();
     }
