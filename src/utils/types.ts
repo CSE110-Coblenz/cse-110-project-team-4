@@ -1,8 +1,8 @@
 export enum Screens {
-    Info = "Info",
-    Options = "Options",
+    Leaderboard = "Leaderboard",
+    Minigame = "Minigame",
     Map = "Map",
-    MainMenu = "MainMenu"
+    Welcome = "Welcome"
 }
 
 export class ScreenSwitcher {

@@ -1,16 +1,19 @@
-import { MainScreenView } from "../views/MainScreenView";
+import { WelcomeScreenView } from "../views/WelcomeScreenView";
 import { ScreenSwitcher, Screens } from "../utils/types";
 import { QuestionToggleController } from "./QuestionToggleController";
+import { InfoCardView } from "../views/InfoCardView";
 
-export class MainScreenController {
-    private view: MainScreenView;
+export class WelcomeScreenController {
+    private view: WelcomeScreenView;
     private switcher: ScreenSwitcher;
+    private infoView: InfoCardView;
     private toggleController: QuestionToggleController;
 
     constructor(container: string, switcher: ScreenSwitcher) {
-        this.view = new MainScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
+        this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
         this.switcher = switcher;
         this.toggleController = new QuestionToggleController(this.view.getStage(), container);
+        this.infoView = new InfoCardView(this.view.getStage());
     }
 
     // handler function when start button is clicked, should save name
@@ -27,7 +30,7 @@ export class MainScreenController {
 
     // route info click to info screen, maybe display a modal instead?
     handleInfo = () => {
-        this.switcher.switchToScreen(Screens.Info);
+        this.infoView.show();
     }
 
     // route options click to options screen
@@ -36,7 +39,7 @@ export class MainScreenController {
         this.toggleController.getView().show();
     }
 
-    getView(): MainScreenView {
+    getView(): WelcomeScreenView {
         return this.view;
     }
 }

@@ -39,7 +39,7 @@ import { TimerModel } from "./models/TimerModel";
 import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
-import { MainScreenController } from "./controllers/MainScreenController";
+import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import Konva from "konva";
 
 
@@ -81,7 +81,7 @@ const store = new StateStore(seed);
 class Application extends ScreenSwitcher {
     private ui: UIController;
     private map: MapController;
-    private menu: MainScreenController;
+    private menu: WelcomeScreenController;
     private stats: GameStatsController;
 
     constructor(store: StateStore) {
@@ -91,7 +91,7 @@ class Application extends ScreenSwitcher {
             { goToQuestionsFor: (_s: USState) => {} }
         );
         this.ui = new UIController(this.map);
-        this.menu = new MainScreenController("welcome-root", this);
+        this.menu = new WelcomeScreenController("welcome-root", this);
         this.stats = new GameStatsController(this.map);
     }
 
@@ -130,7 +130,7 @@ class Application extends ScreenSwitcher {
             case Screens.Map:
                 this.map.getView()!.show();
                 break;
-            case Screens.MainMenu:
+            case Screens.Welcome:
                 this.menu.getView().show();
                 break;
             default: 

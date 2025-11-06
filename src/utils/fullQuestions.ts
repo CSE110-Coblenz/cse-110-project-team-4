@@ -1,4 +1,4 @@
-import { BankJSON } from "../models/QuestionBank"
+import { BankJSON } from "../models/QuestionBankModel"
 
 export const allQuestions: BankJSON = {
     "capitalQuestions": {

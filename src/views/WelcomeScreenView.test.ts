@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { MainScreenView } from "./MainScreenView";
+import { WelcomeScreenView } from "./WelcomeScreenView";
 
 describe("question toggle view", () => {
     const mockEl = document.createElement("div");
     mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
-    let MSV = new MainScreenView(() => {}, () => {}, () => {}, "main-menu-container");
+    let MSV = new WelcomeScreenView(() => {}, () => {}, () => {}, "main-menu-container");
 
     it("should generate a layer, stage, and input element", () => {
         expect(MSV.getLayer()).toBeDefined();

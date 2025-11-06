@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { QuestionBankModel } from "./QuestionBank";
+import { QuestionBankModel } from "./QuestionBankModel";
 
 describe("question bank remaining states", () => {
     let QBM = new QuestionBankModel();

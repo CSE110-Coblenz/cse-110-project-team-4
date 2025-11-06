@@ -1,6 +1,6 @@
 import Konva from "konva";
 
-export class MainScreenView {
+export class WelcomeScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;

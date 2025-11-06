@@ -103,7 +103,6 @@ export class QuestionToggleView {
     show(): void {
         this.layer.visible(true);
         this.layer.draw();
-        console.log(document.getElementById(this.id)!.clientHeight);
     }
 
     hide(): void {

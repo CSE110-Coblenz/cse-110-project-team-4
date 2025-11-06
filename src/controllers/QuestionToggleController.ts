@@ -1,5 +1,5 @@
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
-import { QuestionBankModel, BankJSON } from "../models/QuestionBank"
+import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel"
 import { ALL_STATES } from "../utils/constants";
 import Konva from "konva";
 

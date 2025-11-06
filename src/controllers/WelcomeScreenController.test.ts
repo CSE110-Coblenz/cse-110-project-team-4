@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MainScreenController } from "./MainScreenController";
+import { WelcomeScreenController } from "./WelcomeScreenController";
 import { ScreenSwitcher } from "../utils/types";
 
 describe("main screen controller", () => {
@@ -7,7 +7,7 @@ describe("main screen controller", () => {
     mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
     let switcher: ScreenSwitcher = new ScreenSwitcher();
-    let MSC = new MainScreenController("main-menu-container", switcher);
+    let MSC = new WelcomeScreenController("main-menu-container", switcher);
 
     it("should initialize a view and togglecontroller", () => {
         expect(MSC.getView()).toBeDefined();
