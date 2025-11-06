@@ -10,7 +10,7 @@ export class MainScreenController {
     constructor(container: string, switcher: ScreenSwitcher) {
         this.view = new MainScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
         this.switcher = switcher;
-        this.toggleController = new QuestionToggleController(this.view.getStage());
+        this.toggleController = new QuestionToggleController(this.view.getStage(), container);
     }
 
     // handler function when start button is clicked, should save name

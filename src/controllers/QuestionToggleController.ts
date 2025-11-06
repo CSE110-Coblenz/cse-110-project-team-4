@@ -8,13 +8,13 @@ export class QuestionToggleController {
     private view: QuestionToggleView;
     private currentToggled: Toggles;
 
-    constructor(stage: Konva.Stage) {
+    constructor(stage: Konva.Stage, id: string) {
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
-        this.view = new QuestionToggleView(this.tempHandler, this.handleBack, this.toggleOption, this.saveOptions, stage);
+        this.view = new QuestionToggleView(this.tempHandler, this.handleBack, this.toggleOption, this.saveOptions, stage, id);
         // eventually, once we make a quizmanager or whatever, we should pass in the model created from there instead of initializing it here
         this.model = new QuestionBankModel();
     }

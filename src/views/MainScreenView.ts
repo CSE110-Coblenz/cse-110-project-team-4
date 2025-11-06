@@ -1,5 +1,4 @@
 import Konva from "konva";
-import { QuestionToggleController } from "../controllers/QuestionToggleController";
 
 export class MainScreenView {
     private stage: Konva.Stage;
@@ -116,8 +115,8 @@ export class MainScreenView {
 
     getDims(): number[] {
         let containerEl = document.getElementById(this.id)!;
-        const width  = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
-        const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
-        return [width, height];
+        const width  = Math.max(360, Math.floor(containerEl.clientWidth  || 0));
+        const height = Math.max(360, Math.floor(containerEl.clientHeight || 0));
+        return [ width, height ];
     }
 }

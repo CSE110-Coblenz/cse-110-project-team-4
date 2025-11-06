@@ -18,14 +18,14 @@
       </header>
 
       <!-- Center map area (stable map mount) -->
-      <main id="main-area" class="main-area">
+      <div id="main-area" class="main-area">
         <div id="map-root" class="map-stage"></div>
 
         <!-- Center Q&A box (overlayed, toggled by JS) -->
         <div id="qa-box" class="qa-box" hidden>
           <!-- RESERVED: question text, options, submit -->
         </div>
-      </main>
+      </div>
 
       <!-- Bottom-left score/progress (reserved) -->
       <aside id="hud" class="hud">
@@ -34,9 +34,7 @@
 
       <!-- Views/pages (simple router via [hidden]) -->
       <div id="views">
-        <section data-view="welcome" hidden>
-          <div id="welcome-root"></div>
-        </section>
+        <div id="welcome-root" data-view="welcome"></div>
         <section data-view="leaderboard" hidden>
           <div id="leaderboard-root"></div>
         </section>

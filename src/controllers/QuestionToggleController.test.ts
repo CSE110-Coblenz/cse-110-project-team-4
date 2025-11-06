@@ -6,7 +6,7 @@ describe("question toggle controller", () => {
     const mockEl = document.createElement("div");
     mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
-    let QTC = new QuestionToggleController(new Konva.Stage({container: mockEl.id}));
+    let QTC = new QuestionToggleController(new Konva.Stage({container: mockEl.id}), "main-menu-container");
 
     it("should initialize a view and model", () => {
         expect(QTC.getView()).toBeDefined();

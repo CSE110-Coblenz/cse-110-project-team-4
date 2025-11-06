@@ -7,14 +7,15 @@ export interface Toggles {
 export class QuestionToggleView {
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
+    private id: string;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
-    constructor(temphandler: () => void, backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, stage: Konva.Stage) {
+    constructor(temphandler: () => void, backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, stage: Konva.Stage, id: string) {
         // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
         // code to deal with dynamic resizing...
-
+        this.id = id;
         this.layer = new Konva.Layer({
             visible: false
         });
@@ -102,6 +103,7 @@ export class QuestionToggleView {
     show(): void {
         this.layer.visible(true);
         this.layer.draw();
+        console.log(document.getElementById(this.id)!.clientHeight);
     }
 
     hide(): void {
@@ -115,10 +117,10 @@ export class QuestionToggleView {
 
     // once again temp until we have it in utils
     getDims(): number[] {
-        let containerEl = document.getElementById("main-menu-container")!;
-        const width = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
-        const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
-        return [width, height];
+        let containerEl = document.getElementById(this.id)!;
+        const width  = Math.max(320, Math.floor(containerEl.clientWidth  || 0));
+        const height = Math.max(360, Math.floor(containerEl.clientHeight || 0));
+        return [ width, height ];
     }
 
 }

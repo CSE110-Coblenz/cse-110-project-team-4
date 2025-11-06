@@ -10,7 +10,7 @@
   --map-ratio: 27/12; /*Map-root ratio, 13:8 */
 }
 
-html, body, #app-root { height: 100%; }
+html, body, #app-root, #views { height: 100%; }
 body {
   margin: 0;
   background: var(--bg);
@@ -93,6 +93,10 @@ body {
 
 /* Views container (kept simple; toggle sections via [hidden]) */
 #views section[hidden] { display: none !important; }
+
+#welcome-root {
+  height: 100%;
+}
 
 /* Functional reserve layers */
 .portal-root, .toast-root, .overlay-root {

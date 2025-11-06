@@ -69,7 +69,6 @@ const seed: USState[] = Object.keys({
 	status: StateStatus.NotStarted
 }));
 const store = new StateStore(seed);
-const container = "map-container";
 
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
@@ -83,6 +82,7 @@ class Application extends ScreenSwitcher {
     private ui: UIController;
     private map: MapController;
     private menu: MainScreenController;
+    private stats: GameStatsController;
 
     constructor(store: StateStore) {
         super();

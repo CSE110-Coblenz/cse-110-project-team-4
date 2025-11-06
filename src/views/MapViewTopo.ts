@@ -979,4 +979,16 @@ export default class MapViewTopo {
         else this.riverAnim?.stop();
         this.mapLayer.batchDraw();
     }
+
+    public show() {
+        this.stage.visible(true);
+        this.containerEl.style.display = "block";
+        this.drawAll();
+    }
+
+    public hide() {
+        this.stage.visible(false);
+        this.containerEl.style.display = "none";
+        this.drawAll();
+    }
 }
