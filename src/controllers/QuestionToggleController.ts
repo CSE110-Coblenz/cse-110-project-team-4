@@ -107,4 +107,8 @@ export class QuestionToggleController {
     getModel(): QuestionBankModel {
         return this.model;
     }
+
+    handleResize(): void {
+        this.view.resize();
+    }
 }

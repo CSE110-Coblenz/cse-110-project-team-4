@@ -1,21 +1,30 @@
 import Konva from "konva";
+import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 
 export class WelcomeScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
     private id: string;
+    private startW: number;
     private inputEl;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
-    constructor(startHandler: () => void, infoHandler: () => void, optionsHandler: () => void, id: string) {
+    constructor(
+        startHandler: () => void, 
+        infoHandler: () => void, 
+        optionsHandler: () => void, 
+        id: string) 
+    {
         this.id = id;
+        let [w, h] = getDims(360, 360, id);
+        this.startW = w;
         this.stage = new Konva.Stage({
             container: id,
-            width: this.getDims()[0],
-            height: this.getDims()[1],
+            width: w,
+            height: h,
             visible: false
         })
         // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
@@ -24,67 +33,32 @@ export class WelcomeScreenView {
         this.layer = new Konva.Layer({ visible: true });
         this.toggleButtonGroup = new Konva.Group();
 
-        const startLabel = this.simpleLabelFactory(100, 100, "Start Game", startHandler);
-        const infoLabel = this.simpleLabelFactory(100, 200, "How To Play", infoHandler);
-        const optionsLabel = this.simpleLabelFactory(100, 300, "Options", optionsHandler);
+        const startLabel = simpleLabelFactory(w / 2, h / 4, "Start Game", startHandler);
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 200, "How To Play", infoHandler);
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 300, "Options", optionsHandler);
 
         let menuEl = document.getElementById(id);
         const textBox = document.createElement("textarea");
         textBox.id = "nameInput";
-        textBox.style.top = "100px";
-        textBox.style.left = "300px";
+        textBox.style.top = h / 4 + 100 + "px";
+        textBox.style.width = "200px";
+        textBox.style.left = (w / 2 - 100) + "px";
         textBox.style.position = "absolute";
         textBox.style.zIndex = "1";
         this.inputEl = textBox;
         menuEl?.appendChild(textBox);
 
-        this.toggleButtonGroup.add(startLabel);
-        this.toggleButtonGroup.add(infoLabel);
-        this.toggleButtonGroup.add(optionsLabel);
+        this.init(startLabel, this.toggleButtonGroup);
+        this.init(infoLabel, this.toggleButtonGroup);
+        this.init(optionsLabel, this.toggleButtonGroup);
 
         this.layer.add(this.toggleButtonGroup);
         this.stage.add(this.layer);
     }
-
-    // temporary, may be replaced depending on how UI components factories shape up
-    // for now, produces a button given a position, text, and a handler function
-    private simpleLabelFactory(xPos: number, yPos: number, labelText: string, handler: () => void): Konva.Label {
-        // add a basic checkbox character for toggle buttons
-        let newLabel: string = labelText;
-
-        const out = new Konva.Label({
-            x: xPos,
-            y: yPos,
-            opacity: 0.75
-        });
-        out.add(
-            new Konva.Tag({
-                fill: "lightblue",
-                stroke: "black", 
-                strokeWidth: 1
-            })
-        );
-        out.add(
-            new Konva.Text({
-                text: newLabel,
-                fill: 'black',
-                fontSize: 20,
-                padding: 4
-            })
-        );
-
-        out.on('mouseover', function (e) {
-            e.target.getStage()!.container().style.cursor = 'pointer';
-        });
-        out.on('mouseout', function (e) {
-            e.target.getStage()!.container().style.cursor = 'default';
-        });
-
-        out.on("click", () => {
-            // toggle the checkbox if the button text has one
-            handler();
-        });
-        return out;
+    
+    private init(node: Konva.Group, group: Konva.Group) {
+        node.setAttr('centerOffset', this.startW / 2 - node.getAttr('x'));
+        group.add(node);
     }
 
     show(): void {
@@ -113,10 +87,19 @@ export class WelcomeScreenView {
         return this.inputEl;
     }
 
-    getDims(): number[] {
-        let containerEl = document.getElementById(this.id)!;
-        const width  = Math.max(360, Math.floor(containerEl.clientWidth  || 0));
-        const height = Math.max(360, Math.floor(containerEl.clientHeight || 0));
-        return [ width, height ];
+    public resize(): void {
+        let [w, h] = getDims(360, 360, this.id);
+        this.layer.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+                group.getChildren().forEach(subgroup => {
+                    if (subgroup instanceof Konva.Group) {
+                        subgroup.getChildren().forEach(node => {
+                            node.x(Math.max(10, w / 2 ));
+                        });
+                    }
+                });
+            }
+        });
+        this.inputEl.style.left = (w / 2 - 100) + "px";
     }
 }

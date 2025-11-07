@@ -1,46 +1,77 @@
 import Konva from "konva";
+import { getDims } from "../utils/ViewUtils";
 
 export class InfoCardView {
     private layer: Konva.Layer;
+    private textGroup: Konva.Group;
+    private backGroup: Konva.Group;
+    private startW: number;
+    private id: string;
 
-    constructor(stage: Konva.Stage) {
+    constructor(stage: Konva.Stage, id: string) {
+        let [w, h] = getDims(360, 360, id);
+        this.id = id;
+        this.startW = w;
         this.layer = new Konva.Layer({ visible: false });
-        let group: Konva.Group = new Konva.Group({});
+        this.textGroup = new Konva.Group({});
+        this.backGroup = new Konva.Group({});
         let text: Konva.Text = new Konva.Text({
-            x: 300,
-            y: 220,
-            text: "HOW TO PLAY:\n\nLorem Ipsum Dolor\n\n Sit Amet\n\nHello World",
+            x: w / 4,
+            y: h / 4,
+            text: "HOW TO PLAY:\n\nLorem Ipsum Dolor\n\n Sit Amet\n\nHello World\n\n\n\n\n\n\n\n\n\n\n\n\n\npadding",
             fontSize: 20,
             fontFamily: "Arial",
-            width: 500,
+            width: w / 2,
             align: 'center'
         });
         let backButton: Konva.Text = new Konva.Text({
-            x: 310,
-            y: 200,
+            x: w / 3.8,
+            y: h / 3.8 - 100,
             text: "Go Back",
             width: 80,
             fontSize: 18,
             fontFamily: "Aria",
             align: 'center'
         });
-        let rectangle: Konva.Rect = new Konva.Rect({
-            x: 300,
-            y: 190,
-            width: 500,
-            height: text.height() + 45,
+        let largeRect: Konva.Rect = new Konva.Rect({
+            x: w / 4,
+            y: h / 4.2 - 100,
+            width: w / 2,
+            height: text.height() * 1.2 + 100,
             cornerRadius: 10,
-            fill: "red",
-            stroke: "brown"
+            fill: "#eee",
+            stroke: "black"
+        });
+        let smallRect: Konva.Rect = new Konva.Rect({
+            x: backButton.x() - 5,
+            y: backButton.y() - 5,
+            width: backButton.width() + 10,
+            height: backButton.height() + 10,
+            cornerRadius: 10,
+            fill: "#daafafff",
+            stroke: "black"
         });
 
-        backButton.on("click", () => {this.hide()});
+        this.backGroup.on("click", () => {this.hide()});
+        this.backGroup.on('mouseover', function (e) {
+            e.target.getStage()!.container().style.cursor = 'pointer';
+        });
+        this.backGroup.on('mouseout', function (e) {
+            e.target.getStage()!.container().style.cursor = 'default';
+        });
 
-        group.add(rectangle);
-        group.add(text);
-        group.add(backButton);
-        this.layer.add(group);
+        this.init(largeRect, this.textGroup);
+        this.init(smallRect, this.backGroup);
+        this.init(text, this.textGroup);
+        this.init(backButton, this.backGroup);
+        this.layer.add(this.textGroup);
+        this.layer.add(this.backGroup);
         stage.add(this.layer);
+    }
+
+    private init(node: Konva.Text | Konva.Rect, group: Konva.Group) {
+        node.setAttr('centerOffset', this.startW / 2 - node.getAttr('x'));
+        group.add(node);
     }
 
     public show(): void {
@@ -55,5 +86,16 @@ export class InfoCardView {
 
     public getLayer() {
         return this.layer;
+    }
+
+    public resize(): void {
+        let [w, h] = getDims(360, 360, this.id);
+        this.layer.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+                group.getChildren().forEach(node => {
+                    node.x(Math.max(10, w / 2 - node.getAttr('centerOffset')));
+                });
+            }
+        });
     }
 }
