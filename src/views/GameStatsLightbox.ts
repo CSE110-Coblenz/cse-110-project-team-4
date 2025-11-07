@@ -7,6 +7,7 @@ export type GameStatsLightboxOptions = {
   greyCount: number;
   greenCount: number;
   redCount: number;
+  points: number;
 };
 
 export default class GameStatsLightbox {
@@ -14,9 +15,10 @@ export default class GameStatsLightbox {
   private textGrey: Konva.Text;
   private textGreen: Konva.Text;
   private textRed: Konva.Text;
+  private textPoints: Konva.Text;
 
   constructor(private opts: GameStatsLightboxOptions) {
-    const { greyCount, greenCount, redCount } = opts;
+    const { greyCount, greenCount, redCount, points} = opts;
 
     // main container group
     this.group = new Konva.Group({
@@ -26,7 +28,7 @@ export default class GameStatsLightbox {
     });
 
     const boxWidth = 160;
-    const boxHeight = 80;
+    const boxHeight = 100;
 
     // background box
     const background = new Konva.Rect({
@@ -62,8 +64,17 @@ export default class GameStatsLightbox {
       fill: "red",
     });
 
+    this.textPoints = new Konva.Text({
+      x: 10,
+      y: 70,
+      text: `Points: ${points}`,
+      fontSize: 14,
+      fill: "#0066cc",
+      fontStyle: "bold",
+    });
+
     // add elements to group
-    this.group.add(background, this.textGrey, this.textGreen, this.textRed);
+    this.group.add(background, this.textGrey, this.textGreen, this.textRed, this.textPoints);
   }
 
   /** expose the Konva Group for external addition to a shared layer */
@@ -72,10 +83,11 @@ export default class GameStatsLightbox {
   }
 
   /** update displayed counts */
-  public updateCounts(grey: number, green: number, red: number): void {
+  public updateCounts(grey: number, green: number, red: number, points: number): void {
     this.textGrey.text(`Grey States: ${grey}`);
     this.textGreen.text(`Green States: ${green}`);
     this.textRed.text(`Red States: ${red}/${MAX_ERRORS} `);
+    this.textPoints.text(`Points: ${points}`);
 
     // safely trigger redraw if the group is in a layer
     const layer = this.group.getLayer();

@@ -110,10 +110,10 @@ const map = new MapController(
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 map.mount("map-root");
 //map.mount("qa-box");
-
-const ui = new UIController(map);
 const stageForUI = map.getStage();
 if (stageForUI) {
+	const statsController = new GameStatsController(map);
+	const ui = new UIController(map, statsController);
 	ui.init(stageForUI);   // build overlay layer on top of the map
 	map.setUIBus(ui);      // hand real UI bus back to MapController
 	const timerView = new TimerViewCorner(stageForUI);
@@ -123,10 +123,6 @@ if (stageForUI) {
 }
 const qToggle = new QuestionToggleController("tool-bar");
 qToggle.getView().show?.();
-
-// GameStats lightbox (unchanged)
-new GameStatsController(map);
-
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.

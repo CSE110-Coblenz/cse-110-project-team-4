@@ -54,6 +54,7 @@ export class QuestionCardView {
   private layer: Konva.Layer;
   private currentAnswers: Answer[] = [];
   private selectedAnswerIndex: number | null = null;
+  private onConfirmCallback?: () => void;
 
   constructor() {
     this.layer = this.drawQuestionCard();
@@ -88,6 +89,10 @@ export class QuestionCardView {
     this.layer.draw();
     this.currentAnswers = answers;
 
+  }
+
+  onConfirm(callback: () => void) {
+    this.onConfirmCallback = callback;
   }
 
   private drawQuestionCard(): Konva.Layer {
@@ -256,6 +261,7 @@ export class QuestionCardView {
       circle.fill(CONFIRM_FALSE);
       this.selectedAnswerIndex = null;
 
+      if (this.onConfirmCallback) this.onConfirmCallback();
     });
 
     layer.draw();
