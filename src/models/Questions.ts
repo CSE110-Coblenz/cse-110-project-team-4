@@ -28,9 +28,9 @@ export enum QuestionStatus {
 }
 
 export enum QuestionType {
-    Capital = "capital", 
-    Flower  = "flower",
-    Abbreviation = "abbreviation"
+    Capital = "capitalQuestions", 
+    Flower  = "flowerQuestions",
+    Abbreviation = "abbreviationQuestions"
 }
 
 // Domain object for a single question.

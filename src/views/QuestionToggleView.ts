@@ -88,7 +88,8 @@ export class QuestionToggleView {
                             node.x(Math.max(10, w / 2 ));
                         });
                     } else if (subnode instanceof Konva.Rect) {
-                        subnode.x(Math.max(10, w / 2 - subnode.getAttr('centerOffset')));
+                        subnode.x(Math.max(10, w / 2 - subnode
+                            .getAttr('centerOffset')));
                     }
                 });
             }

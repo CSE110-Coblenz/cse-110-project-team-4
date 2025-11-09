@@ -41,6 +41,7 @@ import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
 import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import Konva from "konva";
+import { QuizManager } from "./controllers/QuizManager";
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -83,9 +84,11 @@ class Application extends ScreenSwitcher {
     private map: MapController;
     private menu: WelcomeScreenController;
     private stats: GameStatsController;
+    private manager: QuizManager;
 
     constructor(store: StateStore) {
         super();
+        this.manager = new QuizManager();
         this.map = new MapController(
             store,
             { goToQuestionsFor: (_s: USState) => {} }
@@ -96,16 +99,16 @@ class Application extends ScreenSwitcher {
     }
 
     init() {
+        this.manager.init(this.menu.getToggler().getModel());
         this.map.mount("map-root");
         this.map.getView()?.hide();
         this.menu.getView().show();
         let stageForUI = this.map.getStage();
         if (stageForUI) {
-            this.ui.init(stageForUI);   // build overlay layer on top of the map
+            this.ui.init(stageForUI, this.manager);   // build overlay layer on top of the map
             this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
             const timerView = new TimerViewCorner(stageForUI);
             const timerCtrl = new TimerController(new TimerModel(300), timerView);
-            timerCtrl.start();
         }
         setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
         setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
@@ -129,6 +132,9 @@ class Application extends ScreenSwitcher {
         switch (screen) {
             case Screens.Map:
                 this.map.getView()!.show();
+                if (!this.manager.getStatus()) {
+                    this.manager.init(this.menu.getToggler().getModel());
+                }
                 break;
             case Screens.Welcome:
                 this.menu.getView().show();

@@ -1,6 +1,5 @@
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
-import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel"
-import { ALL_STATES } from "../utils/constants";
+import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel";
 import Konva from "konva";
 
 export class QuestionToggleController {
@@ -30,7 +29,7 @@ export class QuestionToggleController {
 
     // temporary function handler to demonstrate question getting
     tempHandler = () => {
-        let result = this.getNextQuestion();
+        let result = null; //this.getNextQuestion();
         if (result == null) {
             console.log("question list null or empty");
         } else {
@@ -56,50 +55,6 @@ export class QuestionToggleController {
         console.log(this.model.getQuestions());
     }
 
-    /** gets and returns info necessary for one question, removing that state from the pool
-     * return format:
-     * {question state name, question type, correct answer, [wrong ans, wrong ans, wrong ans]}
-     */
-    getNextQuestion(): {state: string, type: string, 
-            answer: string, incorrect: string[]} | null {
-        let questions: BankJSON = this.model.getQuestions();
-        // check that questions have been initialized + at least 1 state remains
-        if (Object.keys(questions).length == 0 || this.model.getRemainingStates().length == 0) {
-            return null;
-        }
-
-        let incorrectAnswers: string[] = [];
-
-        // choose random state name + question type
-        let out = {state: "", type: "", 
-            answer: "", incorrect: incorrectAnswers}
-        let randomIndex: number = Math.floor(Math.random() * Object.keys(questions).length);
-        let randomStateIndex: number = Math.floor(Math.random() * this.model.getRemainingStates().length);
-        let randomType: string = Object.keys(questions)[randomIndex];
-        let randomState: string = this.model.getRemainingStates()[randomStateIndex];
-        this.model.removeRemainingStates(randomStateIndex);
-
-        out["state"] = randomState;
-        out["type"] = randomType;
-        out["answer"] = questions[randomType][randomState];
-
-        let tempStates: string[] = [...ALL_STATES];
-        tempStates.splice(tempStates.indexOf(randomState), 1);
-
-        // choose 3 of the 49 non-correct states to grab fake answers from
-        incorrectAnswers = [];
-        for (let i = 0; i < 3; i++) {
-            let idx: number = Math.floor(Math.random() * tempStates.length);
-            let stateName: string = tempStates[idx];
-            tempStates.splice(idx, 1);
-            incorrectAnswers.push(questions[randomType][stateName]);
-        }
-
-        out["incorrect"] = incorrectAnswers;
-
-        return out;
-    }
-
     getView(): QuestionToggleView {
         return this.view;
     }
@@ -110,5 +65,9 @@ export class QuestionToggleController {
 
     handleResize(): void {
         this.view.resize();
+    }
+
+    initDefault(): void {
+        this.model.setQuestions(["capitalQuestions"]);
     }
 }

@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { QuestionType } from "../models/Questions";
 
 export function getDims(clampX: number, clampY: number, id: string) {
     let containerEl = document.getElementById(id);

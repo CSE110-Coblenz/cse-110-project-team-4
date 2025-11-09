@@ -10,8 +10,6 @@ export class WelcomeScreenController {
     private infoView: InfoCardView;
     private toggleController: QuestionToggleController;
     private ro: ResizeObserver;
-    private startW: number;
-    private startH: number;
     private containerID: string;
 
     constructor(container: string, switcher: ScreenSwitcher) {
@@ -22,7 +20,6 @@ export class WelcomeScreenController {
         this.ro = new ResizeObserver(this.handleResize);
         this.ro.observe(document.getElementById(container)!);
         this.containerID = container;
-        [this.startW, this.startH] = getDims(360, 360, container);
     }
 
     // handler function when start button is clicked, should save name
@@ -34,6 +31,11 @@ export class WelcomeScreenController {
             // validate the user's name
             // call an init function on the quiz manager, with the user's name
         }
+
+        if (Object.keys(this.toggleController.getModel().getQuestions()).length === 0) {
+            this.toggleController.initDefault();
+        }
+
         this.switcher.switchToScreen(Screens.Map);
     }
 
@@ -59,5 +61,9 @@ export class WelcomeScreenController {
 
     getView(): WelcomeScreenView {
         return this.view;
+    }
+
+    getToggler(): QuestionToggleController {
+        return this.toggleController;
     }
 }
