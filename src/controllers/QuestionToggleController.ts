@@ -50,6 +50,11 @@ export class QuestionToggleController {
     // sends the model the selected options to save
     saveOptions = () => {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
+        if (options.length === 0) {
+            // temporary alert, should eventually make it display some text for x seconds i think
+            alert("please select at least one question type (temp message)")
+            return;
+        }
         this.model.setQuestions(options);
         this.model.resetRemainingStates();
         console.log(this.model.getQuestions());

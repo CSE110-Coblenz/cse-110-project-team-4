@@ -5,6 +5,7 @@ import { Question, QuestionType, Answer, AnswerStatus } from "../models/Question
 export class QuizManager {
     private questionBank?: QuestionBankModel;
     private hasInit: boolean;
+    private name?: string;
 
     constructor() {
         this.hasInit = false;
@@ -91,6 +92,10 @@ export class QuizManager {
         }
 
         return incorrectAnswers;
+    }
+
+    setName(name: string) {
+        this.name = name;
     }
 
     public getStatus(): boolean {

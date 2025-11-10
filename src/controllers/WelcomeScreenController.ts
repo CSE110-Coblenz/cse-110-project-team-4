@@ -3,16 +3,20 @@ import { ScreenSwitcher, Screens } from "../utils/types";
 import { QuestionToggleController } from "./QuestionToggleController";
 import { InfoCardView } from "../views/InfoCardView";
 import { getDims } from "../utils/ViewUtils";
+import { TimerController } from "./TimerController";
+import { QuizManager } from "./QuizManager";
 
 export class WelcomeScreenController {
     private view: WelcomeScreenView;
     private switcher: ScreenSwitcher;
     private infoView: InfoCardView;
     private toggleController: QuestionToggleController;
+    private timer?: TimerController;
     private ro: ResizeObserver;
     private containerID: string;
+    private quiz: QuizManager;
 
-    constructor(container: string, switcher: ScreenSwitcher) {
+    constructor(container: string, switcher: ScreenSwitcher, quiz: QuizManager) {
         this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
         this.switcher = switcher;
         this.toggleController = new QuestionToggleController(this.view.getStage(), container);
@@ -20,6 +24,7 @@ export class WelcomeScreenController {
         this.ro = new ResizeObserver(this.handleResize);
         this.ro.observe(document.getElementById(container)!);
         this.containerID = container;
+        this.quiz = quiz;
     }
 
     // handler function when start button is clicked, should save name
@@ -28,6 +33,7 @@ export class WelcomeScreenController {
         if (inputEl) {
             let name = (<HTMLInputElement>inputEl).value;
             console.log("we should save this name:", name);
+            this.quiz.setName(name);
             // validate the user's name
             // call an init function on the quiz manager, with the user's name
         }
@@ -36,6 +42,9 @@ export class WelcomeScreenController {
             this.toggleController.initDefault();
         }
 
+        if (this.timer) {
+            this.timer.start();
+        }
         this.switcher.switchToScreen(Screens.Map);
     }
 
@@ -65,5 +74,9 @@ export class WelcomeScreenController {
 
     getToggler(): QuestionToggleController {
         return this.toggleController;
+    }
+
+    bindTimer(timer: TimerController): void {
+        this.timer = timer;
     }
 }

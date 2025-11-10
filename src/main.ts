@@ -94,7 +94,7 @@ class Application extends ScreenSwitcher {
             { goToQuestionsFor: (_s: USState) => {} }
         );
         this.ui = new UIController(this.map);
-        this.menu = new WelcomeScreenController("welcome-root", this);
+        this.menu = new WelcomeScreenController("welcome-root", this, this.manager);
         this.stats = new GameStatsController(this.map);
     }
 
@@ -109,6 +109,7 @@ class Application extends ScreenSwitcher {
             this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
             const timerView = new TimerViewCorner(stageForUI);
             const timerCtrl = new TimerController(new TimerModel(300), timerView);
+            this.menu.bindTimer(timerCtrl);
         }
         setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
         setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
