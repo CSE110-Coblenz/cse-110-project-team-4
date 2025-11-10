@@ -6,7 +6,7 @@ describe("question toggle view", () => {
     const mockEl = document.createElement("div");
     mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
-    let QTV = new QuestionToggleView(() => {}, () => {}, (p: keyof Toggles) => {}, () => {}, new Konva.Stage({container: mockEl.id}));
+    let QTV = new QuestionToggleView(() => {}, () => {}, (p: keyof Toggles) => {}, () => {}, new Konva.Stage({container: mockEl.id}), "main-menu-container");
 
     it("should generate a layer", () => {
         expect(QTV.getLayer()).toBeDefined();

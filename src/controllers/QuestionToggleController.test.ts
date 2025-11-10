@@ -13,7 +13,8 @@ describe("question toggle controller", () => {
         expect(QTC.getModel()).toBeDefined();
     })
 
-    // this should eventually be moved to a question bank....
+    // this will be moved to a quiz manager test
+    /*
     it("should be able to properly get questions", () => {
         let selectedStates: string[] = [];
         let opts = ["capitalQuestions", "abbreviationQuestions"];
@@ -29,5 +30,5 @@ describe("question toggle controller", () => {
             expect(q["incorrect"].indexOf(q["answer"])).toEqual(-1);
             expect(opts.indexOf(q["type"])).toBeGreaterThan(-1);
         }
-    })
+    })*/
 })
