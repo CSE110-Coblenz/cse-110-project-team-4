@@ -1,4 +1,22 @@
 // src/views/GameStatsLightbox.ts
+/*=============================
+VIEW LAYER (MVC)
+    Displays game statistics in a lightbox overlay.
+        - Shows counts of grey (not started), green (complete), and red (partial) states.
+        - Displays current points score.
+        - Rendered as a Konva Group with background box and text elements.
+        - Updates dynamically via updateCounts() method.
+
+    Related files:
+        - Controller: src/controllers/GameStatsController.ts
+
+    Update history:
+        Sprint 2 (Nov 2025):
+        - Added points display to lightbox.
+        - Updated updateCounts() to accept and display points parameter.
+        - Adjusted layout height (80 -> 100) to accommodate points text.
+        - Styled points text in blue with bold font.
+==============================*/
 
 import Konva from "konva";
 import {MAX_ERRORS} from "../utils/constants";

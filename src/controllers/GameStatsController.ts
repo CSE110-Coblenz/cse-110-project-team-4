@@ -19,6 +19,28 @@
  */
 // src/controllers/GameStatsController.ts
 
+/*=============================
+CONTROLLER LAYER (MVC)
+    Manages game statistics tracking and display.
+        - Tracks player points and state completion counts (grey/green/red).
+        - Integrates with MapController to access stage and state store.
+        - Updates GameStatsLightbox view with live counts and points.
+        - Awards points on correct answers via onCorrect() method.
+
+    Related files:
+        - View: src/views/GameStatsLightbox.ts
+        - Controller: src/controllers/MapController.ts, src/controllers/UIController.ts
+        - Model: src/models/State.ts (StateStatus enum)
+
+    Update history:
+        Sprint 2 (Nov 2025):
+        - Added points tracking system (10 points per correct answer).
+        - Added onCorrect(stateCode) to mark states complete and increment points.
+        - Rewrote constructor to derive counts from MapController's store for live updates.
+        - Added getColorCounts() helper to compute state status distribution.
+        - Safely adds lightbox to map's Konva stage via passed MapController.
+==============================*/
+
 import Konva from "konva";
 import GameStatsLightbox from "../views/GameStatsLightbox"; // ADDED: Reuse the existing lightbox view from the PR.
 import { MapController } from "./MapController"; // ADDED: We need access to map.getStage() (already provided in MapController).

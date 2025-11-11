@@ -5,8 +5,13 @@
     Mounts tile map view
     On click: cycles status + triggers UI navigation
     Subscribes to store changes and redraws view
+    Exposes getStage(), getStore(), and getSelectedState() for external controllers
+    Tracks currently selected state for integration with UI and stats controllers
     
     Controller: bridges UI and Model; translates user interactions into business calls.
+    Sprint 2 updates (Nov 2025):
+        - Added getStage(), getStore(), getSelectedState() accessor methods
+        - Stores selectedState reference on click events
 ==============================*/
 
 //import MapViewSquares from "../views/MapViewSquares";
