@@ -1,3 +1,33 @@
+// src/views/InfoCardView.ts
+/*==============================================================================
+InfoCardView
+
+Public API
+- constructor(stage: Konva.Stage, id: string)
+- show()
+- hide()
+- getLayer()
+- resize()
+
+Konva Elements
+- layer: layer that holds groups only for the welcome screen, to be added to WelcomeScreen stage
+- textGroup: group that holds the main text and its bounding box
+- backGroup: group that holds the back button and its bounding box
+
+Related
+- Controller: src/controllers/WelcomeScreenController.ts
+==============================================================================*/
+
+const BOX_BG = "#eee"
+const BACK_BG = "#daafafff"
+const STROKE_COLOR = "black"
+const FONT_FAMILY = "Arial"
+
+const HOW_TO_PLAY = "HOW TO PLAY:\n\nLorem Ipsum Dolor\n\n Sit Amet\n\nHello World\n\n\n\n\n\n\n\n\n\n\n\n\n\npadding"
+
+const CORNER_RADIUS = 10
+const ALIGN_STYLE = "center"
+
 import Konva from "konva";
 import { getDims } from "../utils/ViewUtils";
 
@@ -18,11 +48,11 @@ export class InfoCardView {
         let text: Konva.Text = new Konva.Text({
             x: w / 4,
             y: h / 4,
-            text: "HOW TO PLAY:\n\nLorem Ipsum Dolor\n\n Sit Amet\n\nHello World\n\n\n\n\n\n\n\n\n\n\n\n\n\npadding",
+            text: HOW_TO_PLAY,
             fontSize: 20,
-            fontFamily: "Arial",
+            fontFamily: FONT_FAMILY,
             width: w / 2,
-            align: 'center'
+            align: ALIGN_STYLE
         });
         let backButton: Konva.Text = new Konva.Text({
             x: w / 3.8,
@@ -30,26 +60,26 @@ export class InfoCardView {
             text: "Go Back",
             width: 80,
             fontSize: 18,
-            fontFamily: "Aria",
-            align: 'center'
+            fontFamily: FONT_FAMILY,
+            align: ALIGN_STYLE
         });
         let largeRect: Konva.Rect = new Konva.Rect({
             x: w / 4,
             y: h / 4.2 - 100,
             width: w / 2,
             height: text.height() * 1.2 + 100,
-            cornerRadius: 10,
-            fill: "#eee",
-            stroke: "black"
+            cornerRadius: CORNER_RADIUS,
+            fill: BOX_BG,
+            stroke: STROKE_COLOR
         });
         let smallRect: Konva.Rect = new Konva.Rect({
             x: backButton.x() - 5,
             y: backButton.y() - 5,
             width: backButton.width() + 10,
             height: backButton.height() + 10,
-            cornerRadius: 10,
-            fill: "#daafafff",
-            stroke: "black"
+            cornerRadius: CORNER_RADIUS,
+            fill: BACK_BG,
+            stroke: STROKE_COLOR
         });
 
         this.backGroup.on("click", () => {this.hide()});

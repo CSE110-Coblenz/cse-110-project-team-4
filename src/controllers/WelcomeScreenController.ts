@@ -1,3 +1,26 @@
+// src/controllers/WelcomeScreenController.ts
+/*==============================================================================
+WelcomeScreenController
+
+Public API
+- constructor(container: string, switcher: ScreenSwitcher, quiz: QuizManager)
+- handleStart() - initiates game
+- handleInfo() - show info layer
+- handleOptions() - show toggle layer
+- handleResize()
+- getView()
+- getToggler()
+- bindTimer() - fetches timer to save
+
+Design Notes
+- View handler functions implemented here for MVC
+
+Related
+- View: src/views/WelcomeScreenView.ts
+- Sub Controller: src/controllers/QuestionToggleController.ts
+- Sub View: src/views/InfoCardView.ts
+==============================================================================*/
+
 import { WelcomeScreenView } from "../views/WelcomeScreenView";
 import { ScreenSwitcher, Screens } from "../utils/types";
 import { QuestionToggleController } from "./QuestionToggleController";
@@ -32,10 +55,8 @@ export class WelcomeScreenController {
         let inputEl = document.getElementById("nameInput");
         if (inputEl) {
             let name = (<HTMLInputElement>inputEl).value;
-            console.log("we should save this name:", name);
             this.quiz.setName(name);
             // validate the user's name
-            // call an init function on the quiz manager, with the user's name
         }
 
         if (Object.keys(this.toggleController.getModel().getQuestions()).length === 0) {

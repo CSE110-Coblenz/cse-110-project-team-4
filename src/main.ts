@@ -93,9 +93,9 @@ class Application extends ScreenSwitcher {
             store,
             { goToQuestionsFor: (_s: USState) => {} }
         );
-        this.ui = new UIController(this.map);
-        this.menu = new WelcomeScreenController("welcome-root", this, this.manager);
         this.stats = new GameStatsController(this.map);
+        this.ui = new UIController(this.map, this.stats);
+        this.menu = new WelcomeScreenController("welcome-root", this, this.manager);
     }
 
     init() {
@@ -103,6 +103,7 @@ class Application extends ScreenSwitcher {
         this.map.mount("map-root");
         this.map.getView()?.hide();
         this.menu.getView().show();
+        this.stats.attemptReconnect();
         let stageForUI = this.map.getStage();
         if (stageForUI) {
             this.ui.init(stageForUI, this.manager);   // build overlay layer on top of the map

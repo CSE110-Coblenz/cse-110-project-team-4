@@ -1,5 +1,33 @@
+// src/views/QuestionToggleView.ts
+/*==============================================================================
+QuestionToggleView
+
+Public API
+- constructor(backHandler(), toggleHandler(keyof Toggles), saveHandler(), stage: Konva.Stage, id: string)
+    - Each handler is a callback for when a button is clicked
+- show() - makes layer visible
+- hide() - makes layer hidden
+- resize() - callback for when window is resized
+- getLayer(): Konva.Layer - returns Konva layer
+
+Layers & Groups
+- layer: wrapper layer that just contains toggleButtonGroup
+- toggleButtonGroup: contains buttons returned from SimpleLabelFactory and background rectangle
+
+Design Notes
+- similar labels constructed by factory method
+- show/hide similar to choices in lab
+
+Related
+- Controller: src/controllers/QuestionToggleController.ts
+- Model: src/models/QuestionBankModel.ts
+==============================================================================*/
+
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
+
+const BUTTON_WIDTH = 300;
+const HEIGHT_SCALAR = 12;
 
 export interface Toggles {
     [key: string]: boolean
@@ -15,7 +43,6 @@ export class QuestionToggleView {
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
     constructor(
-        temphandler: () => void, 
         backHandler: () => void, 
         toggleHandler: (p: keyof Toggles) => void, 
         saveHandler: () => void, 
@@ -30,12 +57,11 @@ export class QuestionToggleView {
         this.startW = w;
         this.toggleButtonGroup = new Konva.Group();
 
-        const backLabel = simpleLabelFactory(w / 2, 2 * h / 12, "Go Back", backHandler); // should do something w/ screenswitcher
-        const capitalToggle = simpleLabelFactory(w / 2, 3 * h / 12, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
-        const flowersToggle = simpleLabelFactory(w / 2, 4 * h / 12, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
-        const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / 12, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = simpleLabelFactory(w / 2, 6 * h / 12, "Save", () => saveHandler());
-        const tempLabel = simpleLabelFactory(w / 2, 7 * h / 12, "Get Question", temphandler);
+        const backLabel = simpleLabelFactory(w / 2, 2 * h / HEIGHT_SCALAR, "Go Back", backHandler); // should do something w/ screenswitcher
+        const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
+        const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
+        const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
+        const saveButton = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
 
         const rect = new Konva.Rect({
             x: w / 4,
@@ -47,9 +73,9 @@ export class QuestionToggleView {
             strokeWidth: 1
         })
 
-        capitalToggle.width(300);
-        flowersToggle.width(300);
-        abbreviationToggle.width(300);
+        capitalToggle.width(BUTTON_WIDTH);
+        flowersToggle.width(BUTTON_WIDTH);
+        abbreviationToggle.width(BUTTON_WIDTH);
 
         this.init(rect, this.toggleButtonGroup);
         this.init(backLabel, this.toggleButtonGroup);
@@ -57,7 +83,6 @@ export class QuestionToggleView {
         this.init(flowersToggle, this.toggleButtonGroup);
         this.init(abbreviationToggle, this.toggleButtonGroup);
         this.init(saveButton, this.toggleButtonGroup);
-        this.init(tempLabel, this.toggleButtonGroup);
 
         this.layer.add(this.toggleButtonGroup);
         stage.add(this.layer);

@@ -1,3 +1,20 @@
+// src/controllers/QuizManager.ts
+/*==============================================================================
+QuizManager
+
+Public API
+- constructor()
+- init(questionBank: QuestionBankModel) - connects bank to manager due to creation order
+- getNextQuestion() - returns random question and updates bank
+- getIncorrectQuestion(state: string, type: string) - returns incorrect answers given state/type 
+- setName(name: string)
+- getStatus() - return whether init has been called
+- getQuestionBank() - returns model
+
+Related
+- Model: src/models/QuestionBankModel.ts
+==============================================================================*/
+
 import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel";
 import { ALL_STATES } from "../utils/constants";
 import { Question, QuestionType, Answer, AnswerStatus } from "../models/Questions";
@@ -30,8 +47,6 @@ export class QuizManager {
         if (Object.keys(questions).length == 0 || this.questionBank.getRemainingStates().length == 0) {
             return null;
         }
-
-        let incorrectAnswers: string[] = [];
 
         // choose random state name + question type
         let randomIndex: number = Math.floor(Math.random() * Object.keys(questions).length);

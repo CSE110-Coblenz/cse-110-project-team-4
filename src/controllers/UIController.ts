@@ -36,6 +36,15 @@ interface SimpleQuestion {
 	getShuffledAnswers: () => Array<{ answerText: string; status: number }>;
 }
 
+const FILL_CORRECT = '#43A047';
+const STROKE_CORRECT = '#2E7D32';
+const TEXT_CORRECT = 'CORRECT!!!'
+
+const FILL_WRONG = '#be1a1aff'
+const STROKE_WRONG = '#841313ff'
+const TEXT_WRONG = 'INCORRECT'
+
+
 export class UIController {
 	private stage!: Konva.Stage;
 	private card!: QuestionCardView;

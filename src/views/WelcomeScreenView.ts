@@ -1,3 +1,26 @@
+// src/views/WelcomeScreenView.ts
+/*==============================================================================
+WelcomeScreenView
+
+Public API
+- constructor(startHandler(), infoHandler(), optionsHandler(), id: string)
+- show()
+- hide()
+- getLayer()
+- getStage()
+- getInput() - for name input
+- resize()
+
+Konva/Visual Elements
+- stage: stage that holds layers for both this menu and submenus
+- layer: layer that holds groups only for the welcome screen
+- toggleButtonGroup: group that holds only buttons
+- inputEl: input for entering name
+
+Related
+- Controller: src/controllers/WelcomeScreenController.ts
+==============================================================================*/
+
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 

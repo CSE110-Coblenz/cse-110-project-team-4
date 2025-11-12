@@ -1,5 +1,28 @@
+// src/controllers/QuestionToggleController.ts
+/*==============================================================================
+QuestionToggleController
+
+Public API
+- constructor(stage: Konva.Stage, id: string)
+- handleBack() - handler for view, routes back to welcome screen
+- toggleOption(key: keyof Toggles) - handler for view, turns on/off question type for key
+- saveOptions() - updates model to match current option select
+- getView() 
+- getModel()
+- handleResize()
+- initDefault() - in case no questions are selected
+
+Design Notes
+- View handler functions implemented here for MVC
+
+Related
+- View: src/views/QuestionToggleView.ts
+- Model: src/models/QuestionBankModel.ts
+- Parent: src/controllers/WelcomeScreenController.ts
+==============================================================================*/
+
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
-import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel";
+import { QuestionBankModel } from "../models/QuestionBankModel";
 import Konva from "konva";
 
 export class QuestionToggleController {
@@ -13,8 +36,7 @@ export class QuestionToggleController {
             "flowerQuestions": false, 
             "abbreviationQuestions": false 
         }
-        this.view = new QuestionToggleView(this.tempHandler, this.handleBack, this.toggleOption, this.saveOptions, stage, id);
-        // eventually, once we make a quizmanager or whatever, we should pass in the model created from there instead of initializing it here
+        this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions, stage, id);
         this.model = new QuestionBankModel();
     }
 
@@ -25,20 +47,6 @@ export class QuestionToggleController {
             inputEl.style.display = "block";
         }
         this.view.hide();
-    }
-
-    // temporary function handler to demonstrate question getting
-    tempHandler = () => {
-        let result = null; //this.getNextQuestion();
-        if (result == null) {
-            console.log("question list null or empty");
-        } else {
-            console.log("remaining states:", this.model.getRemainingStates());
-            console.log("state:", result["state"]);
-            console.log("type:", result["type"]);
-            console.log("answer:", result["answer"]);
-            console.log("incorrect:", result["incorrect"]);
-        }
     }
 
     // handler function to update when a toggle button is clicked, updates options

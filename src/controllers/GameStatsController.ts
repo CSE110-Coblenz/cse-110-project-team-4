@@ -102,4 +102,16 @@ export class GameStatsController {
 		const { grey, green, red } = this.getColorCounts();
 		this.updateCounts(grey, green, red, this.points);
 	}
+
+	public onIncorrect(stateCode: string) {
+		this.map.getStore().setStatus(stateCode, StateStatus.Partial);
+
+		const { grey, green, red } = this.getColorCounts();
+		this.updateCounts(grey, green, red, this.points);
+	}
+
+	public attemptReconnect() {
+		this.map.getStage()?.add(this.layer);
+		this.layer.draw();
+	}
 }
