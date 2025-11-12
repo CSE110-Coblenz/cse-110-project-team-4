@@ -9,8 +9,10 @@
 // Later replace this with a real router / ScreenSwitcher.
 import Konva from "konva";
 import { USState } from "../models/State";
+import { StateStatus } from "../models/State";
 import { MapController } from "./MapController";
 import { QuestionCardView } from "../views/QuestionCardView";
+import { GameStatsController } from "./GameStatsController";
 
 
 export class UIController {
@@ -18,6 +20,9 @@ export class UIController {
 	private overlayLayer!: Konva.Layer;
 	private backdrop!: Konva.Rect;
 	private card!: QuestionCardView;
+	private statsController!: GameStatsController;
+	private currentPoints: number = 0;
+	private feedbackGroup!: Konva.Group;
 
 	public goToQuestionsFor(state: USState) {
 		console.log(`Opening question for state: ${state.code}`);
@@ -36,13 +41,50 @@ export class UIController {
 		location.hash = `#questions/${state.code}`; 
 	}
 
-	constructor(private mapController: MapController) {}
+	constructor(private mapController: MapController, statsController: GameStatsController) {
+		this.statsController = statsController;
+	}
+
 
 	public init(stage: Konva.Stage) {
 		this.stage = stage;
 		this.overlayLayer = new Konva.Layer({ listening: true, visible: false });
 
 		const vp = { x: 0, y: 0, width: stage.width(), height: stage.height() };
+
+		// creating feedback popup
+		this.feedbackGroup = new Konva.Group({
+			x: stage.width() / 2,
+			y: stage.height() / 2,
+			visible: false
+		});
+		
+		const feedbackRect = new Konva.Rect({
+			width: 300,
+			height: 100,
+			fill: '#43A047',  // green
+			stroke: '#2E7D32',  // darker green
+			strokeWidth: 4,
+			cornerRadius: 10,
+			offsetX: 150,  // center horizontally
+			offsetY: 50    // center vertically
+		});
+		
+		const feedbackText = new Konva.Text({
+			width: 300,
+			height: 100,
+			text: 'CORRECT!!!',
+			fontSize: 36,
+			fontStyle: 'bold',
+			fill: 'white',
+			align: 'center',
+			verticalAlign: 'middle',
+			offsetX: 150,
+			offsetY: 50
+		});
+		
+		this.feedbackGroup.add(feedbackRect, feedbackText);
+		this.overlayLayer.add(this.feedbackGroup);
 
 		// A mask for the question window to avoid outside event.
 		// should be move to the questioncardViews.
@@ -59,6 +101,25 @@ export class UIController {
 
 		this.card = new QuestionCardView();
 		this.card.getLayer().visible(false);
+
+		this.card.onConfirm(() => {
+			this.feedbackGroup.moveTo(this.card.getLayer());
+			this.feedbackGroup.visible(true);
+			this.feedbackGroup.moveToTop();
+			this.card.getLayer().batchDraw();
+
+			if (this.mapController && this.mapController.getSelectedState) {
+				const currentState = this.mapController.getSelectedState?.();
+				if (currentState) {
+					this.statsController.onCorrect(currentState.code);
+				}
+			}			
+			
+			setTimeout(() => {
+				this.feedbackGroup.visible(false);
+				this.closeQuestion();
+			}, 1000);
+		});
 
 		stage.add(this.overlayLayer);
 		stage.add(this.card.getLayer());
