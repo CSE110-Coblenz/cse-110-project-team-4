@@ -111,20 +111,23 @@ const map = new MapController(
 map.mount("map-root");
 //map.mount("qa-box");
 
+// fireworks test part
 const ui = new UIController(map);
+
 const stageForUI = map.getStage();
 if (stageForUI) {
-	ui.init(stageForUI);   // build overlay layer on top of the map
+	// fireworks test part
+	ui.mount(stageForUI);   
+
 	map.setUIBus(ui);      // hand real UI bus back to MapController
 	const timerView = new TimerViewCorner(stageForUI);
-	const timerCtrl = new TimerController(new TimerModel(300), timerView);
+	const timerCtrl = new TimerController(new TimerModel(), timerView);
 	timerCtrl.start();
-
 }
+
 const qToggle = new QuestionToggleController("tool-bar");
 qToggle.getView().show?.();
 
-// GameStats lightbox (unchanged)
 new GameStatsController(map);
 
 
@@ -136,6 +139,10 @@ new GameStatsController(map);
 setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
 setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
 
+// fireworks effect test:
+setTimeout(() => ui.triggerFireworksTest(), 2000);
+
+
 window.addEventListener("keydown", (ev) => {
 	if (ev.key.toLowerCase() === "f") {
 		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
@@ -143,6 +150,10 @@ window.addEventListener("keydown", (ev) => {
 	if (ev.key.toLowerCase() === "r") {
 		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
 	}
+	if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
+    	ui.triggerFireworksTest();
+	}
+
 });
 
 

@@ -76,13 +76,16 @@ export class MapController {
     }
 
     public setInteractive(enabled: boolean) {
+        // Delegate to the view so the Controller does not need to know layer details.
+        if ((this.view as any)?.setInteractive) {
+            (this.view as any).setInteractive(enabled);
+            return;
+        }
+
+        // Fallback: toggle only the known map layer if present (older views).
         const layer = this.mapLayer ?? this.view?.getLayer?.();
         if (layer) {
-            layer.listening(enabled);           // only map layer
-            layer.opacity(enabled ? 1 : 0.9);
-        } else {
-            const st = this.view?.getStage();   // fallback: freeze whole stage
-            if (st) st.listening(enabled);
+            layer.listening(enabled);       // only map layer
         }
     }
 

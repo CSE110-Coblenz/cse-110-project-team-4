@@ -13,11 +13,10 @@
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
-    "konva": "^9.3.22",
-    "topojson-client": "^3.1.0",
-    "us-atlas": "^3.0.1"
+    "konva": "^9.3.22"
   },
   "devDependencies": {
+    "@turf/turf": "^7.2.0",
     "@types/d3-geo": "^3.1.0",
     "@types/geojson": "^7946.0.14",
     "@types/node": "^24.10.0",
@@ -30,8 +29,11 @@
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^27.1.0",
     "prettier": "^3.6.2",
+    "topojson-client": "^3.1.0",
     "typescript": "^5.9.3",
+    "us-atlas": "^3.0.1",
     "vite": "^7.1.12",
-    "vitest": "^4.0.7"
+    "vitest": "^4.0.7",
+    "world-atlas": "^2.0.2"
   }
 }

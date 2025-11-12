@@ -1,6 +1,6 @@
 // src/utils/constants.ts
 export const MAX_ERRORS = 3; //src/views/GameStatsLightbox.ts
-export const GAME_DURATION_MIN = 5; 
+export const GAME_DURATION_MIN = 15;  //src/models/TimerModel.ts
 export const ALL_STATES: string[] = ["Alabama", "Alaska","Arizona", "Arkansas", "California", 
         "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
         "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
@@ -10,3 +10,5 @@ export const ALL_STATES: string[] = ["Alabama", "Alaska","Arizona", "Arkansas", 
         "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
         "West Virginia", "Wisconsin", "Wyoming"
 ];
+export const STAGE_WIDTH = 2000;
+export const STAGE_HEIGHT = 2000;

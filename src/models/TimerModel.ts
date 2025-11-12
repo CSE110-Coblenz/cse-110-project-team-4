@@ -1,4 +1,4 @@
-import { GAME_DURATION_MIN } from "../../constant";
+import { GAME_DURATION_MIN } from "../utils/constants";
 
 export class TimerModel {
   private timerId: (number | null);
