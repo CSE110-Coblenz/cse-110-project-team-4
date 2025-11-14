@@ -38,7 +38,7 @@ export class InfoCardView {
     private startW: number;
     private id: string;
 
-    constructor(stage: Konva.Stage, id: string) {
+    constructor(stage: Konva.Stage, id: string, hide: () => void) {
         let [w, h] = getDims(360, 360, id);
         this.id = id;
         this.startW = w;
@@ -82,7 +82,7 @@ export class InfoCardView {
             stroke: STROKE_COLOR
         });
 
-        this.backGroup.on("click", () => {this.hide()});
+        this.backGroup.on("click", hide);
         this.backGroup.on('mouseover', function (e) {
             e.target.getStage()!.container().style.cursor = 'pointer';
         });

@@ -55,11 +55,23 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
 
     out.on("click", (e) => {
         // toggle the checkbox if the button text has one
-        let txt: string = e.target?.attrs?.text ?? "";
-        if (txt.endsWith("\u2611")) {
-            e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});
-        } else if (txt.includes("\u2610")) {
-            e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
+        let target = e.target
+        let txt: string = "";
+        let newTarget: Konva.Text | undefined;
+        if (target != null) {
+            let siblings = target.getAttr("parent").getChildren()
+            siblings.forEach((sibling: { attrs: { text: string; }; }) => {
+                if (sibling instanceof Konva.Text) {
+                    txt = sibling.attrs.text
+                    newTarget = sibling
+                }
+            })
+        }
+        //console.log("in click handler", e.target);
+        if (txt.endsWith("\u2611") && typeof newTarget != "undefined") {
+            newTarget.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});
+        } else if (txt.includes("\u2610") && typeof newTarget != "undefined") {
+            newTarget.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
         }
         handler();
     });

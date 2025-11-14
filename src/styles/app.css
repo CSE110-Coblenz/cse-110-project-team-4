@@ -94,7 +94,7 @@ body {
 /* Views container (kept simple; toggle sections via [hidden]) */
 #views section[hidden] { display: none !important; }
 
-#welcome-root {
+#welcome-root, #leaderboard-root {
   height: 100%;
   width: 100%;
 }

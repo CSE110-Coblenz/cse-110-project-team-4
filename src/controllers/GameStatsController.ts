@@ -117,6 +117,16 @@ export class GameStatsController {
 
 	public isFinished() {
 		let { grey, green, red } = this.getColorCounts();
-		return green === 50 || red === 3;
+		if (green >= 50) {
+			return 1
+		} else if (red >= 3) {
+			return -1
+		} else {
+			return 0
+		}
+	}
+
+	public resetPoints() {
+		this.points = 0;
 	}
 }

@@ -42,6 +42,7 @@ import { ScreenSwitcher, Screens } from "./utils/types";
 import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import Konva from "konva";
 import { QuizManager } from "./controllers/QuizManager";
+import { ResultScreenController } from "./controllers/ResultScreenController";
 
 
 //=================   2) Compose Models & Services (no UI/DOM here)
@@ -85,10 +86,11 @@ class Application extends ScreenSwitcher {
     private menu: WelcomeScreenController;
     private stats: GameStatsController;
     private manager: QuizManager;
+    private leaderboard: ResultScreenController;
 
     constructor(store: StateStore) {
         super();
-        this.manager = new QuizManager();
+        this.manager = new QuizManager(this);
         this.map = new MapController(
             store,
             { goToQuestionsFor: (_s: USState) => {} }
@@ -96,6 +98,7 @@ class Application extends ScreenSwitcher {
         this.stats = new GameStatsController(this.map);
         this.ui = new UIController(this.map, this.stats);
         this.menu = new WelcomeScreenController("welcome-root", this, this.manager);
+        this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
     }
 
     init() {
@@ -110,7 +113,7 @@ class Application extends ScreenSwitcher {
             const timerView = new TimerViewCorner(stageForUI);
             const timerCtrl = new TimerController(new TimerModel(300), timerView);
             this.menu.bindTimer(timerCtrl);
-            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl);
+            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
         }
 
         window.addEventListener("keydown", (ev) => {
@@ -125,7 +128,7 @@ class Application extends ScreenSwitcher {
     }
 
     public switchToScreen(screen: Screens): void {
-        // hide map
+        this.leaderboard.getView().hide();
         this.map.getView()!.hide();
         this.menu.getView().hide();
 
@@ -135,6 +138,9 @@ class Application extends ScreenSwitcher {
                 break;
             case Screens.Welcome:
                 this.menu.getView().show();
+                break;
+            case Screens.Leaderboard:
+                this.leaderboard.getView().show();
                 break;
             default: 
         }

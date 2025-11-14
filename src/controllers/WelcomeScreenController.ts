@@ -43,7 +43,7 @@ export class WelcomeScreenController {
         this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
         this.switcher = switcher;
         this.toggleController = new QuestionToggleController(this.view.getStage(), container);
-        this.infoView = new InfoCardView(this.view.getStage(), container);
+        this.infoView = new InfoCardView(this.view.getStage(), container, this.hideInfo);
         this.ro = new ResizeObserver(this.handleResize);
         this.ro.observe(document.getElementById(container)!);
         this.containerID = container;
@@ -68,13 +68,18 @@ export class WelcomeScreenController {
         }
         this.switcher.switchToScreen(Screens.Map);
 
-        setTimeout(() => {this.quiz.handleNextAction()}, 3000);
+        setTimeout(() => {this.quiz.handleNextAction()}, 200);
     }
 
     // route info click to info screen, maybe display a modal instead?
     handleInfo = () => {
         this.view.getInput().style.display = "none";
         this.infoView.show();
+    }
+
+    hideInfo = () => {
+        this.view.getInput().style.display = "block";
+        this.infoView.hide();
     }
 
     // route options click to options screen

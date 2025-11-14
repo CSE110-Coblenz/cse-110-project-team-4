@@ -4,7 +4,7 @@ QuizManager
 
 Public API
 - constructor()
-- init(questionBank: QuestionBankModel, stats: GameStatsController) - connects bank to manager due to creation order
+- init(questionBank: QuestionBankModel, stats: GameStatsController, timer: TimerController, map: MapController) - connects bank to manager due to creation order
 - getNextQuestion() - returns random question and updates bank
 - getIncorrectQuestion(state: string, type: string) - returns incorrect answers given state/type 
 - setName(name: string)
@@ -18,10 +18,15 @@ Related
 
 import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel";
 import { ALL_STATES } from "../utils/constants";
+import { FULL_NAME_BY_CODE } from "../data/maps/UsCodeToName"; 
 import { Question, QuestionType, Answer, AnswerStatus } from "../models/Questions";
 import { GameStatsController } from "./GameStatsController";
 import { UIController } from "./UIController";
 import { TimerController } from "./TimerController";
+import { ScreenSwitcher, Screens } from "../utils/types";
+import { finished } from "stream";
+import { MapController } from "./MapController";
+import { StateStatus } from "../models/State";
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
@@ -31,13 +36,22 @@ export class QuizManager {
     private ui?: UIController
     private continue: boolean;
     private timer?: TimerController;
+    private switcher: ScreenSwitcher;
+    private map?: MapController;
 
-    constructor() {
+    constructor(switcher: ScreenSwitcher) {
         this.hasInit = false;
         this.continue = true;
+        this.switcher = switcher;
     }
 
-    public init(questionBank: QuestionBankModel, stats: GameStatsController, ui: UIController, timer: TimerController) {
+    public init(
+        questionBank: QuestionBankModel, 
+        stats: GameStatsController, 
+        ui: UIController, 
+        timer: TimerController,
+        map: MapController) 
+    {
         console.log("INIT SUCCESSFUL", questionBank);
         this.hasInit = true;
         this.questionBank = questionBank;
@@ -45,6 +59,7 @@ export class QuizManager {
         this.ui = ui
         this.continue = true;
         this.timer = timer;
+        this.map = map;
     }
 
     /** gets and returns info necessary for one question, removing that state from the pool
@@ -137,13 +152,25 @@ export class QuizManager {
         return null;
     }
 
+    public restartGame(): void {
+        Object.keys(FULL_NAME_BY_CODE).forEach(key => {
+            this.map?.getStore().setStatus(key, StateStatus.NotStarted);
+        })
+        this.map?.getStore()
+        this.stats?.updateCounts(51, 0, 0, 0)
+        this.continue = true;
+        this.questionBank?.resetRemainingStates();
+        this.stats?.resetPoints();
+    }
+
     public handleNextAction(): void {
         if (!this.hasInit || !this.ui || !this.questionBank || !this.stats || !this.timer) {
             return;
         }
 
+        let finishedStatus = this.stats.isFinished();
         if (this.questionBank.getRemainingStates().length == 0 ||
-                this.stats.isFinished() ||
+                finishedStatus != 0 ||
                 this.timer.isFinished()) {
             this.continue = false;
         }
@@ -151,7 +178,18 @@ export class QuizManager {
         if (this.continue) {
             this.ui.goToQuestionsFor();
         } else {
-            alert("game over should do something now");
+            switch (finishedStatus) {
+                case 1:
+                    console.log("victory royale")
+                    break;
+                case 0:
+                    console.log("probably ran out of time")
+                    break;
+                case -1:
+                    console.log("this is loss")
+                    break
+            }
+            this.switcher.switchToScreen(Screens.Leaderboard);
         }
     }
 }

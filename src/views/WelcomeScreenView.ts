@@ -29,7 +29,6 @@ export class WelcomeScreenView {
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
     private id: string;
-    private startW: number;
     private inputEl;
 
     // backHandler should be a handler for the back button
@@ -43,7 +42,6 @@ export class WelcomeScreenView {
     {
         this.id = id;
         let [w, h] = getDims(360, 360, id);
-        this.startW = w;
         this.stage = new Konva.Stage({
             container: id,
             width: w,
@@ -71,17 +69,12 @@ export class WelcomeScreenView {
         this.inputEl = textBox;
         menuEl?.appendChild(textBox);
 
-        this.init(startLabel, this.toggleButtonGroup);
-        this.init(infoLabel, this.toggleButtonGroup);
-        this.init(optionsLabel, this.toggleButtonGroup);
+        this.toggleButtonGroup.add(startLabel)
+        this.toggleButtonGroup.add(infoLabel)
+        this.toggleButtonGroup.add(optionsLabel)
 
         this.layer.add(this.toggleButtonGroup);
         this.stage.add(this.layer);
-    }
-    
-    private init(node: Konva.Group, group: Konva.Group) {
-        node.setAttr('centerOffset', this.startW / 2 - node.getAttr('x'));
-        group.add(node);
     }
 
     show(): void {
