@@ -114,4 +114,9 @@ export class GameStatsController {
 		this.map.getStage()?.add(this.layer);
 		this.layer.draw();
 	}
+
+	public isFinished() {
+		let { grey, green, red } = this.getColorCounts();
+		return green === 50 || red === 3;
+	}
 }

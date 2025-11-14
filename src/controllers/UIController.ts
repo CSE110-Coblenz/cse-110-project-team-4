@@ -30,6 +30,7 @@ import { FireworksView } from "../views/FireworksView";
 import { GameStatsController } from "./GameStatsController";
 import { Question, Answer } from "../models/Questions";
 import { QuizManager } from "./QuizManager";
+import { CODE_BY_FULL_NAME } from "../data/maps/UsNameToCode";
 
 interface SimpleQuestion {
 	questionText: string;
@@ -81,6 +82,7 @@ export class UIController {
 	private currentPoints: number = 0;
 	private feedbackGroup!: Konva.Group;
 	private manager!: QuizManager;
+	private currentState: USState | null;
 
 	public goToQuestionsFor(state: USState) {
 		console.log(`Opening question for state: ${state.code}`);

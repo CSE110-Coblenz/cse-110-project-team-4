@@ -99,7 +99,6 @@ class Application extends ScreenSwitcher {
     }
 
     init() {
-        this.manager.init(this.menu.getToggler().getModel());
         this.map.mount("map-root");
         this.map.getView()?.hide();
         this.menu.getView().show();
@@ -111,9 +110,8 @@ class Application extends ScreenSwitcher {
             const timerView = new TimerViewCorner(stageForUI);
             const timerCtrl = new TimerController(new TimerModel(300), timerView);
             this.menu.bindTimer(timerCtrl);
+            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl);
         }
-        setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
-        setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
 
         window.addEventListener("keydown", (ev) => {
             if (ev.key.toLowerCase() === "f") {
@@ -134,9 +132,6 @@ class Application extends ScreenSwitcher {
         switch (screen) {
             case Screens.Map:
                 this.map.getView()!.show();
-                if (!this.manager.getStatus()) {
-                    this.manager.init(this.menu.getToggler().getModel());
-                }
                 break;
             case Screens.Welcome:
                 this.menu.getView().show();

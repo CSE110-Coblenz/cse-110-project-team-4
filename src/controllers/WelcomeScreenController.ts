@@ -67,6 +67,8 @@ export class WelcomeScreenController {
             this.timer.start();
         }
         this.switcher.switchToScreen(Screens.Map);
+
+        setTimeout(() => {this.quiz.handleNextAction()}, 3000);
     }
 
     // route info click to info screen, maybe display a modal instead?

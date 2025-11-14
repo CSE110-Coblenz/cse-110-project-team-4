@@ -4,12 +4,13 @@ QuizManager
 
 Public API
 - constructor()
-- init(questionBank: QuestionBankModel) - connects bank to manager due to creation order
+- init(questionBank: QuestionBankModel, stats: GameStatsController) - connects bank to manager due to creation order
 - getNextQuestion() - returns random question and updates bank
 - getIncorrectQuestion(state: string, type: string) - returns incorrect answers given state/type 
 - setName(name: string)
 - getStatus() - return whether init has been called
 - getQuestionBank() - returns model
+- handleNextAction() - checks if game is over, then acts appropriately
 
 Related
 - Model: src/models/QuestionBankModel.ts
@@ -18,20 +19,32 @@ Related
 import { QuestionBankModel, BankJSON } from "../models/QuestionBankModel";
 import { ALL_STATES } from "../utils/constants";
 import { Question, QuestionType, Answer, AnswerStatus } from "../models/Questions";
+import { GameStatsController } from "./GameStatsController";
+import { UIController } from "./UIController";
+import { TimerController } from "./TimerController";
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
     private hasInit: boolean;
     private name?: string;
+    private stats?: GameStatsController;
+    private ui?: UIController
+    private continue: boolean;
+    private timer?: TimerController;
 
     constructor() {
         this.hasInit = false;
+        this.continue = true;
     }
 
-    public init(questionBank: QuestionBankModel) {
+    public init(questionBank: QuestionBankModel, stats: GameStatsController, ui: UIController, timer: TimerController) {
         console.log("INIT SUCCESSFUL", questionBank);
         this.hasInit = true;
         this.questionBank = questionBank;
+        this.stats = stats;
+        this.ui = ui
+        this.continue = true;
+        this.timer = timer;
     }
 
     /** gets and returns info necessary for one question, removing that state from the pool
@@ -122,5 +135,23 @@ export class QuizManager {
             return this.questionBank;
         }
         return null;
+    }
+
+    public handleNextAction(): void {
+        if (!this.hasInit || !this.ui || !this.questionBank || !this.stats || !this.timer) {
+            return;
+        }
+
+        if (this.questionBank.getRemainingStates().length == 0 ||
+                this.stats.isFinished() ||
+                this.timer.isFinished()) {
+            this.continue = false;
+        }
+
+        if (this.continue) {
+            this.ui.goToQuestionsFor();
+        } else {
+            alert("game over should do something now");
+        }
     }
 }
