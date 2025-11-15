@@ -16,6 +16,10 @@ BOOT ORDER — Application Startup Sequence
   4) Mount Views (attach to HTML container)
   5) Seed / Demo Hooks (timers / shortcuts)
   6) Navigation & UI Bus Wiring (router/modals)
+  
+  11/10/2025 update (Sprint 2):
+  - Initialize GameStatsController before UIController to enable stats tracking
+  - Pass GameStatsController into UIController for point/count updates on answers
 ==============================*/
 
 

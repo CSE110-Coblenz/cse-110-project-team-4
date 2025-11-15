@@ -19,6 +19,7 @@ API:
 
 import Konva from "konva";
 import { USState } from "../models/State";
+import { StateStatus } from "../models/State";
 import { MapController } from "./MapController";
 import { QuestionCardView } from "../views/QuestionCardView";
 import { OverlayLayer } from "../views/OverlayLayer";
@@ -26,6 +27,7 @@ import { OverlayLayer } from "../views/OverlayLayer";
 // konva effects testing:
 import { FireworksView } from "../views/FireworksView";
 
+import { GameStatsController } from "./GameStatsController";
 
 interface SimpleQuestion {
 	questionText: string;
@@ -64,6 +66,9 @@ export class UIController {
 
 		this.stage.draw();
 	}
+	private statsController!: GameStatsController;
+	private currentPoints: number = 0;
+	private feedbackGroup!: Konva.Group;
 
 	public goToQuestionsFor(state: USState) {
 		console.log(`Opening question for state: ${state.code}`);

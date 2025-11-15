@@ -5,6 +5,12 @@
   VIEW LAYER:
   - Use Konva to define and draw a question card
   - helper functions such as view, hide, and setQuestion included
+  - Exposes onConfirm() callback for external controllers to hook answer submission
+  - Manages answer selection state and visual feedback
+  
+  Sprint 2 updates (Nov 2025):
+  - Added onConfirm() callback registration for UIController integration
+  - Callback fires on confirm button click to enable stats/feedback updates
 
 ==============================*/
 
@@ -54,6 +60,7 @@ export class QuestionCardView {
   private layer: Konva.Layer;
   private currentAnswers: Answer[] = [];
   private selectedAnswerIndex: number | null = null;
+  private onConfirmCallback?: () => void;
 
   constructor() {
     this.layer = this.drawQuestionCard();
@@ -88,6 +95,10 @@ export class QuestionCardView {
     this.layer.draw();
     this.currentAnswers = answers;
 
+  }
+
+  onConfirm(callback: () => void) {
+    this.onConfirmCallback = callback;
   }
 
   private drawQuestionCard(): Konva.Layer {
@@ -250,12 +261,17 @@ export class QuestionCardView {
 
     });
     confirmButton.on('click', () => {
+      if (this.selectedAnswerIndex === null) {
+        // Don't allow confirmation without selecting an answer
+        return;
+      }
       confirmButton.scale({ x: 1, y: 1 });
       layer.draw();
       layer.getStage().container().style.cursor = 'default';
       circle.fill(CONFIRM_FALSE);
       this.selectedAnswerIndex = null;
 
+      if (this.onConfirmCallback) this.onConfirmCallback();
     });
 
     layer.draw();
