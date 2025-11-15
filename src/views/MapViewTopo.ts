@@ -181,9 +181,13 @@ function createUpArrowTemplate(): Konva.Arrow {
         listening: false,
         shadowForStrokeEnabled: true,
         opacity:ARROW_OPACITY,
+
+        //The canvas blur filter wastes cost too much.
+        /*
         shadowColor: ARROW_SHADOW,
         shadowOpacity: 0.5,
         shadowBlur: 2,
+        */
         perfectDrawEnabled: false,
     });
 
