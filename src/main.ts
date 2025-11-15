@@ -80,6 +80,7 @@ const store = new StateStore(seed);
 //		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
 //		  const minigame = new MinigameController(cardState);
 
+// application class stores controllers, modeled after lab design
 class Application extends ScreenSwitcher {
     private ui: UIController;
     private map: MapController;
@@ -88,6 +89,7 @@ class Application extends ScreenSwitcher {
     private manager: QuizManager;
     private leaderboard: ResultScreenController;
 
+    // initialize most controllers
     constructor(store: StateStore) {
         super();
         this.manager = new QuizManager(this);
@@ -97,10 +99,12 @@ class Application extends ScreenSwitcher {
         );
         this.stats = new GameStatsController(this.map);
         this.ui = new UIController(this.map, this.stats);
-        this.menu = new WelcomeScreenController("welcome-root", this, this.manager);
+        this.menu = new WelcomeScreenController("welcome-root", this.manager);
         this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
     }
 
+    // finish initializations that have certain dependencies
+    // mount views onto divs
     init() {
         this.map.mount("map-root");
         this.map.getView()?.hide();
@@ -112,10 +116,10 @@ class Application extends ScreenSwitcher {
             this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
             const timerView = new TimerViewCorner(stageForUI);
             const timerCtrl = new TimerController(new TimerModel(300), timerView);
-            this.menu.bindTimer(timerCtrl);
             this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
         }
 
+        // temp debug
         window.addEventListener("keydown", (ev) => {
             if (ev.key.toLowerCase() === "f") {
                 store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
@@ -127,6 +131,7 @@ class Application extends ScreenSwitcher {
         this.stats;
     }
 
+    // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
     public switchToScreen(screen: Screens): void {
         this.leaderboard.getView().hide();
         this.map.getView()!.hide();
@@ -147,14 +152,6 @@ class Application extends ScreenSwitcher {
     }
 }
 
-
-//=================    3) Compose Controllers
-//	  Put: business controllers that connect model and view (no rendering details).
-//	  Where teammates should add later:
-//		- Quiz flow: `import { QuizManager } from "./controllers/QuizManager";`
-//		  const quiz = new QuizManager(questionBank, leaderBoard);
-//		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
-//		  const minigame = new MinigameController(cardState);
 const app = new Application(store);
 app.init();
 

@@ -31,9 +31,6 @@ export class WelcomeScreenView {
     private id: string;
     private inputEl;
 
-    // backHandler should be a handler for the back button
-    // toggleHandler should be a handler for the toggle question buttons
-    // saveHandler should be a handler for the save options button
     constructor(
         startHandler: () => void, 
         infoHandler: () => void, 
@@ -48,8 +45,6 @@ export class WelcomeScreenView {
             height: h,
             visible: false
         })
-        // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
-        // code to deal with dynamic resizing...
 
         this.layer = new Konva.Layer({ visible: true });
         this.toggleButtonGroup = new Konva.Group();

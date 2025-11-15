@@ -57,7 +57,7 @@ export class QuestionToggleView {
         this.startW = w;
         this.toggleButtonGroup = new Konva.Group();
 
-        const backLabel = simpleLabelFactory(w / 2, 2 * h / HEIGHT_SCALAR, "Go Back", backHandler); // should do something w/ screenswitcher
+        const backLabel = simpleLabelFactory(w / 2, 2 * h / HEIGHT_SCALAR, "Go Back", backHandler);
         const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
         const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
         const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));

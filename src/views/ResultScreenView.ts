@@ -1,3 +1,24 @@
+// src/views/ResultScreenView.ts
+/*==============================================================================
+ResultScreenView
+
+Public API
+- constructor(restartHandler(), id: string)
+- getLayer()
+- getStage()
+- show()
+- hide()
+- resize()
+
+Konva/Visual Elements
+- stage: overall stage for post-game screen
+- layer: holds groups for post-game screen
+- restartGroup: holds elements for the restart button
+
+Related
+- Controller: src/controllers/ResultScreenView.ts
+==============================================================================*/
+
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 

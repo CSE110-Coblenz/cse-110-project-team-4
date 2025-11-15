@@ -1,3 +1,17 @@
+// src/controllers/ResultScreenController.ts
+/*==============================================================================
+ResultScreenController
+
+Public API
+- constructor(quiz: QuizManager, switcher: ScreenSwitcher, container: string)
+- handleRestart() - conveys to quiz manager to restart quiz
+- getView()
+- handleREsize()
+
+Related
+- View: src/views/ResultScreenView.ts
+==============================================================================*/
+
 import { QuizManager } from "./QuizManager";
 import { ResultScreenView } from "../views/ResultScreenView";
 import { ScreenSwitcher, Screens } from "../utils/types";

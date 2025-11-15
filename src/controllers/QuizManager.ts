@@ -3,13 +3,14 @@
 QuizManager
 
 Public API
-- constructor()
-- init(questionBank: QuestionBankModel, stats: GameStatsController, timer: TimerController, map: MapController) - connects bank to manager due to creation order
+- constructor(switcher: ScreenSwitcher)
+- init(questionBank: QuestionBankModel, stats: GameStatsController, timer: TimerController, map: MapController) - connects manager to dependent components
 - getNextQuestion() - returns random question and updates bank
 - getIncorrectQuestion(state: string, type: string) - returns incorrect answers given state/type 
-- setName(name: string)
+- startGame(name: string)
 - getStatus() - return whether init has been called
 - getQuestionBank() - returns model
+- restartGame() 
 - handleNextAction() - checks if game is over, then acts appropriately
 
 Related
@@ -24,14 +25,13 @@ import { GameStatsController } from "./GameStatsController";
 import { UIController } from "./UIController";
 import { TimerController } from "./TimerController";
 import { ScreenSwitcher, Screens } from "../utils/types";
-import { finished } from "stream";
 import { MapController } from "./MapController";
 import { StateStatus } from "../models/State";
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
     private hasInit: boolean;
-    private name?: string;
+    private name?: string; // eventually save this into database
     private stats?: GameStatsController;
     private ui?: UIController
     private continue: boolean;
@@ -52,7 +52,6 @@ export class QuizManager {
         timer: TimerController,
         map: MapController) 
     {
-        console.log("INIT SUCCESSFUL", questionBank);
         this.hasInit = true;
         this.questionBank = questionBank;
         this.stats = stats;
@@ -137,8 +136,13 @@ export class QuizManager {
         return incorrectAnswers;
     }
 
-    setName(name: string) {
+    startGame(name: string) {
         this.name = name;
+        if (this.timer) {
+            this.timer.start();
+        }
+        this.switcher.switchToScreen(Screens.Map);
+        setTimeout(() => {this.handleNextAction()}, 200);
     }
 
     public getStatus(): boolean {
