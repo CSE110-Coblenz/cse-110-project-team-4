@@ -63,7 +63,7 @@ export class ResultScreenView {
     }
 
     hide() {
-        this.stage.visible(true);
+        this.stage.visible(false);
         document.getElementById(this.id)!.style.display = "none";
         this.stage.draw();
     }

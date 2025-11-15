@@ -118,7 +118,11 @@ export class QuizManager {
         let incorrectAnswers: Answer[] = [];
 
         let tempStates: string[] = [...ALL_STATES];
-        tempStates.splice(tempStates.indexOf(state), 1);
+        let idx = tempStates.indexOf(state)
+        if (idx < 0) {
+            return null;
+        }
+        tempStates.splice(idx, 1);
 
         // choose 3 of the 49 non-correct states to grab fake answers from
         incorrectAnswers = [];
@@ -126,6 +130,9 @@ export class QuizManager {
             let idx: number = Math.floor(Math.random() * tempStates.length);
             let stateName: string = tempStates[idx];
             tempStates.splice(idx, 1);
+            if (Object.keys(this.questionBank.getQuestions()).indexOf(type) === -1) {
+                return null;
+            }
             let ans: Answer = {
                 answerText: this.questionBank.getQuestions()[type][stateName],
                 status: AnswerStatus.NotSelected

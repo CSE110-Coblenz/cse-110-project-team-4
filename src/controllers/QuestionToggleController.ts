@@ -52,7 +52,7 @@ export class QuestionToggleController {
     // handler function to update when a toggle button is clicked, updates options
     toggleOption = (key: keyof Toggles) => {
         this.currentToggled[key] = !this.currentToggled[key];
-        console.log("curr options", this.currentToggled)
+        return this.currentToggled
     }
 
     // sends the model the selected options to save

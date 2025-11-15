@@ -13,22 +13,18 @@ describe("question toggle controller", () => {
         expect(QTC.getModel()).toBeDefined();
     })
 
-    // this will be moved to a quiz manager test
-    /*
-    it("should be able to properly get questions", () => {
-        let selectedStates: string[] = [];
-        let opts = ["capitalQuestions", "abbreviationQuestions"];
-        QTC.getModel().setQuestions(opts);
-        for (let i = 0; i < 50; i++) {
-            let q = QTC.getNextQuestion()!;
-            let keys = Object.keys(q);
-            expect(QTC.getModel().getRemainingStates().length).toEqual(49 - i);
-            expect(keys.length).toEqual(4);
-            let nextState = q["state"];
-            expect(selectedStates.indexOf(nextState)).toEqual(-1);
-            selectedStates.push(nextState);
-            expect(q["incorrect"].indexOf(q["answer"])).toEqual(-1);
-            expect(opts.indexOf(q["type"])).toBeGreaterThan(-1);
-        }
-    })*/
+    it("should update the toggles when toggleOption is called", () => {
+        let toggles = QTC.toggleOption("flowerQuestions")
+        QTC.toggleOption("capitalQuestions")
+        expect(toggles["capitalQuestions"]).toBeTruthy();
+        expect(toggles["flowerQuestions"]).toBeTruthy();
+        expect(toggles["abbreviationQuestions"]).toBeFalsy();
+    })
+
+    it("should be able to toggle options off", () => {
+        let toggles = QTC.toggleOption("capitalQuestions")
+        expect(toggles["capitalQuestions"]).toBeFalsy();
+        expect(toggles["flowerQuestions"]).toBeTruthy();
+        expect(toggles["abbreviationQuestions"]).toBeFalsy();
+    })
 })
