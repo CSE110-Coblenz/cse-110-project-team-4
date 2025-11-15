@@ -5,9 +5,9 @@
   --text: #020202;
   --border: #000000;
 
-  --map-min-w: 720px; /* map-root-Minimum & Max width */
+  --map-min-w: 640px; /* map-root-Minimum & Max width */
   --map-max-w: 1280px;
-  --map-ratio: 16/7; /*Map-root ratio*/
+  --map-ratio: 27/12; /*Map-root ratio, 13:8 */
 }
 
 html, body, #app-root { height: 100%; }
@@ -70,7 +70,7 @@ body {
   width: clamp(var(--map-min-w), 100%, var(--map-max-w));
   aspect-ratio: var(--map-ratio);
   box-sizing: border-box;
-  background: #7dcdfb;
+  background: #9de3f3;
   border: 1px solid var(--border);
   border-radius: 12px;
   min-width: 0;
