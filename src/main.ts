@@ -98,7 +98,7 @@ class Application extends ScreenSwitcher {
             { goToQuestionsFor: (_s: USState) => {} }
         );
         this.stats = new GameStatsController(this.map);
-        this.ui = new UIController(this.map, this.stats);
+        this.ui = new UIController(this.map, this.stats, this.manager);
         this.menu = new WelcomeScreenController("welcome-root", this.manager);
         this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
     }
@@ -112,10 +112,10 @@ class Application extends ScreenSwitcher {
         this.stats.attemptReconnect();
         let stageForUI = this.map.getStage();
         if (stageForUI) {
-            this.ui.init(stageForUI, this.manager);   // build overlay layer on top of the map
+            this.ui.mount(stageForUI)
             this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
             const timerView = new TimerViewCorner(stageForUI);
-            const timerCtrl = new TimerController(new TimerModel(300), timerView);
+            const timerCtrl = new TimerController(new TimerModel(), timerView);
             this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
         }
 
@@ -126,6 +126,9 @@ class Application extends ScreenSwitcher {
             }
             if (ev.key.toLowerCase() === "r") {
                 store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
+            }
+            if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
+                this.ui.triggerFireworksTest();
             }
         });
         this.stats;
@@ -186,53 +189,13 @@ app.init();
 //	  Where teammates should add later:
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
-map.mount("map-root");
-//map.mount("qa-box");
-
-// fireworks test part
-const ui = new UIController(map);
-
-const stageForUI = map.getStage();
-if (stageForUI) {
-	// fireworks test part
-	ui.mount(stageForUI);   
-
-	map.setUIBus(ui);      // hand real UI bus back to MapController
-	const timerView = new TimerViewCorner(stageForUI);
-	const timerCtrl = new TimerController(new TimerModel(), timerView);
-	timerCtrl.start();
-}
-
-const qToggle = new QuestionToggleController("tool-bar");
-qToggle.getView().show?.();
-
-new GameStatsController(map);
-
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
 //	  Where teammates can test quickly:
 //		- Preload a quiz for CA: `quiz.loadFor("CA")`
 //		- Bump score for demo: `leaderBoard.addPoints("player1", 10)`
-setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
-setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
 
-// fireworks effect test:
-setTimeout(() => ui.triggerFireworksTest(), 2000);
-
-
-window.addEventListener("keydown", (ev) => {
-	if (ev.key.toLowerCase() === "f") {
-		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
-	}
-	if (ev.key.toLowerCase() === "r") {
-		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
-	}
-	if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
-    	ui.triggerFireworksTest();
-	}
-
-});
 
 
 //=================    6) Navigation & UI Bus Wiring (router/modals)
