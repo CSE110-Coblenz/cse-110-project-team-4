@@ -3,6 +3,8 @@
 // 
 /*=============================
   - Use LocalStorage to get, set, and clear leaderboard data
+  - added in Sprint 2
+  - still need to connect to Supabase
 
 ==============================*/
 

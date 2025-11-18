@@ -79,7 +79,7 @@ export class LeaderboardView {
     }
 
      // Show leaderboard on the stage
-    view(stage: Konva.Stage): void {
+    view(): void {
         this.group.show();
     }
 
