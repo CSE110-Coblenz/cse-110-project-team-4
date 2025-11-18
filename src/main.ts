@@ -43,7 +43,7 @@ import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import Konva from "konva";
 import { QuizManager } from "./controllers/QuizManager";
 import { ResultScreenController } from "./controllers/ResultScreenController";
-
+import { supabase } from "./supabaseClient";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -131,7 +131,9 @@ class Application extends ScreenSwitcher {
                 this.ui.triggerFireworksTest();
             }
         });
+        console.log("Fetching users table from Supabase...");
         this.stats;
+        testSupabaseUsers();
     }
 
     // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
@@ -207,3 +209,21 @@ app.init();
 //		  const modal = new ModalService(); ui.setModal(modal);
 //	  Example: in UIController.goToQuestionsFor(...), open a modal or navigate:
 //		- modal.open(<QuestionsView code={state.code} />)  OR  router.push(`/questions/${state.code}`)
+
+//================= Supabase test: fetch Shanu2605 (test user) from users table
+
+async function testSupabaseUsers() {
+  try {
+    const { data, error } = await supabase
+      .from('users') 
+      .select('*');
+
+    if (error) {
+      console.error("Error fetching users:", error);
+    } else {
+      console.log("Users table data:", data);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+}
