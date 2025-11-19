@@ -1,7 +1,7 @@
 # CSE 110 Team 4 — Integration Update (v0.2)
 
-online test(github):
-[Team_4_Project_Test](https://cse110-coblenz.github.io/cse-110-project-team-4/)
+online test(github pages):
+<a href="https://cse110-coblenz.github.io/cse-110-project-team-4/" target="_blank">Team_4_Project_Testv0.2</a>
 
 >**How it’s set up (for future reference)**: 
 We deploy via GitHub Actions → Pages from the main branch.
