@@ -1,121 +1,127 @@
+// src/views/QuestionToggleView.ts
+/*==============================================================================
+QuestionToggleView
+
+Public API
+- constructor(backHandler(), toggleHandler(keyof Toggles), saveHandler(), stage: Konva.Stage, id: string)
+    - Each handler is a callback for when a button is clicked
+- show() - makes layer visible
+- hide() - makes layer hidden
+- resize() - callback for when window is resized
+- getLayer(): Konva.Layer - returns Konva layer
+
+Layers & Groups
+- layer: wrapper layer that just contains toggleButtonGroup
+- toggleButtonGroup: contains buttons returned from SimpleLabelFactory and background rectangle
+
+Design Notes
+- similar labels constructed by factory method
+- show/hide similar to choices in lab
+
+Related
+- Controller: src/controllers/QuestionToggleController.ts
+- Model: src/models/QuestionBankModel.ts
+==============================================================================*/
+
 import Konva from "konva";
+import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
+
+const BUTTON_WIDTH = 300;
+const HEIGHT_SCALAR = 12;
 
 export interface Toggles {
     [key: string]: boolean
 }
 
 export class QuestionToggleView {
-    private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
+    private startW: number;
     private id: string;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
     // saveHandler should be a handler for the save options button
-    constructor(backHandler: () => void, toggleHandler: (p: keyof Toggles) => void, saveHandler: () => void, id: string) {
-        this.id = id;
-        this.stage = new Konva.Stage({
-            container: id,
-            width: this.getDims()[0],
-            height: this.getDims()[1],
+    constructor(
+        backHandler: () => void, 
+        toggleHandler: (p: keyof Toggles) => void, 
+        saveHandler: () => void, 
+        stage: Konva.Stage, 
+        id: string) 
+    {
+        this.layer = new Konva.Layer({
             visible: false
-        })
-        // I think we should eventually have a standardized getDimensions method if we want to avoid repeating
-        // code to deal with dynamic resizing...
-
-        this.layer = new Konva.Layer();
+        });
+        this.id = id;
+        let [w, h] = getDims(360, 360, id)
+        this.startW = w;
         this.toggleButtonGroup = new Konva.Group();
 
-        const backLabel = this.simpleLabelFactory(100, 100, "Go Back", backHandler); // should do something w/ screenswitcher
-        const capitalToggle = this.simpleLabelFactory(100, 200, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
-        const flowersToggle = this.simpleLabelFactory(100, 300, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
-        const abbreviationToggle = this.simpleLabelFactory(100, 400, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = this.simpleLabelFactory(100, 500, "Save", () => saveHandler());
+        const backLabel = simpleLabelFactory(w / 2, 2 * h / HEIGHT_SCALAR, "Go Back", backHandler);
+        const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
+        const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
+        const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
+        const saveButton = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
 
-        this.toggleButtonGroup.add(backLabel);
-        this.toggleButtonGroup.add(capitalToggle);
-        this.toggleButtonGroup.add(flowersToggle);
-        this.toggleButtonGroup.add(abbreviationToggle);
-        this.toggleButtonGroup.add(saveButton);
+        const rect = new Konva.Rect({
+            x: w / 4,
+            y: h / 8,
+            width: w / 2,
+            height: 5 * h / 8,
+            fill: 'gray',
+            stroke: 'black',
+            strokeWidth: 1
+        })
+
+        capitalToggle.width(BUTTON_WIDTH);
+        flowersToggle.width(BUTTON_WIDTH);
+        abbreviationToggle.width(BUTTON_WIDTH);
+
+        this.init(rect, this.toggleButtonGroup);
+        this.init(backLabel, this.toggleButtonGroup);
+        this.init(capitalToggle, this.toggleButtonGroup);
+        this.init(flowersToggle, this.toggleButtonGroup);
+        this.init(abbreviationToggle, this.toggleButtonGroup);
+        this.init(saveButton, this.toggleButtonGroup);
 
         this.layer.add(this.toggleButtonGroup);
-        this.stage.add(this.layer);
+        stage.add(this.layer);
     }
-
-    // temporary, may be replaced depending on how UI components factories shape up
-    // for now, produces a button given a position, text, and a handler function
-    private simpleLabelFactory(xPos: number, yPos: number, labelText: string, handler: () => void): Konva.Label {
-        // add a basic checkbox character for toggle buttons
-        let newLabel: string = labelText;
-        if (labelText.includes("Toggle")) {
-            newLabel += ": \u2610";
-        }
-
-        const out = new Konva.Label({
-            x: xPos,
-            y: yPos,
-            opacity: 0.75
-        });
-        out.add(
-            new Konva.Tag({
-                fill: "lightblue",
-                stroke: "black", 
-                strokeWidth: 1
-            })
-        );
-        out.add(
-            new Konva.Text({
-                text: newLabel,
-                fill: 'black',
-                fontSize: 20,
-                padding: 4
-            })
-        );
-
-        out.on('mouseover', function (e) {
-            e.target.getStage()!.container().style.cursor = 'pointer';
-        });
-        out.on('mouseout', function (e) {
-            e.target.getStage()!.container().style.cursor = 'default';
-        });
-
-        out.on("click", (e) => {
-            // toggle the checkbox if the button text has one
-            let txt: string = e.target?.attrs?.text ?? "";
-            if (txt.endsWith("\u2611")) {
-                e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2610"});
-            } else if (txt.includes("\u2610")) {
-                e.target.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
-            }
-            handler();
-        });
-        return out;
+        
+    private init(node: Konva.Group | Konva.Rect, group: Konva.Group) {
+        node.setAttr('centerOffset', this.startW / 2 - node.getAttr('x'));
+        group.add(node);
     }
 
     show(): void {
-        this.stage.visible(true);
-        this.stage.draw();
+        this.layer.visible(true);
+        this.layer.draw();
     }
 
     hide(): void {
-        this.stage.visible(false);
-        this.stage.draw();
+        this.layer.visible(false);
+        this.layer.draw();
+    }
+
+    public resize(): void {
+        let [w, h] = getDims(360, 360, this.id);
+        this.layer.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+                group.getChildren().forEach(subnode => {
+                    if (subnode instanceof Konva.Group) {
+                        subnode.getChildren().forEach(node => {
+                            node.x(Math.max(10, w / 2 ));
+                        });
+                    } else if (subnode instanceof Konva.Rect) {
+                        subnode.x(Math.max(10, w / 2 - subnode
+                            .getAttr('centerOffset')));
+                    }
+                });
+            }
+        });
     }
 
     getLayer(): Konva.Layer {
         return this.layer;
     }
-
-    getStage(): Konva.Stage {
-        return this.stage;
-    }
-
-    getDims(): number[] {
-        let containerEl = document.getElementById(this.id)!;
-        const width  = Math.max(320, Math.floor(containerEl.getBoundingClientRect().width));
-        const height = Math.max(220, Math.floor(containerEl.getBoundingClientRect().height));
-        return [width, height];
-    }
-
 }

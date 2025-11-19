@@ -60,10 +60,12 @@ export class QuestionCardView {
   private layer: Konva.Layer;
   private currentAnswers: Answer[] = [];
   private selectedAnswerIndex: number | null = null;
-  private onConfirmCallback?: () => void;
+  private onConfirmCallback?: (correct: boolean) => void;
+  private correctIndex: number;
 
   constructor() {
     this.layer = this.drawQuestionCard();
+    this.correctIndex = -1;
   }
 
   getLayer(): Konva.Layer {
@@ -79,7 +81,8 @@ export class QuestionCardView {
   }
 
   setQuestion(question: Question) {
-    const answers = question.getShuffledAnswers();
+    const [answers, idx] = question.getShuffledAnswers();
+    this.correctIndex = idx;
 
     // update the question
     const questionText = this.layer.findOne(`.question-text`) as Konva.Text;
@@ -97,7 +100,7 @@ export class QuestionCardView {
 
   }
 
-  onConfirm(callback: () => void) {
+  onConfirm(callback: (correct: boolean) => void) {
     this.onConfirmCallback = callback;
   }
 
@@ -269,9 +272,8 @@ export class QuestionCardView {
       layer.draw();
       layer.getStage().container().style.cursor = 'default';
       circle.fill(CONFIRM_FALSE);
+      if (this.onConfirmCallback) this.onConfirmCallback(this.selectedAnswerIndex === this.correctIndex);
       this.selectedAnswerIndex = null;
-
-      if (this.onConfirmCallback) this.onConfirmCallback();
     });
 
     layer.draw();

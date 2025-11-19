@@ -28,9 +28,9 @@ export enum QuestionStatus {
 }
 
 export enum QuestionType {
-    Capital = "capital", 
-    Flower  = "flower",
-    Abbreviation = "abbreviation"
+    Capital = "capitalQuestions", 
+    Flower  = "flowerQuestions",
+    Abbreviation = "abbreviationQuestions"
 }
 
 // Domain object for a single question.
@@ -64,9 +64,10 @@ export class Question {
         return this.status;
     }
 
-    getShuffledAnswers(): Answer[] {
+    getShuffledAnswers(): [Answer[], number] {
         const answers = [this.correctAnswer, ...this.incorrectAnswers];  
-        return answers.sort(() => Math.random() - 0.5);
+        const sorted = answers.sort(() => Math.random() - 0.5);
+        return [sorted, sorted.indexOf(this.correctAnswer)]
     }
 
     setIncorrectAnswers(incorrect: Answer[]) {

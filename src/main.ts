@@ -33,12 +33,17 @@ import { StateStatus, USState } from "./models/State";
 import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
-import { QuestionToggleController } from "./controllers/QuestionToggleController";
 import { GameStatsController } from "./controllers/GameStatsController";
 import './styles/app.css';
 import { TimerModel } from "./models/TimerModel";
 import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
+import { ScreenSwitcher, Screens } from "./utils/types";
+import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
+import Konva from "konva";
+import { QuizManager } from "./controllers/QuizManager";
+import { ResultScreenController } from "./controllers/ResultScreenController";
+
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -52,6 +57,7 @@ import { TimerController } from "./controllers/TimerController";
 
 /* TEST-seed: minimal demo data for all 50 states. 
  * Replace with persisted data if we finish the data part. */
+
 const seed: USState[] = Object.keys({
 	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
 	MT:1, WY:1, ND:1, SD:1, NE:1, KS:1, OK:1, TX:1,
@@ -66,7 +72,6 @@ const seed: USState[] = Object.keys({
 }));
 const store = new StateStore(seed);
 
-
 //=================    3) Compose Controllers
 //	  Put: business controllers that connect model and view (no rendering details).
 //	  Where teammates should add later:
@@ -75,11 +80,83 @@ const store = new StateStore(seed);
 //		- Minigame flow: `import { MinigameController } from "./controllers/MinigameController";`
 //		  const minigame = new MinigameController(cardState);
 
-const map = new MapController(
-	store,
-	{ goToQuestionsFor: (_s: USState) => {} } // temp no-op bus
-);
+// application class stores controllers, modeled after lab design
+class Application extends ScreenSwitcher {
+    private ui: UIController;
+    private map: MapController;
+    private menu: WelcomeScreenController;
+    private stats: GameStatsController;
+    private manager: QuizManager;
+    private leaderboard: ResultScreenController;
 
+    // initialize most controllers
+    constructor(store: StateStore) {
+        super();
+        this.manager = new QuizManager(this);
+        this.map = new MapController(
+            store,
+            { goToQuestionsFor: (_s: USState) => {} }
+        );
+        this.stats = new GameStatsController(this.map);
+        this.ui = new UIController(this.map, this.stats, this.manager);
+        this.menu = new WelcomeScreenController("welcome-root", this.manager);
+        this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
+    }
+
+    // finish initializations that have certain dependencies
+    // mount views onto divs
+    init() {
+        this.map.mount("map-root");
+        this.map.getView()?.hide();
+        this.menu.getView().show();
+        this.stats.attemptReconnect();
+        let stageForUI = this.map.getStage();
+        if (stageForUI) {
+            this.ui.mount(stageForUI)
+            this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
+            const timerView = new TimerViewCorner(stageForUI);
+            const timerCtrl = new TimerController(new TimerModel(), timerView);
+            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
+        }
+
+        // temp debug
+        window.addEventListener("keydown", (ev) => {
+            if (ev.key.toLowerCase() === "f") {
+                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
+            }
+            if (ev.key.toLowerCase() === "r") {
+                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
+            }
+            if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
+                this.ui.triggerFireworksTest();
+            }
+        });
+        this.stats;
+    }
+
+    // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
+    public switchToScreen(screen: Screens): void {
+        this.leaderboard.getView().hide();
+        this.map.getView()!.hide();
+        this.menu.getView().hide();
+
+        switch (screen) {
+            case Screens.Map:
+                this.map.getView()!.show();
+                break;
+            case Screens.Welcome:
+                this.menu.getView().show();
+                break;
+            case Screens.Leaderboard:
+                this.leaderboard.getView().show();
+                break;
+            default: 
+        }
+    }
+}
+
+const app = new Application(store);
+app.init();
 
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
@@ -112,53 +189,13 @@ const map = new MapController(
 //	  Where teammates should add later:
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
-map.mount("map-root");
-//map.mount("qa-box");
-
-// fireworks test part
-const ui = new UIController(map);
-
-const stageForUI = map.getStage();
-if (stageForUI) {
-	// fireworks test part
-	ui.mount(stageForUI);   
-
-	map.setUIBus(ui);      // hand real UI bus back to MapController
-	const timerView = new TimerViewCorner(stageForUI);
-	const timerCtrl = new TimerController(new TimerModel(), timerView);
-	timerCtrl.start();
-}
-
-const qToggle = new QuestionToggleController("tool-bar");
-qToggle.getView().show?.();
-
-new GameStatsController(map);
-
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
 //	  Where teammates can test quickly:
 //		- Preload a quiz for CA: `quiz.loadFor("CA")`
 //		- Bump score for demo: `leaderBoard.addPoints("player1", 10)`
-setTimeout(() => store.setStatus("CA", StateStatus.Complete), 1000);
-setTimeout(() => store.setStatus("TX", StateStatus.Partial), 1500);
 
-// fireworks effect test:
-setTimeout(() => ui.triggerFireworksTest(), 2000);
-
-
-window.addEventListener("keydown", (ev) => {
-	if (ev.key.toLowerCase() === "f") {
-		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
-	}
-	if (ev.key.toLowerCase() === "r") {
-		store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
-	}
-	if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
-    	ui.triggerFireworksTest();
-	}
-
-});
 
 
 //=================    6) Navigation & UI Bus Wiring (router/modals)

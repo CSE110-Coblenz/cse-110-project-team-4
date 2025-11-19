@@ -20,4 +20,8 @@ export class TimerController {
   stop() {
     this.model.stopTimer();
   }
+
+  isFinished() {
+    return this.model.getTimeRemaining() === 0;
+  }
 }

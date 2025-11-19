@@ -1,3 +1,23 @@
+// src/models/QuestionBankModel.ts
+/*==============================================================================
+QuestionBankModel
+
+Public API
+- constructor()
+- getRemainingStates(): string[]
+- resetRemainingStates()
+- removeRemainingStates(idx: number) - remove state at idx from remaining list
+- getQuestions()
+- setQuestions()
+
+Design Notes
+- Stores info relating to remaining questinos
+
+Related
+- View: src/views/QuestionToggleView.ts
+- Controller: src/controllers/QuestionToggleController.ts
+==============================================================================*/
+
 import { allQuestions } from "../utils/fullQuestions"
 import { ALL_STATES } from "../utils/constants"
 
