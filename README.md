@@ -1,6 +1,22 @@
-# CSE 110 Team 4 — Integration Update (v0.1)
+# CSE 110 Team 4 — Integration Update (v0.2)
+
+online test(github):
+[https://cse110-coblenz.github.io/cse-110-project-team-4/](Team_4_Project_Test)
+
+>**How it’s set up (for future reference)**: 
+We deploy via GitHub Actions → Pages from the main branch.
+vite.config.ts uses base: "/cse-110-project-team-4/" so assets load correctly on Pages.
+
+Supabase config is wired through repo-level Actions secrets:
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+When we rotate Supabase keys, we need to update both:
+  1,local .env files for dev
+2,GitHub Settings → Secrets and variables → Actions → Repository secrets (same names as above)
+
+
+last-Integration Update (v0.1)
 _Date: 2025-11-05_ 
-_credit: the README.md format was organized by ChatGPT._
 
 > **Scope**: This README summarizes the big merge, current wiring, and the next steps for UI, data, and minigame work.  
 > **Status note**: Toolbar has been temporarily moved to the **bottom-right**. No other UI visual changes have been made yet.
