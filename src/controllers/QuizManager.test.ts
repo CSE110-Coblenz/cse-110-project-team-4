@@ -55,7 +55,7 @@ describe("main screen controller", () => {
             );
     let stats = new GameStatsController(map);
     let timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage))
-    let ui = new UIController(map, stats);
+    let ui = new UIController(map, stats, quiz);
 
     it("should start unitialized", () => {
         expect(quiz.getStatus()).toBeFalsy();
