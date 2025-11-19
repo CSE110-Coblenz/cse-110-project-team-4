@@ -46,7 +46,7 @@ jobs:
           run: npm run build         # create static files into dist/
           env:
             VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-            VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }} //dataset , in repo settings->secrets & variables.
+            VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }} # dataset , in repo settings->secrets & variables.
   
         # 5：upload dist/ Pages work
         - name: Upload build artifact
