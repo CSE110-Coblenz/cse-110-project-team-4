@@ -12,6 +12,7 @@
 import Konva from "konva";
 import type { LeaderboardEntry } from "../models/LeaderboardModel";
 import { STAGE_WIDTH } from "../utils/constants";
+import { getDims } from "../utils/ViewUtils";
 
 // constants
 const TEXT_COLOR = "#000000ff";
@@ -36,13 +37,16 @@ export class LeaderboardView {
 
     // assumes entries are already sorted
     draw(entries: LeaderboardEntry[]): void {
+        // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
+        let [w, h] = getDims(360, 360, "leaderboard-root");
+        // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
 
         // Reset contents
         this.group.destroyChildren();
 
         // Draw title
 		const title = new Konva.Text({
-			x: STAGE_WIDTH / 2,
+			x: w / 2, // TEMP EDIT: "w" used to be STAGE_WIDTH
 			y: TITLE_Y,
 			text: "High Scores",
 			fontSize: 48,
@@ -56,6 +60,10 @@ export class LeaderboardView {
     }
 
     drawEntries(entries: LeaderboardEntry[]): void {
+        // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
+        let [w, h] = getDims(360, 360, "leaderboard-root");
+        // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
+
         entries.forEach((entry, index) => {
             const y = START_Y + index * ENTRY_SPACING;
 
@@ -66,7 +74,7 @@ export class LeaderboardView {
             else if (index === 2) fillColor = ENTRY_COLOR_3RD;
 
             const text = new Konva.Text({
-                x: STAGE_WIDTH / 2,
+                x: w / 2, // TEMP EDIT: "w" used to be STAGE_WIDTH
                 y: y,
                 text: `${index + 1}. ${entry.player.name} - ${entry.score}`,
                 fontSize: ENTRY_FONTSIZE,
