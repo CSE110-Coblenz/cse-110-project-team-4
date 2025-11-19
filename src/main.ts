@@ -40,7 +40,7 @@ import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
 import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
-import Konva from "konva";
+//import Konva from "konva"; //
 import { QuizManager } from "./controllers/QuizManager";
 import { ResultScreenController } from "./controllers/ResultScreenController";
 import { supabase } from "./supabaseClient";

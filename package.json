@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.81.1",
+    "@supabase/supabase-js": "^2.83.0",
     "d3-geo": "^3.1.1",
     "konva": "^9.3.22"
   },
