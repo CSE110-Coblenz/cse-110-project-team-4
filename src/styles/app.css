@@ -106,3 +106,62 @@ body {
   pointer-events: none;
   z-index: 1000;
 }
+
+/* Minigame container (holds the minigame stage and cards) */
+#minigame {
+  display: flex;
+  flex-direction: column;
+}
+
+.minigame-stage{
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: repeat(4, 1fr);                                        /* 4 columns */
+  gap: 1rem;
+  padding: 1rem;
+  background: #35654d ;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 85%;
+  height: 85%;
+  
+  position: absolute;
+  inset: 50% auto auto 50%; 
+  transform: translate(-50%, -50%);  
+}
+
+.card {
+  width: 100%;                                                                  /* fill up the grid column cell with card-like shape*/
+  border-radius: 20px;
+  border-color: var(--border);
+  
+  display: flex;                                                                /* To center the emoji string */
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  color: transparent;    
+  border: 2px solid var(--border);
+  border-color: var(--border);                                                       /* hide the emoji when not flipped */       
+
+  background-image: url('../data/img/card-facedown.jpg');                              /* card back image */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  cursor: pointer;                                                              /* changes mouse to cursor when above the card */
+  transition: transform 0.2s ease;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+  background-image: none;
+  background-color: white;
+  border: 2px solid var(--border);
+  border-color: var(--border);
+  color: black;
+}
+
+#score {
+  padding: 1rem;
+}
