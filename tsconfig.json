@@ -10,7 +10,9 @@
     "noEmit": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": { "*": ["./*"] }
+    "paths": { "*": ["./*"] },
+
+    "types": ["vite/client"]
   },
   "include": ["src", "index.html"]
 }
