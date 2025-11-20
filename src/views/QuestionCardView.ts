@@ -25,7 +25,7 @@ const RAD_Q = 10;
 const STROKEWIDTH = 3;
 
 // box positioning
-const X_Q = 250;
+const X_Q = 435;
 const Y_Q = 50;
 
 // text params
