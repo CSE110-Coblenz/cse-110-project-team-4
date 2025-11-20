@@ -73,6 +73,21 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
         } else if (txt.includes("\u2610") && typeof newTarget != "undefined") {
             newTarget.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
         }
+
+        // grey-out effect
+        const rectNode = out.findOne('Rect');
+        if (rectNode && rectNode instanceof Konva.Rect) {
+            const rect = rectNode as Konva.Rect; // type cast
+            const originalFill = rect.fill();
+            rect.fill('#b38fa0ff'); // darker color of button
+            rect.getLayer()?.batchDraw();
+
+            setTimeout(() => {
+                rect.fill(originalFill); // restore original color
+                rect.getLayer()?.batchDraw();
+            }, 300); // duration the color lasts
+        }
+
         handler();
     });
     return out;

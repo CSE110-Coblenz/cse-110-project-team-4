@@ -51,26 +51,29 @@ export class MapController {
             states: this.store.getAll(),
 
             onStateClick: (s) => {
-                // Demo:================================== 
-                // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
-                const next =
-                    s.status === StateStatus.NotStarted ? StateStatus.Partial :
-                    s.status === StateStatus.Partial    ? StateStatus.Complete : 
-                                                            StateStatus.NotStarted;
-                // update the store; subscribers (e.g., the View) will redraw with new fills.
-                this.store.setStatus(s.code, next);
-                // store which state was clicked
-                this.selectedState = s;
-                if (this.uiBus && this.uiBus.goToQuestionsFor) {
-                    this.uiBus.goToQuestionsFor(s);
-                } else {
-                    console.error("UI Bus not properly initialized!");
-                }
+                // // Demo:================================== 
+                // // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
+                // const next =
+                //     s.status === StateStatus.NotStarted ? StateStatus.Partial :
+                //     s.status === StateStatus.Partial    ? StateStatus.Complete : 
+                //                                             StateStatus.NotStarted;
+                // // update the store; subscribers (e.g., the View) will redraw with new fills.
+                // this.store.setStatus(s.code, next);
+                // // store which state was clicked
+                // this.selectedState = s;
+                // if (this.uiBus && this.uiBus.goToQuestionsFor) {
+                //     this.uiBus.goToQuestionsFor(s);
+                // } else {
+                //     console.error("UI Bus not properly initialized!");
+                // }
 
-                // Emit a global CustomEvent
-                window.dispatchEvent(new CustomEvent("usmap:stateClick", {
-                    detail: { code: s.code, nextStatus: next }
-                }));
+                // // Emit a global CustomEvent
+                // window.dispatchEvent(new CustomEvent("usmap:stateClick", {
+                //     detail: { code: s.code, nextStatus: next }
+                // }));
+
+                // Clicks are now ignored. Hover effects remain functional.
+                console.log(`State ${s.code} clicked, and no action taken`);
             }
         });
         
