@@ -36,7 +36,6 @@ The goal is to feel like a small educational product, not just a one-off assignm
   - Timer, attempts, and basic progress tracking.
 
 - **Minigame**
-  - Separate MVC under `src/minigame/` (model / view / controller).
   - Launched via the main flow using a screen-switcher.
   - Designed as lightweight extra practice (e.g., simple matching / card-flip mechanics).
 
