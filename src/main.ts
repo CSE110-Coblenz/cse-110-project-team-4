@@ -95,7 +95,7 @@ class Application extends ScreenSwitcher {
         this.manager = new QuizManager(this);
         this.map = new MapController(
             store,
-            { goToQuestionsFor: (_s: USState) => {} }
+            { openQuestion: (q: any) => {} }
         );
         this.stats = new GameStatsController(this.map);
         this.ui = new UIController(this.map, this.stats, this.manager);
