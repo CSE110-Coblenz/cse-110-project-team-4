@@ -23,6 +23,7 @@ const WIDTH_Q = 400;
 const HEIGHT_Q = 420;
 const RAD_Q = 10;
 const STROKEWIDTH = 3;
+const HIGHLIGHT_STROKEWIDTH = 10;
 
 // box positioning
 const X_Q = 435;
@@ -52,6 +53,7 @@ const yPositions = [TOP_Y_A, BOTTOM_Y_A];
 const COLOR_Q = '#f5f0e0d5';
 const COLORS_A = ['#ff6767ff', '#6a6cffff', '#62ff6aff', '#fdf66aff'];
 const black = '#000000ff';
+const CORRECT_HIGHLIGHT = '#28722cff'
 const CONFIRM_TRUE = '#ffffffff';
 const CONFIRM_FALSE = '#585858ff';
 const FONTSIZE_A = 25;
@@ -62,8 +64,10 @@ export class QuestionCardView {
   private selectedAnswerIndex: number | null = null;
   private onConfirmCallback?: (correct: boolean) => void;
   private correctIndex: number;
+  private answerCards: Konva.Group[] | null[];
 
   constructor() {
+    this.answerCards = [null, null, null, null];
     this.layer = this.drawQuestionCard();
     this.correctIndex = -1;
   }
@@ -213,6 +217,7 @@ export class QuestionCardView {
       layer.draw();
     });
 
+    this.answerCards[i] = group;
     layer.add(group);
   }
 
@@ -279,5 +284,32 @@ export class QuestionCardView {
     layer.draw();
   }
 
+  highlightCorrect() {
+    let cardGroup = this.answerCards[this.correctIndex];
+    if (cardGroup === null) {
+      return;
+    }
+    let border = cardGroup.findOne('Rect')
+    if (border instanceof Konva.Rect) {
+      border.strokeWidth(HIGHLIGHT_STROKEWIDTH);
+      border.stroke(CORRECT_HIGHLIGHT)
+    }
+    cardGroup.moveToTop();
+    cardGroup.draw();
+  }
+
+  clearHighlights() {
+    this.answerCards.forEach(cardGroup => {
+      if (cardGroup === null) {
+        return;
+      }
+      let border = cardGroup.findOne('Rect')
+      if (border instanceof Konva.Rect) {
+        border.strokeWidth(STROKEWIDTH)
+        border.stroke(black)
+      }
+      cardGroup.draw();
+    })
+  }
 }
 
