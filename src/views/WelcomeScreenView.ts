@@ -51,7 +51,7 @@ export class WelcomeScreenView {
 
         const startLabel = simpleLabelFactory(w / 2, h / 4, "Start Game", startHandler);
         const infoLabel = simpleLabelFactory(w / 2, h / 4 + 200, "How To Play", infoHandler);
-        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 300, "Options", optionsHandler);
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 300, "Game Options", optionsHandler);
 
         let menuEl = document.getElementById(id);
         const textBox = document.createElement("textarea");
@@ -61,6 +61,7 @@ export class WelcomeScreenView {
         textBox.style.left = (w / 2 - 100) + "px";
         textBox.style.position = "absolute";
         textBox.style.zIndex = "1";
+        textBox.placeholder = "Enter Your Name";
         this.inputEl = textBox;
         menuEl?.appendChild(textBox);
 

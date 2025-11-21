@@ -45,6 +45,7 @@ import Konva from "konva";
 import GameStatsLightbox from "../views/GameStatsLightbox"; // ADDED: Reuse the existing lightbox view from the PR.
 import { MapController } from "./MapController"; // ADDED: We need access to map.getStage() (already provided in MapController).
 import { StateStatus } from "../models/State"; //ADDED: import to check color/status
+import { MAX_ERRORS } from "../utils/constants";
 
 export class GameStatsController {
 	private layer: Konva.Layer;
@@ -117,10 +118,10 @@ export class GameStatsController {
 
 	public isFinished() {
 		let { grey, green, red } = this.getColorCounts();
-		if (green >= 50) {
-			return 1
-		} else if (red >= 3) {
+		if (red >= MAX_ERRORS) {
 			return -1
+		} else if (grey === 0) {
+			return 1
 		} else {
 			return 0
 		}

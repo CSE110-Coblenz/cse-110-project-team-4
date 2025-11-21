@@ -172,6 +172,7 @@ export class QuizManager {
         this.continue = true;
         this.questionBank?.resetRemainingStates();
         this.stats?.resetPoints();
+        this.timer?.stop()
     }
 
     public handleNextAction(): void {
