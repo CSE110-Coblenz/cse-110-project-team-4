@@ -33,9 +33,9 @@ const HOW_TO_PLAY: string =
   "    * Start Game, How to Play, or Options (where you pick the kinds of questions you want)\n\n" +
   "2. Pick Your Question Types\n" +
   "Head to Options to choose what you want to be quizzed on:\n" +
-  "* Capitals (like “What’s the capital of California?”)\n" +
-  "* Abbreviations (“What’s CA stand for?”)\n" +
-  "* State Flowers (yep, every state has one!)\n" +
+  "* Capitals (ex: “What’s the capital of California?”)\n" +
+  "* Abbreviations (ex: “What’s CA stand for?”)\n" +
+  "* State Flowers (Yep, every state has one!)\n" +
   "Make sure you hit Save! If you don’t pick anything, the game will default to capital questions.\n\n" +
   "3. Gameplay Basics\n" +
   "Hit Start Game, and you’ll jump into the US map!\n" +
@@ -46,7 +46,7 @@ const HOW_TO_PLAY: string =
   "3. Pick your answer, and click OK to lock it in.\n" +
   "Scoring\n" +
   "* Correct? +10 points and the state turns green.\n" +
-  "* Wrong? The state turns red (and you can only get 3 wrong before the game ends!).\n\n" +
+  "* Wrong? The state turns red (and you can only get 3 wrong answers before the game ends!).\n\n" +
   "4. When the Game Ends\n" +
   "The game stops when:\n" +
   "* You get all 50 states correct, OR\n" +
