@@ -28,6 +28,7 @@ describe("main screen controller", () => {
     })
 
     it("should give default questions if no questions selected", () => {
+      WSC.getView().getInput().value = 'name';
       WSC.handleStart();
       expect(Object.keys(WSC.getToggler().getModel().getQuestions())).toContain("capitalQuestions")
       expect(Object.keys(WSC.getToggler().getModel().getQuestions()).length === 1).toBeTruthy()
