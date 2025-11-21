@@ -30,13 +30,13 @@ export class MapController {
     private mapLayer?: Konva.Layer;          // was: Konva.Layer
     private selectedState: USState | null = null;
 
-    public setUIBus(bus: { goToQuestionsFor: (s: USState) => void }) {
+    public setUIBus(bus: { openQuestion: (q: any) => void }) {
         this.uiBus = bus; // allow late wiring
     }
 
     constructor(
         private store: StateStore,
-        private uiBus: { goToQuestionsFor: (state: USState) => void } // UI bus (navigation)
+        private uiBus: { openQuestion: (q: any) => void } // UI bus (navigation)
     ) {}
 
     /**
@@ -51,6 +51,11 @@ export class MapController {
             states: this.store.getAll(),
 
             onStateClick: (s) => {
+                if (this.uiBus && this.uiBus.openQuestion) {
+                    this.uiBus.openQuestion(null)
+                } else {
+                    console.error("UI Bus not properly initialized!")
+                }
                 // // Demo:================================== 
                 // // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
                 // const next =

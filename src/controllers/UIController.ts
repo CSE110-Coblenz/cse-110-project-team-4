@@ -48,6 +48,7 @@ export class UIController {
 	private manager!: QuizManager;
 	private currentState: USState | null;
 	private feedback?: FeedbackCardView;
+	private lastQuestion?: Question;
 
 	private roadTripDashboard?: RoadTripDashboardView;
 
@@ -109,6 +110,7 @@ export class UIController {
 		nextQuestion.setIncorrectAnswers(incorrectAnswers);
         
         this.openQuestion(nextQuestion);
+		this.lastQuestion = nextQuestion;
 		location.hash = `#questions/${state.code}`; 
 	}
 
@@ -145,7 +147,11 @@ export class UIController {
 		if (!this.overlay || !this.card) return;
 
 		this.mapController.setInteractive(false);
-		if (q) this.card.setQuestion(q as any);
+		if (q) {
+			this.card.setQuestion(q as any);
+		} else if (this.lastQuestion) {
+			this.card.setQuestion(this.lastQuestion);
+		}
 
 		this.overlay.show();
 		this.card.getLayer().visible(true);
