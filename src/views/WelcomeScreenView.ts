@@ -54,7 +54,7 @@ export class WelcomeScreenView {
         const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 300, "Game Options", optionsHandler);
 
         let menuEl = document.getElementById(id);
-        const textBox = document.createElement("textarea");
+        const textBox = document.createElement("input");
         textBox.id = "nameInput";
         textBox.style.top = h / 4 + 100 + "px";
         textBox.style.width = "200px";

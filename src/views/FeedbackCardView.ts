@@ -16,7 +16,7 @@ import { QuestionCardView } from "./QuestionCardView";
 
 const FILL_CORRECT = '#43A047';
 const STROKE_CORRECT = '#2E7D32';
-const TEXT_CORRECT = 'CORRECT!!!'
+const TEXT_CORRECT = 'CORRECT!'
 
 const FILL_WRONG = '#be1a1aff'
 const STROKE_WRONG = '#841313ff'
@@ -31,13 +31,13 @@ export class FeedbackCardView {
     constructor(stage: Konva.Stage, overlay: OverlayLayer) {
 		this.feedbackGroup = new Konva.Group({
 			x: stage.width() / 2,
-			y: stage.height() / 2,
+			y: stage.height() / 2.65,
 			visible: false
 		});
 
 		this.feedbackGroup = new Konva.Group({
 			x: stage.width() / 2,
-			y: stage.height() / 2,
+			y: stage.height() / 2.65,
 			visible: false
 		});
 		

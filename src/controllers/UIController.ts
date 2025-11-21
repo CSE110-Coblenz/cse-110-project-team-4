@@ -114,6 +114,9 @@ export class UIController {
 
 	public answerResponse(correct: boolean) {
 		this.feedback?.show(correct, this.card);
+		if (!correct) {
+			this.card.highlightCorrect();
+		}
 
 		if (this.mapController && this.currentState && this.mapController.getSelectedState) {
 			const currentState = this.mapController.getSelectedState?.(); // use for diff mode later?
@@ -131,6 +134,7 @@ export class UIController {
 
 		setTimeout(() => {
 			this.feedback?.hide();
+			this.card.clearHighlights();
 			this.closeQuestion();
 			setTimeout(() => {this.manager.handleNextAction()}, 500);
 		}, 1000)
