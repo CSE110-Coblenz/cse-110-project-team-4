@@ -24,6 +24,7 @@ Related
 import { WelcomeScreenView } from "../views/WelcomeScreenView";
 import { QuestionToggleController } from "./QuestionToggleController";
 import { InfoCardView } from "../views/InfoCardView";
+import { PopUpView } from "../views/PopUpView";
 import { getDims } from "../utils/ViewUtils";
 import { QuizManager } from "./QuizManager";
 
@@ -34,11 +35,13 @@ export class WelcomeScreenController {
     private ro: ResizeObserver;
     private containerID: string;
     private quiz: QuizManager;
+    private popup: PopUpView;
 
     constructor(container: string, quiz: QuizManager) {
         this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
         this.toggleController = new QuestionToggleController(this.view.getStage(), container);
         this.infoView = new InfoCardView(this.view.getStage(), container, this.hideInfo);
+        this.popup = new PopUpView(this.view.getLayer(), "Please enter your name\n in the input box below.");
         this.ro = new ResizeObserver(this.handleResize);
         this.ro.observe(document.getElementById(container)!);
         this.containerID = container;
@@ -48,7 +51,17 @@ export class WelcomeScreenController {
     // handler function when start button is clicked, should save name, initiate quiz
     handleStart = () => {
         let name = this.view.getInput().value;
-        // still need to validate the user's name
+
+        if (name === "") {
+            console.log("stop")
+            this.popup.show()
+            setTimeout(() => {this.popup.hide()}, 3000)
+            return
+        }
+
+        if (!/^[\w\s]+$/.test(name)) {
+
+        }
 
         if (Object.keys(this.toggleController.getModel().getQuestions()).length === 0) {
             this.toggleController.initDefault();
@@ -79,6 +92,7 @@ export class WelcomeScreenController {
         this.view.resize();
         this.toggleController.handleResize();
         this.infoView.resize();
+        this.popup.resize();
         this.view.getStage().width(w);
     }
 

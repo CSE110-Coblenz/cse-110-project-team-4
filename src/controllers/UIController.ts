@@ -132,7 +132,7 @@ export class UIController {
 		setTimeout(() => {
 			this.feedback?.hide();
 			this.closeQuestion();
-			setTimeout(() => {this.manager.handleNextAction()}, 1000);
+			setTimeout(() => {this.manager.handleNextAction()}, 500);
 		}, 1000)
 	}
 
