@@ -30,9 +30,7 @@ const HOW_TO_PLAY: string =
   "* You’ll start on the Welcome Screen.\n" +
   "* Type in your name so the game knows who’s playing.\n" +
   "* Choose what you want to do:\n" +
-  "    * Start Game\n" +
-  "    * How to Play\n" +
-  "    * Options (this is where you pick the kinds of questions you want)\n\n" +
+  "    * Start Game, How to Play, or Options (where you pick the kinds of questions you want)\n\n" +
   "2. Pick Your Question Types\n" +
   "Head to Options to choose what you want to be quizzed on:\n" +
   "* Capitals (like “What’s the capital of California?”)\n" +
@@ -41,8 +39,7 @@ const HOW_TO_PLAY: string =
   "Make sure you hit Save! If you don’t pick anything, the game will default to capital questions.\n\n" +
   "3. Gameplay Basics\n" +
   "Hit Start Game, and you’ll jump into the US map!\n" +
-  "Timer\n" +
-  "You get 15 minutes to play. When time’s up, game over.\n" +
+  "Timer: You get 15 minutes to play. When time’s up, game over.\n" +
   "How it works\n" +
   "1. Click a state on the map.\n" +
   "2. A question pops up with four choices.\n" +
