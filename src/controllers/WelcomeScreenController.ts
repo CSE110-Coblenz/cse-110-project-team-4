@@ -28,6 +28,8 @@ import { PopUpView } from "../views/PopUpView";
 import { getDims } from "../utils/ViewUtils";
 import { QuizManager } from "./QuizManager";
 
+const MAX_NAME_LENGTH = 50;
+
 export class WelcomeScreenController {
     private view: WelcomeScreenView;
     private infoView: InfoCardView;
@@ -53,16 +55,13 @@ export class WelcomeScreenController {
         let name = this.view.getInput().value;
 
         if (name === "") {
-            console.log("stop")
             this.popup.show()
             setTimeout(() => {this.popup.hide()}, 3000)
             return
         }
 
-        if (!/^[\w\s]+$/.test(name)) {
-
-        }
-
+        name = this.sanitize(name)
+        
         if (Object.keys(this.toggleController.getModel().getQuestions()).length === 0) {
             this.toggleController.initDefault();
         }
@@ -85,6 +84,17 @@ export class WelcomeScreenController {
     handleOptions = () => {
         this.view.getInput().style.display = "none";
         this.toggleController.getView().show();
+    }
+
+    sanitize(name: string): string {
+        name = name.trim();
+        if (name.length > MAX_NAME_LENGTH) {
+            name = name.substring(0, MAX_NAME_LENGTH);
+        }
+        name = name.normalize("NFC");
+        name = name.replace(/<[^>]*>?/gm, "");
+
+        return name
     }
 
     handleResize = () => {

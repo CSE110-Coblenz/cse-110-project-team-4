@@ -112,7 +112,7 @@ export class QuestionToggleView {
                         subnode.getChildren().forEach(node => {
                             node.x(Math.max(10, w / 2 ));
                         });
-                    } else if (subnode instanceof Konva.Rect) {
+                    } else if (subnode instanceof Konva.Rect && subnode.getAttr('centerOffset')) {
                         subnode.x(Math.max(10, w / 2 - subnode
                             .getAttr('centerOffset')));
                     }
