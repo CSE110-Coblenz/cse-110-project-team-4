@@ -76,14 +76,6 @@ export class QuestionCardView {
     return this.layer;
   }
 
-  hide() {
-    this.layer.hide();
-  }
-
-  show() {
-    this.layer.show();
-  }
-
   setQuestion(question: Question) {
     const [answers, idx] = question.getShuffledAnswers();
     this.correctIndex = idx;

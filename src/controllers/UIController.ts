@@ -134,8 +134,6 @@ export class UIController {
 		this.mapController.setInteractive(false);
 		if (q) {
 			this.card.setQuestion(q as any);
-		} else if (this.lastQuestion) {
-			this.card.setQuestion(this.lastQuestion);
 		}
 
 		this.overlay.show();
@@ -144,7 +142,6 @@ export class UIController {
 
 		this.stage.batchDraw();
 	}
-
 	public closeQuestion() {
 		if (!this.overlay || !this.card) return;
 
