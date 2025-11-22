@@ -50,7 +50,7 @@ export class MapController {
             containerId,
             states: this.store.getAll(),
 
-            onStateClick: (s) => {
+            onStateClick: () => {
                 if (this.uiBus && this.uiBus.openQuestion) {
                     this.uiBus.openQuestion(null)
                 } else {
@@ -78,7 +78,6 @@ export class MapController {
                 // }));
 
                 // Clicks are now ignored. Hover effects remain functional.
-                console.log(`State ${s.code} clicked, and no action taken`);
             }
         });
         
