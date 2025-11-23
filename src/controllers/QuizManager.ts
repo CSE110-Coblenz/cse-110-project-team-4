@@ -196,10 +196,12 @@ export class QuizManager {
         if (this.continue) {
             this.ui.goToQuestionsFor();
         } else {
-            this.timer?.stop();
+            this.ui?.disableMap();
+            // this.timer?.stop(); <-- uncomment this once timer alerts are fixed
             switch (finishedStatus) {
                 case 1:
                     console.log("victory royale")
+                    this.ui?.triggerFireworks();
                     break;
                 case 0:
                     console.log("probably ran out of time")
@@ -208,7 +210,7 @@ export class QuizManager {
                     console.log("this is loss")
                     break
             }
-            this.switcher.switchToScreen(Screens.Leaderboard);
+            setTimeout(() => {this.switcher.switchToScreen(Screens.Leaderboard)}, 5000);
         }
     }
 }

@@ -8,7 +8,8 @@ export const ALL_STATES: string[] = ["Alabama", "Alaska","Arizona", "Arkansas", 
         "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", 
         "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
         "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
-        "West Virginia", "Wisconsin", "Wyoming"
+        "District of Columbia", "West Virginia", "Wisconsin", "Wyoming"
 ];
 export const STAGE_WIDTH = 2000;
 export const STAGE_HEIGHT = 2000;
+export const CORRECT_POINT_VALUE = 10;

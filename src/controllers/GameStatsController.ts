@@ -33,7 +33,7 @@ import Konva from "konva";
 import GameStatsLightbox from "../views/GameStatsLightbox"; // ADDED: Reuse the existing lightbox view from the PR.
 import { MapController } from "./MapController"; // ADDED: We need access to map.getStage() (already provided in MapController).
 import { StateStatus } from "../models/State"; //ADDED: import to check color/status
-import { MAX_ERRORS } from "../utils/constants";
+import { MAX_ERRORS, CORRECT_POINT_VALUE } from "../utils/constants";
 
 // new : Navigation processor type
 type NavHandlers = {
@@ -95,7 +95,7 @@ export class GameStatsController {
 	// call this when a state is correctly answered
 	public onCorrect(stateCode: string) {
 		this.map.getStore().setStatus(stateCode, StateStatus.Complete);
-		this.points += 10;
+		this.points += CORRECT_POINT_VALUE;
 
 		const { grey, green, red } = this.getColorCounts();
 		this.updateCounts(grey, green, red, this.points);

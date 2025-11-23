@@ -13,10 +13,11 @@ Konva Elements
 import Konva from "konva"
 import { OverlayLayer } from "./OverlayLayer";
 import { QuestionCardView } from "./QuestionCardView";
+import { CORRECT_POINT_VALUE } from "../utils/constants";
 
 const FILL_CORRECT = '#43A047';
 const STROKE_CORRECT = '#2E7D32';
-const TEXT_CORRECT = 'CORRECT!'
+const TEXT_CORRECT = 'CORRECT! \n+' + CORRECT_POINT_VALUE + " POINTS!"
 
 const FILL_WRONG = '#be1a1aff'
 const STROKE_WRONG = '#841313ff'

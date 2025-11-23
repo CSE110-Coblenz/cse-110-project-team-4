@@ -172,10 +172,14 @@ export class UIController {
 		this.overlay?.dispose();
 	}
 
+	public disableMap() {
+		this.mapController.setInteractive(false);
+	}
+
 	// fireworks effect
 	private fxLayer?: Konva.Layer; 
 	private fireworks?: FireworksView; 
-	public triggerFireworksTest = () => {
+	public triggerFireworks = () => {
 		this.fxLayer?.moveToTop();
 		this.fireworks?.startFireworks();
 		this.stage?.batchDraw();

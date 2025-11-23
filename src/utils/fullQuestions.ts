@@ -49,6 +49,7 @@ export const allQuestions: BankJSON = {
         "Vermont": "Montpelier",
         "Virginia": "Richmond",
         "Washington": "Olympia",
+        "District of Columbia": "None",
         "West Virginia": "Charleston",
         "Wisconsin": "Madison",
         "Wyoming": "Cheyenne"
@@ -101,11 +102,12 @@ export const allQuestions: BankJSON = {
         "Vermont": "Red Clover",
         "Virginia": "American Dogwood",
         "Washington": "Coast Rhododendron",
+        "District of Columbia": "American Beauty Rose",
         "West Virginia": "Rhododendron",
         "Wisconsin": "Wood Violet",
         "Wyoming": "Indian Paintbrush"
     },
-    "landmarkQuestions": {
+    "abbreviationQuestions": {
         "Alabama": "AL",
         "Alaska": "AK",
         "Arizona": "AZ",
@@ -153,6 +155,7 @@ export const allQuestions: BankJSON = {
         "Vermont": "VT",
         "Virginia": "VA",
         "Washington": "WA",
+        "District of Columbia": "DC",
         "West Virginia": "WV",
         "Wisconsin": "WI",
         "Wyoming": "WY"
