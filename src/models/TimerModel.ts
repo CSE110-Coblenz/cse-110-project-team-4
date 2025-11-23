@@ -39,27 +39,25 @@ export class TimerModel {
     this.timerId = window.setInterval(() => {
       const remaining = this.getTimeRemaining();
       this.onTick?.(remaining);
-      if (remaining <= 0) this.stopTimer(true); // will call onDone below
+      if (remaining <= 0) this.stopTimer(); // will call onDone below
     }, 250); // smoother than 1000ms but still cheap
   }
 
-  stopTimer(alert: boolean): void {
+  stopTimer(): void {
     if (this.timerId !== null) {
       clearInterval(this.timerId);
       this.timerId = null;
     }
     // snap remaining to 0 and notify completion once
     this.onTick?.(0);
-    if (alert) {
-      this.onDone?.();
-    }
+    this.onDone?.();
   }
 
   reset(durationSeconds?: number): void {
     if (durationSeconds !== undefined) this.durationSeconds = durationSeconds;
     if (this.isRunning) {
       // restart with new duration
-      this.stopTimer(false);
+      this.stopTimer();
       this.startTimer(this.onTick!, this.onDone!);
     }
   }

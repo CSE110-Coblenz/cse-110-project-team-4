@@ -18,7 +18,7 @@ export class TimerController {
   }
 
   stop() {
-    this.model.stopTimer(false);
+    this.model.stopTimer();
   }
 
   isFinished() {

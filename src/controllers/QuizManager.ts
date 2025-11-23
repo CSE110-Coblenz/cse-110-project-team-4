@@ -137,6 +137,11 @@ export class QuizManager {
                 answerText: this.questionBank.getQuestions()[type][stateName],
                 status: AnswerStatus.NotSelected
             }
+            if (ans.answerText === this.questionBank.getQuestions()[type][state]) {
+                console.log("duplicate answer found, rerolling");
+                i--;
+                continue;
+            }
             incorrectAnswers.push(ans);
         }
 
@@ -149,7 +154,7 @@ export class QuizManager {
             this.timer.start();
         }
         this.switcher.switchToScreen(Screens.Map);
-        setTimeout(() => {this.handleNextAction()}, 200);
+        this.handleNextAction();
     }
 
     public getStatus(): boolean {
@@ -174,7 +179,6 @@ export class QuizManager {
         this.stats?.resetPoints();
         // road car dashboard
         this.ui?.resetRoadTripHud();
-        this.timer?.stop()
     }
 
     public handleNextAction(): void {
@@ -192,6 +196,7 @@ export class QuizManager {
         if (this.continue) {
             this.ui.goToQuestionsFor();
         } else {
+            this.timer?.stop();
             switch (finishedStatus) {
                 case 1:
                     console.log("victory royale")
