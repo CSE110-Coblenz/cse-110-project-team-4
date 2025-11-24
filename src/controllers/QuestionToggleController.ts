@@ -36,7 +36,8 @@ export class QuestionToggleController {
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
-            "abbreviationQuestions": false 
+            "abbreviationQuestions": false,
+            "dateQuestions": false 
         }
         this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions, stage, id);
         this.model = new QuestionBankModel();

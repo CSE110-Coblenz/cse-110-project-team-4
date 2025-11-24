@@ -85,6 +85,7 @@ export class QuizManager {
         let typeString: string = "";
         // adapter for json key to QuestionType
         let qType: QuestionType = QuestionType.Capital;
+        let useDateFormat = false;
         switch (randomType) {
             case "capitalQuestions":
                 qType = QuestionType.Capital;
@@ -98,10 +99,19 @@ export class QuizManager {
                 qType = QuestionType.Abbreviation;
                 typeString = "abbreviation";
                 break;
+            case "dateQuestions":
+                qType = QuestionType.Date;
+                useDateFormat = true;
+                break;
             default:
                 typeString = "no type found"
         }
-        let questionString: string = `What is the ${typeString} for ${randomState}?`;
+        let questionString: string;
+        if (useDateFormat) {   
+            questionString = `What year was ${randomState} added to the union?`;
+        } else {
+            questionString = `What is the ${typeString} for ${randomState}?`;
+        }
 
         let answer: Answer = {
             answerText: questions[randomType][randomState],

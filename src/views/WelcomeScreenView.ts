@@ -63,6 +63,13 @@ export class WelcomeScreenView {
         textBox.style.zIndex = "1";
         textBox.placeholder = "Enter Your Name";
         this.inputEl = textBox;
+
+        this.inputEl.addEventListener('keyup', (e) => {
+            if (e.key === "Enter") {
+                startHandler();
+            }
+        })
+
         menuEl?.appendChild(textBox);
 
         this.toggleButtonGroup.add(startLabel)

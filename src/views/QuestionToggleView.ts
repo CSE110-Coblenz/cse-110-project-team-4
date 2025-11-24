@@ -61,7 +61,8 @@ export class QuestionToggleView {
         const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
         const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
         const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
+        const dateToggle = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Toggle Creation Dates", () => toggleHandler("dateQuestions"));
+        const saveButton = simpleLabelFactory(w / 2, 7 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
 
         const rect = new Konva.Rect({
             x: w / 4,
@@ -76,12 +77,14 @@ export class QuestionToggleView {
         capitalToggle.width(BUTTON_WIDTH);
         flowersToggle.width(BUTTON_WIDTH);
         abbreviationToggle.width(BUTTON_WIDTH);
+        dateToggle.width(BUTTON_WIDTH);
 
         this.init(rect, this.toggleButtonGroup);
         this.init(backLabel, this.toggleButtonGroup);
         this.init(capitalToggle, this.toggleButtonGroup);
         this.init(flowersToggle, this.toggleButtonGroup);
         this.init(abbreviationToggle, this.toggleButtonGroup);
+        this.init(dateToggle, this.toggleButtonGroup);
         this.init(saveButton, this.toggleButtonGroup);
 
         this.layer.add(this.toggleButtonGroup);
