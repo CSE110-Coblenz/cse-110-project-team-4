@@ -10,6 +10,7 @@ Public API
 - getLayer()               // returns mapLayer (backward compat)
 - setInteractive(on: boolean)  // toggles map & label interactions
 
+
 Layers & Groups
 - mapLayer (Konva.Layer, listening: true)
   * State shapes as Konva.Path (cached in shapesByCode)
@@ -86,6 +87,12 @@ const HOVER_STROKE_WIDTH = 2;
 // Fixed Spasming issue: make hit region wider to stabilize hover on small shapes
 const HIT_STROKE_WIDTH = 20;
 
+// Map padding & right gutter for tiny-state label column
+const MAP_MARGIN_LEFT = 16;
+const MAP_MARGIN_RIGHT_GUTTER = 140;  // or 180, 200 set right side space for tiny states label
+// const MAP_MARGIN_TOP = 0;
+// const MAP_MARGIN_BOTTOM = 16; 
+
 // mountinas style (arrow) :
 const ARROW_COLOR = '#b89775ff';
 const ARROW_STROKE_WIDTH = 3;
@@ -93,7 +100,6 @@ const ARROW_LEN_PX = 1;        // arrow body, min >= 1
 const ARROW_SPACING_PX = 15;    // peak distance
 const ARROW_HEAD_LEN = 8;       // peak high
 const ARROW_HEAD_WIDTH = 5;     // peak width
-const ARROW_SHADOW = 'rgba(0,0,0,0.18)'
 const ARROW_OPACITY = 0.7;
 
 // Neighbors & water labels styling
@@ -102,6 +108,7 @@ const WATER_LABEL_FILL = "#607d8b";
 const WATER_LABEL_OPACITY = 0.35;
 const ATLANTIC_AVOID_TINY = true; 
 const TINY_MARGIN = 20;    
+
 
 // sprint 2: US neighbor 
 // Canada / Mexico outline. Layer: maylayer
@@ -131,9 +138,9 @@ export type MapViewTopoOptions = {
 
 // States -> fill color
 function fillByStatus(s: StateStatus): string {
-    if (s === StateStatus.Complete) return "#43A047";
-    if (s === StateStatus.Partial)  return "#F8BBD0";
-    return "#FFFFFF";                          
+    if (s === StateStatus.Complete) return "#81C784";
+    if (s === StateStatus.Partial)  return "#E57373";
+    return "#FAF0E6";     
 }
 // mountina helper 1: pick pot follow the data.json line
 function samplePolylineBySpacing(
@@ -315,10 +322,24 @@ export default class MapViewTopo {
     // updateProjection(): fit projection to current container size.
     private updateProjection(size?: { width: number; height: number }) {
         const { width, height } = size ?? this.getContainerSize();
-        this.projection = d3geo.geoAlbersUsa().fitSize([width, height], {
-            type: "FeatureCollection",
-            features: this.geoFeatures
-        } as any);
+        
+        //new: Leave some space for the right tiny states label side
+        // Calculate the actual rectangular area the map will occupy:
+        // Horizontal: From MAP_MARGIN_LEFT to (width - MAP_MARGIN_RIGHT_GUTTER)
+        // Top and bottom: Leave some top and bottom margins
+        const left = MAP_MARGIN_LEFT;
+        const right = Math.max(left + 100, width - MAP_MARGIN_RIGHT_GUTTER); // avoide the stage being too small
+        const top = 0;
+        const bottom = height;
+
+        this.projection = d3geo.geoAlbersUsa().fitExtent(
+            [[left, top], [right, bottom]],
+            {
+                type: "FeatureCollection",
+                features: this.geoFeatures
+            } as any
+        );
+
         this.geoPath = d3geo.geoPath(this.projection);
     }
 

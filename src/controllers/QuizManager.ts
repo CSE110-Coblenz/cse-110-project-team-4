@@ -172,6 +172,8 @@ export class QuizManager {
         this.continue = true;
         this.questionBank?.resetRemainingStates();
         this.stats?.resetPoints();
+        // road car dashboard
+        this.ui?.resetRoadTripHud();
     }
 
     public handleNextAction(): void {

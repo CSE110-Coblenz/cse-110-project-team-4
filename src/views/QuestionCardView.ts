@@ -1,17 +1,28 @@
 // src/views/QuestionCardView.ts
-// 
-// 
 /*=============================
   VIEW LAYER:
-  - Use Konva to define and draw a question card
-  - helper functions such as view, hide, and setQuestion included
-  - Exposes onConfirm() callback for external controllers to hook answer submission
-  - Manages answer selection state and visual feedback
-  
+  - Use Konva to define and draw a question card.
+  - Manages answer selection state and visual feedback.
+  - Implements "Global Scaling" to ensure the card fits any screen size.
+
+  Sprint 3 updates (Nov 2025):
+  - Added global scaling logic via resize().
+  - Constructor now requires Konva.Stage to calculate responsive dimensions.
+  - Implemented ResizeObserver pattern (via main window listener) for auto-scaling.
+
+  Public API:
+  + constructor(stage: Konva.Stage)
+  + show(): void
+  + hide(): void
+  + setQuestion(question: Question): void
+  + onConfirm(callback: (correct: boolean) => void): void
+  + resize(): void  <-- New core method for responsive layout
+  + getLayer(): Konva.Layer
+
+  History:
   Sprint 2 updates (Nov 2025):
   - Added onConfirm() callback registration for UIController integration
   - Callback fires on confirm button click to enable stats/feedback updates
-
 ==============================*/
 
 import Konva from "konva";
@@ -63,9 +74,51 @@ export class QuestionCardView {
   private onConfirmCallback?: (correct: boolean) => void;
   private correctIndex: number;
 
-  constructor() {
+  // [new 11/23 Dennis] 
+  private stage: Konva.Stage;
+
+  constructor(stage: Konva.Stage){
+    this.stage = stage;
     this.layer = this.drawQuestionCard();
     this.correctIndex = -1;
+    // [new 11/23 Dennis] Listen for window size changes and trigger scaling.
+    // Use requestAnimationFrame to avoid frequent triggering
+    window.addEventListener('resize', () => {
+        this.resize();
+    });
+    
+    // Execute once during initialization
+    this.resize();
+  }
+
+  //[new 11/23 Dennis]
+  public resize() {
+    if (!this.stage || this.stage.width() === 0) return;
+    const w = this.stage.width();
+    const h = this.stage.height();
+    
+    // 1. Define the "safe zone" of the original answer sheet design
+    // Based on constants: the card is approximately 400 wide and 420 high. 
+    // With the confirmation button and shadow, it will occupy approximately 500x550 space.
+    // The origin is around (450, 260) (250+200, 50+210).
+    const DESIGN_W = 450;
+    const DESIGN_H = 600;
+    
+    // 2. Calculate the scaling ratio: Fit the card to the screen, 
+    // but do not exceed its original size (1.0).
+    // 0.85 leaving some margin.
+    let scale = Math.min(
+        (w / DESIGN_W) * 0.9, 
+        (h / DESIGN_H) * 0.85
+    );
+    
+    // 3. apply change
+    // Set the origin as the geometric center of the card (based on an estimated value of the original constant).
+    this.layer.offset({ x: 450, y: 260 }); 
+    this.layer.position({ x: w / 2, y: h / 2 }); // Move to the center of the screen
+    this.layer.scale({ x: scale, y: scale });
+    
+    this.layer.batchDraw();
   }
 
   getLayer(): Konva.Layer {
@@ -78,6 +131,7 @@ export class QuestionCardView {
 
   show() {
     this.layer.show();
+    this.resize();
   }
 
   setQuestion(question: Question) {

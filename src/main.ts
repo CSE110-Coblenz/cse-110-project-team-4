@@ -40,10 +40,13 @@ import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
 import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
-//import Konva from "konva"; //
 import { QuizManager } from "./controllers/QuizManager";
 import { ResultScreenController } from "./controllers/ResultScreenController";
 import { supabase } from "./supabaseClient";
+
+import { RoadTripDashboardView } from './views/RoadTripDashboardView';
+import Konva from "konva";
+import { MAX_ERRORS } from "./utils/constants";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -89,6 +92,10 @@ class Application extends ScreenSwitcher {
     private manager: QuizManager;
     private leaderboard: ResultScreenController;
 
+    // NEW: reference to bottom HUD row, so we can hide it on Welcome/Leaderboard
+    private roadTripDashboard?: RoadTripDashboardView;
+    private hudRowEl: HTMLElement | null;
+
     // initialize most controllers
     constructor(store: StateStore) {
         super();
@@ -97,10 +104,21 @@ class Application extends ScreenSwitcher {
             store,
             { goToQuestionsFor: (_s: USState) => {} }
         );
+
         this.stats = new GameStatsController(this.map);
         this.ui = new UIController(this.map, this.stats, this.manager);
         this.menu = new WelcomeScreenController("welcome-root", this.manager);
         this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
+
+        // =====bottom HUD row container (score + car + time)
+        this.hudRowEl = document.getElementById("hud-row");
+    }
+
+    // move to uicontrol soon, just for testing Dennis
+    // helper: Control the visibility of the three bottom HUD panels.
+    private setHudVisible(visible: boolean): void {
+        if (!this.hudRowEl) return;
+        this.hudRowEl.style.display = visible ? "grid" : "none";
     }
 
     // finish initializations that have certain dependencies
@@ -109,32 +127,133 @@ class Application extends ScreenSwitcher {
         this.map.mount("map-root");
         this.map.getView()?.hide();
         this.menu.getView().show();
-        this.stats.attemptReconnect();
-        let stageForUI = this.map.getStage();
+
+        // The initial screen is Welcome: 
+        // the three hubs at the bottom are all hidden.
+        this.setHudVisible(false);
+
+        const stageForUI = this.map.getStage();
         if (stageForUI) {
-            this.ui.mount(stageForUI)
-            this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
-            const timerView = new TimerViewCorner(stageForUI);
-            const timerCtrl = new TimerController(new TimerModel(), timerView);
-            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
+            this.ui.mount(stageForUI);
+            this.map.setUIBus(this.ui);
+
+            // [new 12/23 Dennis] 
+            // Logic for binding navigation buttons to the bottom left corner HUD
+            this.stats.bindNavigation({
+                onHome: () => {
+                    console.log("Nav: Home");
+                    this.switchToScreen(Screens.Welcome);
+                    // To reset the game when returning to the homepage, 
+                    // uncomment the following:
+                    // this.manager.restartGame();
+                },
+                onOptions: () => {
+                    console.log("Nav: Options");
+                    this.switchToScreen(Screens.Welcome);
+                    // Call WelcomeController to display the options layer
+                    this.menu.handleOptions();
+                },
+                onHelp: () => {
+                    console.log("Nav: Help");
+                    this.switchToScreen(Screens.Welcome);
+                    // Call WelcomeController to display the help layer
+                    this.menu.handleInfo();
+                }
+            });
+
+            // ========== left hub "score-hub"： GameStatsLightbox.ts ==========
+            const scoreContainer = document.getElementById("score-hub");
+            if (!scoreContainer) {
+                console.error("Score HUD container #score-hub not found; score HUD will stay on map stage if attached.");
+            } else {
+                const rectScore = scoreContainer.getBoundingClientRect();
+                const scoreStage = new Konva.Stage({
+                    container: "score-hub",
+                    width: rectScore.width || 200,
+                    height: rectScore.height || 72,
+                });
+/*                 window.addEventListener("resize", () => {
+                    scoreContainer.resizeToStage();
+                }); */
+                // attachHudStage：game stats light box layer mount on the new Stage
+                this.stats.attachHudStage(scoreStage);
+
+            }
+
+            // ========== mid HUD "roadtrip-hub": RoadTripDashboardView ==========
+            const roadTripContainer = document.getElementById("roadtrip-hub");
+            if (roadTripContainer) {
+                this.roadTripDashboard = new RoadTripDashboardView(
+                    "roadtrip-hub",
+                    MAX_ERRORS
+                );
+                this.roadTripDashboard.init();
+
+                // inject the roadtrop HUD into UIController
+                this.ui.attachRoadTripDashboard(this.roadTripDashboard);
+            } else {
+                console.error("RoadTrip HUD container #roadtrip-hub not found; car dashboard will not be shown.");
+            }
+
+            // ========== right HUD "timer-hub"：timerDispalyView.ts ==========
+            let timerCtrl: TimerController;
+
+            const timerContainer = document.getElementById("timer-hub");
+            if (!timerContainer) {
+                console.error("Timer HUD container #timer-hub not found; falling back to map corner.");
+                const timerView = new TimerViewCorner(stageForUI);
+                timerCtrl = new TimerController(new TimerModel(), timerView);
+            } else {
+                const rect = timerContainer.getBoundingClientRect();
+                const timerStage = new Konva.Stage({
+                    container: "timer-hub",
+                    width: rect.width || 200,
+                    height: rect.height || 72,
+                });
+                const timerView = new TimerViewCorner(timerStage);
+                timerCtrl = new TimerController(new TimerModel(), timerView);
+            }
+
+            // init QuizManager controlling the whole game life cyclic
+            this.manager.init(
+                this.menu.getToggler().getModel(),
+                this.stats,
+                this.ui,
+                timerCtrl,
+                this.map
+            );
         }
 
-        // temp debug
+        // ====== Testing debug & Supabase  ======
         window.addEventListener("keydown", (ev) => {
             if (ev.key.toLowerCase() === "f") {
                 store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
             }
             if (ev.key.toLowerCase() === "r") {
                 store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
+                this.ui.resetRoadTripHud(); 
             }
-            if (ev.key.toLowerCase() === 'o' && ev.ctrlKey) {
+            if (ev.key.toLowerCase() === "o" && ev.ctrlKey) {
                 this.ui.triggerFireworksTest();
             }
+            if (ev.key.toLowerCase() === "t") {
+                console.log("Test: Plane Flyover");
+                (this.ui as any).roadTripDashboard?.debugTrigger('plane');
+            }
+            if (ev.key.toLowerCase() === "y") {
+                console.log("Test: Correct Answer Effect");
+                (this.ui as any).roadTripDashboard?.debugTrigger('star');
+            }
+            if (ev.key.toLowerCase() === "u") {
+                console.log("Test: Wrong Answer Effect");
+                (this.ui as any).roadTripDashboard?.debugTrigger('hit');
+            }
         });
+
         console.log("Fetching users table from Supabase...");
-        this.stats;
         testSupabaseUsers();
     }
+
 
     // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
     public switchToScreen(screen: Screens): void {
@@ -142,9 +261,12 @@ class Application extends ScreenSwitcher {
         this.map.getView()!.hide();
         this.menu.getView().hide();
 
+        this.setHudVisible(false);
+
         switch (screen) {
             case Screens.Map:
                 this.map.getView()!.show();
+                this.setHudVisible(true);
                 break;
             case Screens.Welcome:
                 this.menu.getView().show();
@@ -177,7 +299,7 @@ app.init();
 //      settingsView.mount(ensureEl("settings-root"))
 //  - HUD (bottom-left: score/progress/timer):
 //      hudView.mount(ensureEl("hud"))
-//  - Toolbar (top-left: back/home/help/settings buttons):
+//  - Toolbar (left: back/home/help/settings buttons):
 //      toolbarView.mount(ensureEl("toolbar"))
 //
 //  Functional overlay layers (singletons; mount render roots or controllers):
@@ -191,6 +313,9 @@ app.init();
 //	  Where teammates should add later:
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
+
+
+
 
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
