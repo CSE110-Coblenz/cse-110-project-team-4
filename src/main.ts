@@ -226,27 +226,29 @@ class Application extends ScreenSwitcher {
 
         // ====== Testing debug & Supabase  ======
         window.addEventListener("keydown", (ev) => {
-            if (ev.key.toLowerCase() === "f") {
-                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
-            }
-            if (ev.key.toLowerCase() === "r") {
-                store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
-                this.ui.resetRoadTripHud(); 
-            }
-            if (ev.key.toLowerCase() === 'o') {
-                this.ui.triggerFireworks();
-            }
-            if (ev.key.toLowerCase() === "t") {
-                console.log("Test: Plane Flyover");
-                (this.ui as any).roadTripDashboard?.debugTrigger('plane');
-            }
-            if (ev.key.toLowerCase() === "y") {
-                console.log("Test: Correct Answer Effect");
-                (this.ui as any).roadTripDashboard?.debugTrigger('star');
-            }
-            if (ev.key.toLowerCase() === "u") {
-                console.log("Test: Wrong Answer Effect");
-                (this.ui as any).roadTripDashboard?.debugTrigger('hit');
+            if (ev.ctrlKey) {
+                if (ev.key.toLowerCase() === "f") {
+                    store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
+                }
+                if (ev.key.toLowerCase() === "r") {
+                    store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
+                    this.ui.resetRoadTripHud(); 
+                }
+                if (ev.key.toLowerCase() === 'o') {
+                    this.ui.triggerFireworks();
+                }
+                if (ev.key.toLowerCase() === "t") {
+                    console.log("Test: Plane Flyover");
+                    (this.ui as any).roadTripDashboard?.debugTrigger('plane');
+                }
+                if (ev.key.toLowerCase() === "y") {
+                    console.log("Test: Correct Answer Effect");
+                    (this.ui as any).roadTripDashboard?.debugTrigger('star');
+                }
+                if (ev.key.toLowerCase() === "u") {
+                    console.log("Test: Wrong Answer Effect");
+                    (this.ui as any).roadTripDashboard?.debugTrigger('hit');
+                }
             }
         });
 

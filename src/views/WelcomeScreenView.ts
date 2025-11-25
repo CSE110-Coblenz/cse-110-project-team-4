@@ -62,6 +62,7 @@ export class WelcomeScreenView {
         textBox.style.position = "absolute";
         textBox.style.zIndex = "1";
         textBox.placeholder = "Enter Your Name";
+        textBox.autocomplete = "off";
         this.inputEl = textBox;
 
         this.inputEl.addEventListener('keyup', (e) => {

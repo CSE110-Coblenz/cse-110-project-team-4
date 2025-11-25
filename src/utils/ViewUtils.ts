@@ -32,7 +32,7 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
     let rect = new Konva.Rect({
         x: xPos,
         y: yPos - 5,
-        opacity: 0.75,
+        opacity: 1,
         cornerRadius: 10,
         fill: "#daafafff",
         stroke: "black",

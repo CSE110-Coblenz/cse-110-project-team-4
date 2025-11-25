@@ -28,6 +28,9 @@ import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 
 const BUTTON_WIDTH = 300;
 const HEIGHT_SCALAR = 12;
+const CORNER_RADIUS = 10;
+const BOX_BG = "#eee";
+const STROKE_COLOR = "black";
 
 export interface Toggles {
     [key: string]: boolean
@@ -69,9 +72,10 @@ export class QuestionToggleView {
             y: h / 8,
             width: w / 2,
             height: 5 * h / 8,
-            fill: 'gray',
-            stroke: 'black',
-            strokeWidth: 1
+            fill: BOX_BG,
+            stroke: STROKE_COLOR,
+            strokeWidth: 1,
+            cornerRadius: CORNER_RADIUS
         })
 
         capitalToggle.width(BUTTON_WIDTH);
