@@ -36,7 +36,7 @@ const seed: USState[] = Object.keys({
 }));
 
 describe("main screen controller", () => {
-    // Declare variables at the top level, but initialize them in beforeEach
+    // Declare variables at the top level
     let stage: Konva.Stage;
     let switcher: ScreenSwitcher;
     let quiz: QuizManager;
@@ -48,11 +48,11 @@ describe("main screen controller", () => {
     let ui: UIController;
 
     beforeEach(() => {
-        // 1. Setup Fake Timers to control setTimeout
+        // 1. Setup Fake Timers
         vi.useFakeTimers();
 
-        // 2. Create fresh DOM elements for each test
-        document.body.innerHTML = ''; // Clear previous elements
+        // 2. Create fresh DOM elements
+        document.body.innerHTML = '';
         const mockEl = document.createElement("div");
         const inputEl = document.createElement("input");
         mockEl.id = "main-menu-container";
@@ -79,7 +79,6 @@ describe("main screen controller", () => {
         );
         
         stats = new GameStatsController(map);
-        // Assuming TimerViewCorner needs stage to function
         timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage));
         ui = new UIController(map, stats, quiz);
     });
@@ -107,10 +106,10 @@ describe("main screen controller", () => {
     })
 
     it("should be able to return questions", () => {
-        // Make sure to init first if the test expects it, 
-        // or test the "null" behavior if that's the intent.
-        // Based on your original test logic:
-        expect(quiz.getNextQuestion() === null).toBeFalsy(); 
+        // Fix here: Init the quiz so it has data
+        quiz.init(bank, stats, ui, timer, map);
+
+        expect(quiz.getNextQuestion() === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("California", "capitalQuestions") === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("", "")).toBeNull();
         expect(quiz.getQuestionBank() === null).toBeFalsy();
