@@ -196,6 +196,16 @@ export class RoadTripDashboardView {
         imageObj.onload = () => {
             if (!this.stage || !this.backgroundLayer) return;
             
+            if (!imageObj.width || !imageObj.height) {
+                console.warn(
+                    "[RoadTripDashboardView] Background image loaded but has zero size. " +
+                    "Falling back to solid color background."
+                );
+                this.bgImageLoaded = false;
+                this.installFallbackBackground();
+                this.backgroundLayer.batchDraw();
+                return;
+            }
             this.bgOriginalWidth = imageObj.width;
             this.bgOriginalHeight = imageObj.height;
             
@@ -214,7 +224,50 @@ export class RoadTripDashboardView {
             this.bgImageLoaded = true;
             this.resize(); // resize again
         };
+
+        // Callback for loading failure (404 / CORS / dev server path error, etc.)
+        imageObj.onerror = () => {
+            console.warn(
+                "[RoadTripDashboardView] Failed to load background image. " +
+                "Using solid color fallback instead."
+            );
+            this.bgImageLoaded = false;
+
+            if (this.bgGroup) {
+                this.bgGroup.destroyChildren();
+            }
+
+            this.installFallbackBackground();
+            this.backgroundLayer?.batchDraw();
+        };
         imageObj.src = bgUrl;
+    }
+
+    // helper: Safety fallback: When an image fails to load, use a solid-color rectangle as the background.
+    private installFallbackBackground(): void {
+        if (!this.backgroundLayer) return;
+
+        const w = this.stage ? this.stage.width() : 800;
+        const h = this.stage ? this.stage.height() : 120;
+
+        if (!this.bgGroup) {
+            this.bgGroup = new Konva.Group();
+            this.backgroundLayer.add(this.bgGroup);
+        }
+
+        this.bgGroup.destroyChildren();
+
+        const fallbackRect = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: w,
+            height: h,
+            fill: "#6d8299",
+            listening: false,
+        });
+
+        this.bgGroup.add(fallbackRect);
+        this.backgroundLayer.moveToBottom();
     }
 
     public resize(): void {

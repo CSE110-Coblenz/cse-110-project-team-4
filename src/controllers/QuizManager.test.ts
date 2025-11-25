@@ -42,7 +42,11 @@ describe("main screen controller", () => {
     document.body.appendChild(mockEl);
     document.body.appendChild(inputEl);
 
-    let stage = new Konva.Stage({container: "main-menu-container"})
+    let stage = new Konva.Stage({
+        container: mockEl, 
+        width: 800,
+        height: 600,
+    });
     let switcher: ScreenSwitcher = new ScreenSwitcher();
     let quiz: QuizManager = new QuizManager(switcher);
     let store: StateStore = new StateStore(seed);

@@ -35,7 +35,7 @@ Related
 - Model/Store: src/models/State.ts, src/models/StateStore.ts
 - Maps: src/data/maps/UsIdToCode.ts, src/data/maps/UsCodeToName.ts
 
-History
+Historyy
 - update : add mountains and rivers view.
 - Sprint 2: merged base/abbrev/external into mapLayer + labelsLayer; moved tooltip to uiLayer.
 - Sprint 1: switched from square tiles to real TopoJSON shapes.

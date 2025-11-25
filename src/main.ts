@@ -233,7 +233,7 @@ class Application extends ScreenSwitcher {
                 store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
                 this.ui.resetRoadTripHud(); 
             }
-            if (ev.key.toLowerCase() === "o" && ev.ctrlKey) {
+            if (ev.key.toLowerCase() === "o") {
                 this.ui.triggerFireworksTest();
             }
             if (ev.key.toLowerCase() === "t") {
