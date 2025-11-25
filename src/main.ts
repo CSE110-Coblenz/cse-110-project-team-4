@@ -115,7 +115,7 @@ class Application extends ScreenSwitcher {
             this.ui.mount(stageForUI)
             this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
             const timerView = new TimerViewCorner(stageForUI);
-            const timerCtrl = new TimerController(new TimerModel(), timerView);
+            const timerCtrl = new TimerController(new TimerModel(), timerView, this);
             this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
         }
 

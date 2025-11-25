@@ -54,7 +54,7 @@ describe("main screen controller", () => {
                 { goToQuestionsFor: (_s: USState) => {} }
             );
     let stats = new GameStatsController(map);
-    let timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage))
+    let timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher)
     let ui = new UIController(map, stats, quiz);
 
     it("should start unitialized", () => {
