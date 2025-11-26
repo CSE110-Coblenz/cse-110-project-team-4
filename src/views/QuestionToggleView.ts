@@ -25,6 +25,7 @@ Related
 
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
+import click from "../data/sfx/click.wav";
 
 const BUTTON_WIDTH = 300;
 const HEIGHT_SCALAR = 12;
@@ -38,6 +39,7 @@ export class QuestionToggleView {
     private toggleButtonGroup: Konva.Group;
     private startW: number;
     private id: string;
+    private clickAudio: HTMLAudioElement;
 
     // backHandler should be a handler for the back button
     // toggleHandler should be a handler for the toggle question buttons
@@ -57,11 +59,38 @@ export class QuestionToggleView {
         this.startW = w;
         this.toggleButtonGroup = new Konva.Group();
 
-        const backLabel = simpleLabelFactory(w / 2, 2 * h / HEIGHT_SCALAR, "Go Back", backHandler);
-        const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
-        const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
-        const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
+        this.clickAudio = new Audio(click);
+        this.clickAudio.preload = "auto";
+
+        const backLabel = simpleLabelFactory(
+            w / 2, 2 * h / HEIGHT_SCALAR,
+            "Go Back",
+            () => this.playClickAnd(backHandler)
+        );
+
+        const capitalToggle = simpleLabelFactory(
+            w / 2, 3 * h / HEIGHT_SCALAR,
+            "Toggle Capitals",
+            () => this.playClickAnd(() => toggleHandler("capitalQuestions"))
+        );
+
+        const flowersToggle = simpleLabelFactory(
+            w / 2, 4 * h / HEIGHT_SCALAR,
+            "Toggle Flowers",
+            () => this.playClickAnd(() => toggleHandler("flowerQuestions"))
+        );
+
+        const abbreviationToggle = simpleLabelFactory(
+            w / 2, 5 * h / HEIGHT_SCALAR,
+            "Toggle Abbreviations",
+            () => this.playClickAnd(() => toggleHandler("abbreviationQuestions"))
+        );
+
+        const saveButton = simpleLabelFactory(
+            w / 2, 6 * h / HEIGHT_SCALAR,
+            "Save",
+            () => this.playClickAnd(saveHandler)
+        );
 
         const rect = new Konva.Rect({
             x: w / 4,
@@ -124,4 +153,11 @@ export class QuestionToggleView {
     getLayer(): Konva.Layer {
         return this.layer;
     }
+
+    private playClickAnd(handler: () => void) {
+            this.clickAudio.currentTime = 0;
+            this.clickAudio.play().catch(err => console.error(err));
+            handler();
+    }
+
 }

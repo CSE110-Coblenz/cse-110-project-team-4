@@ -17,6 +17,11 @@
 import Konva from "konva";
 import { Answer, Question } from "../models/Questions"
 
+import click from "../data/sfx/click.wav";
+import correctClick from "../data/sfx/correct.wav";
+import incorrectClick from "../data/sfx/incorrect.wav";
+
+
 // question card constants:
 // box size 
 const WIDTH_Q = 400;
@@ -63,9 +68,25 @@ export class QuestionCardView {
   private onConfirmCallback?: (correct: boolean) => void;
   private correctIndex: number;
 
+  // SFX
+  private clickAudio: HTMLAudioElement;
+  private correctAudio: HTMLAudioElement;
+  private incorrectAudio: HTMLAudioElement;
+
+
   constructor() {
     this.layer = this.drawQuestionCard();
     this.correctIndex = -1;
+
+    this.clickAudio = new Audio(click);
+    this.clickAudio.preload = "auto";
+
+    this.correctAudio = new Audio(correctClick);
+    this.correctAudio.preload = "auto";
+
+    this.incorrectAudio = new Audio(incorrectClick);
+    this.incorrectAudio.preload = "auto";
+
   }
 
   getLayer(): Konva.Layer {
@@ -205,7 +226,7 @@ export class QuestionCardView {
     // update selected answer and confirm button functionality on click
     group.on('click', () => {
       this.selectedAnswerIndex = i;
-
+      this.playClick(this.clickAudio);
       group.scale({ x: 1, y: 1 });
 
       const confirmCircle = layer.findOne('.confirm-circle') as Konva.Circle;
@@ -268,6 +289,14 @@ export class QuestionCardView {
         // Don't allow confirmation without selecting an answer
         return;
       }
+
+      if (this.selectedAnswerIndex === this.correctIndex) {
+          this.playClick(this.correctAudio);
+      } else {
+          this.playClick(this.incorrectAudio);
+      }
+
+
       confirmButton.scale({ x: 1, y: 1 });
       layer.draw();
       layer.getStage().container().style.cursor = 'default';
@@ -277,6 +306,11 @@ export class QuestionCardView {
     });
 
     layer.draw();
+  }
+
+  private playClick(audio: HTMLAudioElement) { 
+    audio.currentTime = 0; 
+    audio.play().catch(err => console.error(err)); 
   }
 
 }
