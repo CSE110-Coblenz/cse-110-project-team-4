@@ -75,7 +75,7 @@ describe("main screen controller", () => {
         
         map = new MapController(
             store,
-            { goToQuestionsFor: (_s: USState) => {} }
+            { openQuestion: (q: any) => {} }
         );
         
         stats = new GameStatsController(map);
