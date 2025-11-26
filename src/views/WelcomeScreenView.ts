@@ -55,11 +55,10 @@ export class WelcomeScreenView {
         })
 
         this.layer = new Konva.Layer({ visible: true });
-        this.toggleButtonGroup = new Konva.Group();
 
         this.titleGroup = new Konva.Group({
             x: w / 2,
-            y: h / 4 - 20,
+            y: h / 4 - 10,
             name: "titleGroup",
         });
         let titleText = new Konva.Text({
@@ -75,7 +74,7 @@ export class WelcomeScreenView {
         this.layer.add(this.titleGroup);
 
         Konva.Image.fromURL(flagSrc, (flagImage) => {
-            flagImage.width(150);
+            flagImage.width(160);
             flagImage.height(100);
             flagImage.y(-(flagImage.height() + 10));
             flagImage.offsetX(flagImage.width() / 2);
@@ -87,19 +86,21 @@ export class WelcomeScreenView {
         //const infoLabel = simpleLabelFactory(w / 2, h / 4 + 300, "How To Play", infoHandler);
         //const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 400, "Options", optionsHandler);
 
-        const startLabel = simpleLabelFactory(w / 2, h / 4 + 100, "Start Game", () => {
+        this.toggleButtonGroup = new Konva.Group();
+
+        const startLabel = simpleLabelFactory(w / 2, h / 4 + 125, "Start Game", () => {
             this.clickAudio.currentTime = 0;
             this.clickAudio.play().catch(err => console.error(err));
             startHandler();
         });
 
-        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 300, "How To Play", () => {
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 325, "How To Play", () => {
             this.clickAudio.currentTime = 0;
             this.clickAudio.play().catch(err => console.error(err));
             infoHandler();
         });
 
-        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 400, "Options", () => {
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 425, "Options", () => {
             this.clickAudio.currentTime = 0;
             this.clickAudio.play().catch(err => console.error(err));
             optionsHandler();
@@ -109,7 +110,7 @@ export class WelcomeScreenView {
         const textBox = document.createElement("textarea");
         textBox.placeholder = "Type your name here...";
         textBox.id = "nameInput";
-        textBox.style.top = h / 4 + 200 + "px";
+        textBox.style.top = h / 4 + 225 + "px";
         textBox.style.width = "200px";
         textBox.style.left = (w / 2 - 100) + "px";
         textBox.style.position = "absolute";
