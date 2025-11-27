@@ -21,14 +21,12 @@ Related
 
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
-import click from "../data/sfx/click.wav";
 
 export class ResultScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
     private restartGroup: Konva.Group;
     private id: string;
-    private clickAudio: HTMLAudioElement;
 
     constructor(restartHandler: () => void, id: string) {
         let [w, h] = getDims(360, 360, id);
@@ -41,16 +39,8 @@ export class ResultScreenView {
         this.layer = new Konva.Layer({});
         this.restartGroup = new Konva.Group({});
         this.id = id;
-
-        this.clickAudio = new Audio(click);
-        this.clickAudio.preload = "auto";
         
-        const restartLabel = simpleLabelFactory(w / 2, h / 4, "Restart Game", () => {
-            this.clickAudio.currentTime = 0;
-            this.clickAudio.play().catch(err => console.error(err));
-            restartHandler();
-        });
-
+        const restartLabel = simpleLabelFactory(w / 2, h / 4, "Restart Game", restartHandler);
         this.restartGroup.add(restartLabel);
 
         this.layer.add(this.restartGroup);

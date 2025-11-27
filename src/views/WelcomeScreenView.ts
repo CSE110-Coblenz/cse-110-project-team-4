@@ -24,7 +24,6 @@ Related
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 import flagSrc from "../data/img/america-flag.jpg";
-import click from "../data/sfx/click.wav";
 
 export class WelcomeScreenView {
     private stage: Konva.Stage;
@@ -33,7 +32,6 @@ export class WelcomeScreenView {
     private titleGroup: Konva.Group;
     private id: string;
     private inputEl;
-    private clickAudio: HTMLAudioElement;
 
     constructor(
         startHandler: () => void, 
@@ -42,9 +40,6 @@ export class WelcomeScreenView {
         id: string) 
     {
         this.id = id;
-
-        this.clickAudio = new Audio(click);
-        this.clickAudio.preload = "auto";
 
         let [w, h] = getDims(360, 360, id);
         this.stage = new Konva.Stage({
@@ -82,35 +77,17 @@ export class WelcomeScreenView {
             this.layer.batchDraw();
         });
 
-        //const startLabel = simpleLabelFactory(w / 2, h / 4 + 100, "Start Game", startHandler);
-        //const infoLabel = simpleLabelFactory(w / 2, h / 4 + 300, "How To Play", infoHandler);
-        //const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 400, "Options", optionsHandler);
+        const startLabel = simpleLabelFactory(w / 2, h / 4 + 110, "Start Game", startHandler);
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 310, "How To Play", infoHandler);
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 410, "Options", optionsHandler);
 
         this.toggleButtonGroup = new Konva.Group();
-
-        const startLabel = simpleLabelFactory(w / 2, h / 4 + 125, "Start Game", () => {
-            this.clickAudio.currentTime = 0;
-            this.clickAudio.play().catch(err => console.error(err));
-            startHandler();
-        });
-
-        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 325, "How To Play", () => {
-            this.clickAudio.currentTime = 0;
-            this.clickAudio.play().catch(err => console.error(err));
-            infoHandler();
-        });
-
-        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 425, "Options", () => {
-            this.clickAudio.currentTime = 0;
-            this.clickAudio.play().catch(err => console.error(err));
-            optionsHandler();
-        });
 
         let menuEl = document.getElementById(id);
         const textBox = document.createElement("textarea");
         textBox.placeholder = "Type your name here...";
         textBox.id = "nameInput";
-        textBox.style.top = h / 4 + 225 + "px";
+        textBox.style.top = h / 4 + 210 + "px";
         textBox.style.width = "200px";
         textBox.style.left = (w / 2 - 100) + "px";
         textBox.style.position = "absolute";
