@@ -29,8 +29,10 @@ export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
+    private onBackCallback?: () => void
 
-    constructor(stage: Konva.Stage, id: string) {
+    constructor(stage: Konva.Stage, id: string, onBackCallback?: () => void) {
+        this.onBackCallback = onBackCallback;
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
@@ -47,6 +49,10 @@ export class QuestionToggleController {
             inputEl.style.display = "block";
         }
         this.view.hide();
+
+        if (this.onBackCallback) {
+            this.onBackCallback();
+        }
     }
 
     // handler function to update when a toggle button is clicked, updates options
