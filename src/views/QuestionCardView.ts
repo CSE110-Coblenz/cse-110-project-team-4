@@ -170,6 +170,7 @@ export class QuestionCardView {
     for (let i = 0; i < 4; i++) {
       const answerText = this.layer.findOne(`.answer-text-${i}`) as Konva.Text;
       answerText.text(answers[i].answerText);
+      this.fitTextToWidth(answerText, WIDTH_A - 10, FONTSIZE_A);
     }
 
     // redraw and update parameters
@@ -255,8 +256,8 @@ export class QuestionCardView {
     });
 
     const text = new Konva.Text({
-      x: -WIDTH_A / 2,
-      y: -HEIGHT_A / 2 + HEIGHT_A / 3,
+      x: 0,
+      y: 0,
       width: WIDTH_A,
       text: `${i + 1}`,           // just a placeholder
       fontSize: FONTSIZE_A,
@@ -264,6 +265,8 @@ export class QuestionCardView {
       align: 'center',
       name: `answer-text-${i}`,
     });
+
+    this.fitTextToWidth(text, WIDTH_A - 10, FONTSIZE_A); 
 
     group.add(rect, text);
 
@@ -294,6 +297,27 @@ export class QuestionCardView {
     this.answerCards[i] = group;
     layer.add(group);
   }
+
+  // 11/26/25 drawAnswerCard helper method
+  private fitTextToWidth(textNode: Konva.Text, maxWidth: number, maxFontSize: number) {
+    let fontSize = maxFontSize;
+    textNode.fontSize(fontSize);
+
+    // Remove any existing width constraint for measuring true width
+    textNode.width(undefined);
+
+    while (textNode.width() > maxWidth && fontSize > 5) {
+        fontSize -= 1;
+        textNode.fontSize(fontSize);
+    }
+
+      textNode.x(-textNode.width() / 2);
+
+      // Vertically center inside the answer card
+      const groupHeight = HEIGHT_A;
+      const textHeight = textNode.height();
+      textNode.y(-textHeight / 2);
+    }
 
   private drawConfirmButton(layer: Konva.Layer): void {
     const confirmButton = new Konva.Group({

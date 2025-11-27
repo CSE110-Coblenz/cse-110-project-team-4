@@ -197,11 +197,10 @@ export class QuizManager {
         }
 
         let finishedStatus = this.stats.isFinished();
-        if (this.questionBank.getRemainingStates().length == 0 ||
-                finishedStatus != 0 ||
-                this.timer.isFinished()) {
+        if (this.questionBank.getRemainingStates().length == 0 || finishedStatus != 0) {
             this.continue = false;
         }
+
 
         if (this.continue) {
             this.ui.goToQuestionsFor();

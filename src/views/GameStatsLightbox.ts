@@ -102,7 +102,7 @@ export default class GameStatsLightbox {
     // --- top right: ERRORS (red) ---
     this.labelErrors = new Konva.Text({
       x: col2X, y: row1Y,
-      text: `Red ERRORS: ${redCount}/${MAX_ERRORS}`,
+      text: `ERRORS: ${redCount}/${MAX_ERRORS}`,
       fontSize: baseFontSize,
       fontFamily: STYLE.font,
       fill: STYLE.red, //red 

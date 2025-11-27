@@ -202,7 +202,7 @@ class Application extends ScreenSwitcher {
             if (!timerContainer) {
                 console.error("Timer HUD container #timer-hub not found; falling back to map corner.");
                 const timerView = new TimerViewCorner(stageForUI);
-                timerCtrl = new TimerController(new TimerModel(), timerView);
+                timerCtrl = new TimerController(new TimerModel(), timerView, this);
             } else {
                 const rect = timerContainer.getBoundingClientRect();
                 const timerStage = new Konva.Stage({
@@ -211,7 +211,7 @@ class Application extends ScreenSwitcher {
                     height: rect.height || 72,
                 });
                 const timerView = new TimerViewCorner(timerStage);
-                timerCtrl = new TimerController(new TimerModel(), timerView);
+                timerCtrl = new TimerController(new TimerModel(), timerView, this);
             }
 
             // init QuizManager controlling the whole game life cyclic
@@ -222,6 +222,9 @@ class Application extends ScreenSwitcher {
                 timerCtrl,
                 this.map
             );
+            this.ui.mount(stageForUI)
+            this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
+            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
         }
 
         // ====== Testing debug & Supabase  ======

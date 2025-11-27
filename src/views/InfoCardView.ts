@@ -36,6 +36,7 @@ const HOW_TO_PLAY: string =
   "* Capitals (ex: “What’s the capital of California?”)\n" +
   "* Abbreviations (ex: “What’s CA stand for?”)\n" +
   "* State Flowers (Yep, every state has one!)\n" +
+  "* Year the state was founded (added to the Union)\n" +
   "Make sure you hit Save! If you don’t pick anything, the game will default to capital questions.\n\n" +
   "3. Gameplay Basics\n" +
   "Hit Start Game, and you’ll jump into the US map!\n" +

@@ -79,7 +79,7 @@ describe("main screen controller", () => {
         );
         
         stats = new GameStatsController(map);
-        timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage));
+        timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher);
         ui = new UIController(map, stats, quiz);
     });
 
