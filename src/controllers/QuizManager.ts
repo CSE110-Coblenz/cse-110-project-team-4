@@ -27,6 +27,7 @@ import { TimerController } from "./TimerController";
 import { ScreenSwitcher, Screens } from "../utils/types";
 import { MapController } from "./MapController";
 import { StateStatus } from "../models/State";
+import { LeaderboardService } from '../services/LeaderboardService';
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
@@ -38,6 +39,7 @@ export class QuizManager {
     private timer?: TimerController;
     private switcher: ScreenSwitcher;
     private map?: MapController;
+    private gameStartTime?: number;
 
     constructor(switcher: ScreenSwitcher) {
         this.hasInit = false;
@@ -160,6 +162,7 @@ export class QuizManager {
 
     startGame(name: string) {
         this.name = name;
+        this.gameStartTime = Date.now();
         if (this.timer) {
             this.timer.start();
         }
@@ -176,6 +179,14 @@ export class QuizManager {
             return this.questionBank;
         }
         return null;
+    }
+
+    public getScore(): number {
+        return this.stats?.getPoints() || 0;
+    }
+    
+    public getName(): string | undefined {
+        return this.name;
     }
 
     public restartGame(): void {
@@ -219,6 +230,22 @@ export class QuizManager {
                     console.log("this is loss")
                     break
             }
+            
+            // Save score to database before showing leaderboard
+            if (this.name && this.stats) {
+                const finalScore = this.stats.getPoints();
+                const gameDuration = this.gameStartTime 
+                    ? Math.floor((Date.now() - this.gameStartTime) / 1000) 
+                    : null;
+
+                LeaderboardService.saveScore(this.name, finalScore, gameDuration)
+                    .then(success => {
+                        if (success) {
+                            console.log('Score saved successfully!');
+                        }
+                    });
+            }
+
             setTimeout(() => {this.switcher.switchToScreen(Screens.Leaderboard)}, 5000);
         }
     }

@@ -40,7 +40,7 @@ export class ResultScreenView {
         this.restartGroup = new Konva.Group({});
         this.id = id;
         
-        const restartLabel = simpleLabelFactory(w / 2, h / 4, "Restart Game", restartHandler);
+        const restartLabel = simpleLabelFactory(w / 2, h - 450, "Restart Game", restartHandler);
         this.restartGroup.add(restartLabel);
 
         this.layer.add(this.restartGroup);
