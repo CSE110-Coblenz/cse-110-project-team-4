@@ -28,6 +28,11 @@
 import Konva from "konva";
 import { Answer, Question } from "../models/Questions"
 
+import click from "../data/sfx/click.wav";
+import correctClick from "../data/sfx/correct.wav";
+import incorrectClick from "../data/sfx/incorrect.wav";
+
+
 // question card constants:
 // box size 
 const WIDTH_Q = 400;
@@ -77,10 +82,15 @@ export class QuestionCardView {
   private correctIndex: number;
   private answerCards: Konva.Group[] | null[];
 
+  // SFX [11/26 Phillip]
+  private clickAudio: HTMLAudioElement;
+  private correctAudio: HTMLAudioElement;
+  private incorrectAudio: HTMLAudioElement;
+
   // [new 11/23 Dennis] 
   private stage: Konva.Stage;
 
-  constructor(stage: Konva.Stage){
+  constructor(stage: Konva.Stage) {
     this.answerCards = [null, null, null, null];
     this.stage = stage;
     this.layer = this.drawQuestionCard();
@@ -93,6 +103,16 @@ export class QuestionCardView {
     
     // Execute once during initialization
     this.resize();
+
+    // Initialize all click sfx [11/26 Phillip]
+    this.clickAudio = new Audio(click);
+    this.clickAudio.preload = "auto";
+
+    this.correctAudio = new Audio(correctClick);
+    this.correctAudio.preload = "auto";
+
+    this.incorrectAudio = new Audio(incorrectClick);
+    this.incorrectAudio.preload = "auto";
   }
 
   //[new 11/23 Dennis]
@@ -263,7 +283,7 @@ export class QuestionCardView {
     // update selected answer and confirm button functionality on click
     group.on('click', () => {
       this.selectedAnswerIndex = i;
-
+      this.playClick(this.clickAudio);
       group.scale({ x: 1, y: 1 });
 
       const confirmCircle = layer.findOne('.confirm-circle') as Konva.Circle;
@@ -327,6 +347,14 @@ export class QuestionCardView {
         // Don't allow confirmation without selecting an answer
         return;
       }
+
+      if (this.selectedAnswerIndex === this.correctIndex) {
+          this.playClick(this.correctAudio);
+      } else {
+          this.playClick(this.incorrectAudio);
+      }
+
+
       confirmButton.scale({ x: 1, y: 1 });
       layer.draw();
       layer.getStage().container().style.cursor = 'default';
@@ -365,5 +393,11 @@ export class QuestionCardView {
       cardGroup.draw();
     })
   }
+
+  private playClick(audio: HTMLAudioElement) { 
+    audio.currentTime = 0; 
+    audio.play().catch(err => console.error(err)); 
+  }
+
 }
 

@@ -23,11 +23,13 @@ Related
 
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
+import flagSrc from "../data/img/america-flag.jpg";
 
 export class WelcomeScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
     private toggleButtonGroup: Konva.Group;
+    private titleGroup: Konva.Group;
     private id: string;
     private inputEl;
 
@@ -38,6 +40,7 @@ export class WelcomeScreenView {
         id: string) 
     {
         this.id = id;
+
         let [w, h] = getDims(360, 360, id);
         this.stage = new Konva.Stage({
             container: id,
@@ -47,17 +50,47 @@ export class WelcomeScreenView {
         })
 
         this.layer = new Konva.Layer({ visible: true });
+
+        this.titleGroup = new Konva.Group({
+            x: w / 2,
+            y: h / 4 - 10,
+            name: "titleGroup",
+        });
+        let titleText = new Konva.Text({
+            text: " WELCOME to the \n U.S. Geography Game!",
+            fill: 'black',
+            fontSize: 40,
+            fontStyle: "bold",
+            padding: 4,
+            align: "center"      
+        });
+        titleText.offsetX(titleText.width() / 2);
+        this.titleGroup.add(titleText);
+
+        this.layer.add(this.titleGroup);
+
+        Konva.Image.fromURL(flagSrc, (flagImage) => {
+            flagImage.width(160);
+            flagImage.height(100);
+            flagImage.y(-(flagImage.height() + 10));
+            flagImage.offsetX(flagImage.width() / 2);
+            this.titleGroup.add(flagImage);
+            this.layer.batchDraw();
+        });
+
+        const startLabel = simpleLabelFactory(w / 2, h / 4 + 110, "Start Game", startHandler);
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 310, "How To Play", infoHandler);
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 410, "Options", optionsHandler);
+
         this.toggleButtonGroup = new Konva.Group();
 
-        const startLabel = simpleLabelFactory(w / 2, h / 4, "Start Game", startHandler);
-        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 200, "How To Play", infoHandler);
-        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 300, "Game Options", optionsHandler);
-
         let menuEl = document.getElementById(id);
-        const textBox = document.createElement("input");
+        const textBox = document.createElement("textarea");
         textBox.id = "nameInput";
-        textBox.style.top = h / 4 + 100 + "px";
+        textBox.style.top = h / 4 + 210 + "px";
         textBox.style.width = "200px";
+        textBox.style.height = "15px";
+        textBox.style.resize = "none";
         textBox.style.left = (w / 2 - 100) + "px";
         textBox.style.position = "absolute";
         textBox.style.zIndex = "1";
@@ -109,6 +142,10 @@ export class WelcomeScreenView {
 
     public resize(): void {
         let [w, h] = getDims(360, 360, this.id);
+    
+        this.titleGroup.x(w / 2);
+        this.titleGroup.offsetX(this.titleGroup.width() / 2);
+
         this.layer.getChildren().forEach((group) => {
             if (group instanceof Konva.Group) {
                 group.getChildren().forEach(subgroup => {

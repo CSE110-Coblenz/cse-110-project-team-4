@@ -40,7 +40,7 @@ export class WelcomeScreenController {
 
     constructor(container: string, quiz: QuizManager) {
         this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
-        this.toggleController = new QuestionToggleController(this.view.getStage(), container);
+        this.toggleController = new QuestionToggleController(this.view.getStage(), container, () => this.view.getLayer().show());
         this.infoView = new InfoCardView(this.view.getStage(), container, this.hideInfo);
         this.popup = new PopUpView(this.view.getLayer(), "Please enter your name\n in the input box below.");
         this.ro = new ResizeObserver(this.handleResize);
@@ -81,6 +81,7 @@ export class WelcomeScreenController {
 
     // route options click to options screen
     handleOptions = () => {
+        this.view.getLayer().hide();
         this.view.getInput().style.display = "none";
         this.toggleController.getView().show();
     }

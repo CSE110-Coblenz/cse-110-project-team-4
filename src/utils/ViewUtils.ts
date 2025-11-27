@@ -1,5 +1,16 @@
 import Konva from "konva";
 import { QuestionType } from "../models/Questions";
+import click from "../data/sfx/click.wav";
+
+const clickAudio = new Audio(click);
+clickAudio.preload = "auto";
+clickAudio.load();
+clickAudio.volume = 0.4;
+
+function playClick() {
+    clickAudio.currentTime = 0;
+    clickAudio.play();
+}
 
 export function getDims(clampX: number, clampY: number, id: string) {
     let containerEl = document.getElementById(id);
@@ -54,6 +65,9 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
     });
 
     out.on("click", (e) => {
+        // play audio
+        playClick();
+        
         // toggle the checkbox if the button text has one
         let target = e.target
         let txt: string = "";
