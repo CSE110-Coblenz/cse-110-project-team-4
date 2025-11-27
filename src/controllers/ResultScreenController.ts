@@ -17,6 +17,7 @@ import { ResultScreenView } from "../views/ResultScreenView";
 import { ScreenSwitcher, Screens } from "../utils/types";
 import { LeaderboardView } from "../views/LeaderboardView";
 import { LeaderboardEntry, Player } from "../models/LeaderboardModel";
+import { LeaderboardService } from '../services/LeaderboardService';
 
 export class ResultScreenController {
     private view: ResultScreenView;
@@ -30,24 +31,33 @@ export class ResultScreenController {
         this.view = new ResultScreenView(this.handleRestart, container);
         this.leaderboard = new LeaderboardView();
         this.switcher = switcher;
-
+    
         this.ro = new ResizeObserver(this.handleResize);
         this.ro.observe(document.getElementById(container)!);
         
-        // mock a leaderboard entry for demo purposes
-        let mockPlayer: Player = {
-            id: 42,
-            name: "hal"
+        // Attach leaderboard view to layer
+        this.view.getLayer().add(this.leaderboard.getGroup());
+        
+        // Load real leaderboard data
+        this.loadLeaderboard();
+    }
+    
+    // Add method to load and display leaderboard
+    private async loadLeaderboard(): Promise<void> {
+        const entries = await LeaderboardService.getTopScores(5);
+        
+        if (entries.length > 0) {
+            this.leaderboard.draw(entries);
+        } else {
+            // Show empty state if no scores yet
+            console.log('No scores yet. leaderboard is empty');
+            this.leaderboard.draw([]);
         }
-        let mockEntry: LeaderboardEntry = {
-            score: 100,
-            player: mockPlayer,
-            timestamp: "now"
-        }
-
-        // attach leaderboard to results screen directly for demo purposes, maybe will change later
-        this.leaderboard.draw([mockEntry])
-        this.view.getLayer().add(this.leaderboard.getGroup())
+    }
+    
+    // Add public method to refresh leaderboard when screen is shown
+    public refreshLeaderboard(): void {
+        this.loadLeaderboard();
     }
 
     handleRestart = () => {

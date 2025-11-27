@@ -277,6 +277,7 @@ class Application extends ScreenSwitcher {
                 this.menu.getView().show();
                 break;
             case Screens.Leaderboard:
+                this.leaderboard.refreshLeaderboard();
                 this.leaderboard.getView().show();
                 break;
             default: 
