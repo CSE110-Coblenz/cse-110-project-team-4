@@ -128,6 +128,10 @@ export class GameStatsController {
 		this.points = 0;
 	}
 
+	public getPoints(): number {
+		return this.points;
+	}
+
 	public attachHudStage(stage: Konva.Stage): void {
 		this.layer = new Konva.Layer();
 		stage.add(this.layer);
