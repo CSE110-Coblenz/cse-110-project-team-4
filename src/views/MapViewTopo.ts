@@ -10,7 +10,6 @@ Public API
 - getLayer()               // returns mapLayer (backward compat)
 - setInteractive(on: boolean)  // toggles map & label interactions
 
-
 Layers & Groups
 - mapLayer (Konva.Layer, listening: true)
   * State shapes as Konva.Path (cached in shapesByCode)
@@ -45,7 +44,6 @@ Historyy
 import Konva from "konva";
 import { feature,mesh } from "topojson-client";   // TopoJSON -> GeoJSON
 import * as d3geo from "d3-geo";             // projection & path generator
-
 import us from "us-atlas/states-10m.json";   // US TopoJSON data
 import countriesTopo from "world-atlas/countries-50m.json"; // Canada and Mexico data
 
@@ -58,14 +56,12 @@ import { codeToFullName, TINY_STATES } from "../data/maps/UsCodeToName";
 import rivers from "../data/maps/rivers.json";
 import mountains from "../data/maps/mountains.json";
 
-
 type Topology = any;
 
-// Ignore territory of U.S.
-const TERRITORY_FIPS = new Set([60, 66, 69, 72, 78]);
+// Ignore territory of U.S. like  American Sa moa
+const TERRITORY_FIPS = new Set([60, 66, 69, 72, 78]); 
 
-// Move to theme/constants later ========================================
-// Sprint 2 Typography for labels and tooltip
+// Move to theme/constants later ========= Sprint 2 Typography for labels and tooltip
 const LABEL_FONT_FAMILY = "system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif";
 const LABEL_FONT_SIZE = 12;      // in-map abbreviations
 const TOOLTIP_FONT_SIZE = 14;    // floating full name
@@ -80,7 +76,7 @@ const CHIP_RADIUS = 6;
 const CHIP_STROKE = "#8aa0b3";
 const CHIP_ROW = 26;
 
-//  Mouse hover High light
+// States Mouse hover High light
 const HOVER_STROKE = "#004bfaff";
 const HOVER_STROKE_WIDTH = 2;
 
@@ -90,8 +86,6 @@ const HIT_STROKE_WIDTH = 20;
 // Map padding & right gutter for tiny-state label column
 const MAP_MARGIN_LEFT = 16;
 const MAP_MARGIN_RIGHT_GUTTER = 140;  // or 180, 200 set right side space for tiny states label
-// const MAP_MARGIN_TOP = 0;
-// const MAP_MARGIN_BOTTOM = 16; 
 
 // mountinas style (arrow) :
 const ARROW_COLOR = '#b89775ff';
@@ -142,7 +136,8 @@ function fillByStatus(s: StateStatus): string {
     if (s === StateStatus.Partial)  return "#E57373";
     return "#FAF0E6";     
 }
-// mountina helper 1: pick pot follow the data.json line
+
+// == mountina helper 1: pick pot follow the data.json line
 function samplePolylineBySpacing(
     pts: { x: number; y: number }[], spacing: number): { x: number; y: number }[] {
         if (pts.length < 2) return pts.slice();
@@ -175,7 +170,7 @@ function samplePolylineBySpacing(
     if (!lastOut || lastOut.x !== last.x || lastOut.y !== last.y) out.push({ ...last });
     return out;
 }
-// mountina helper 2: arrow shape as peak
+// == mountina helper 2: arrow shape as peak
 function createUpArrowTemplate(): Konva.Arrow {
     const arrow = new Konva.Arrow({
         points: [0, ARROW_LEN_PX, 0, 0],
@@ -211,7 +206,7 @@ export default class MapViewTopo {
 
     // sprint2:  
     private labelsLayer: Konva.Layer;   //State abbreviations "CA" + tiny states on the right
-    private uiLayer: Konva.Layer;               // floating tooltip
+    private uiLayer: Konva.Layer;       // floating tooltip
 
     // sprint2:  
     private tooltipGroup!: Konva.Group;
@@ -228,8 +223,7 @@ export default class MapViewTopo {
     private chipsByCode = new Map<string, { group: Konva.Group; rect: Konva.Rect }>();
     private ro!: ResizeObserver;  // responsive observer
 
-    // sprint 2: 
-    // state's geographical features mountains and rivers.
+    // sprint 2: state's geographical features mountains and rivers.
     private terrainGroup?: Konva.Group;
     private rangesGroup?: Konva.Group;
     private riversGroup?: Konva.Group;
@@ -249,11 +243,11 @@ export default class MapViewTopo {
             height: size.height
         });
 
-        this.mapLayer = new Konva.Layer();
-        this.labelsLayer = new Konva.Layer();
-        this.uiLayer = new Konva.Layer({ listening: false }); 
+        //sprint2 
+        this.mapLayer = new Konva.Layer(); // all geographic shapes — states, terrain, neighbor countries, borders.
+        this.labelsLayer = new Konva.Layer(); //state abbreviations, tiny-state chips, water/neighbor labels.
+        this.uiLayer = new Konva.Layer({ listening: false }); // tooltip only, listening: false, always on top.
 
-        //sprint2
         this.stage.add(this.mapLayer);
         this.stage.add(this.labelsLayer);
         this.stage.add(this.uiLayer);
@@ -272,6 +266,7 @@ export default class MapViewTopo {
         this.uiLayer.add(this.tooltipGroup);
 
         this.prepareGeo();
+
         // Use the same measured size to init projection
         this.updateProjection(size);
 
@@ -280,24 +275,6 @@ export default class MapViewTopo {
         this.ro = new ResizeObserver(() => this.resizeAndRedraw());
         this.ro.observe(this.containerEl);
     }
-
-    // destroy(): Cleanup resources & listeners to prevent leaks 
-    //      (disconnect ResizeObserver, destroy Stage).
-    public destroy() {
-        this.ro.disconnect();
-        this.stage.destroy();
-        this.riverAnim?.stop();
-        this.riverAnim = undefined;
-    }
-
-    // redraw(states): Incremental redraw based on new state 
-    //      (update fills only), no geometry/projection rebuild.
-    public redraw(states: USState[]) {
-        this.opts = { ...this.opts, states };
-        this.byCode = new Map(states.map(s => [s.code, s]));
-        this.drawAll(true);
-    }
-
 
   // ---------- Internal implementation helpers ----------
     // getContainerSize():
@@ -309,29 +286,33 @@ export default class MapViewTopo {
         return { width, height };
     }
 
-    // prepareGeo(): TopoJSON -> GeoJSON, build code->state index, init projection
+    // prepareGeo(): get the Geo states shape data:  TopoJSON -> GeoJSON, build code->state index, init projection
     private prepareGeo() {
         const topo: Topology = us as any;
-        const fc: any = feature(topo, topo.objects.states); // Feature Collection
+        // GeoJSON Feature Collection
+
+        const fc: any = feature(topo, topo.objects.states); 
+        // each states shape info
         this.geoFeatures = fc.features;
 
         this.byCode = new Map(this.opts.states.map(s => [s.code, s]));
         this.updateProjection();
     }
 
-    // updateProjection(): fit projection to current container size.
+    // updateProjection():  States location on the map, fit projection to current container size.
     private updateProjection(size?: { width: number; height: number }) {
         const { width, height } = size ?? this.getContainerSize();
         
-        //new: Leave some space for the right tiny states label side
+        //11/20 new: Leave some space for the right tiny states label side
         // Calculate the actual rectangular area the map will occupy:
         // Horizontal: From MAP_MARGIN_LEFT to (width - MAP_MARGIN_RIGHT_GUTTER)
         // Top and bottom: Leave some top and bottom margins
         const left = MAP_MARGIN_LEFT;
-        const right = Math.max(left + 100, width - MAP_MARGIN_RIGHT_GUTTER); // avoide the stage being too small
+        const right = Math.max(left + 100, width - MAP_MARGIN_RIGHT_GUTTER); 
         const top = 0;
         const bottom = height;
 
+        //geoAlbersUSA.fit: put the USA map in to the map - stage
         this.projection = d3geo.geoAlbersUsa().fitExtent(
             [[left, top], [right, bottom]],
             {
@@ -343,6 +324,9 @@ export default class MapViewTopo {
         this.geoPath = d3geo.geoPath(this.projection);
     }
 
+
+
+    // sprint 3 ===============Terrion & helpers ===================================
     // mountina line Project [[lon,lat],...] as [x1,y1,x2,y2,...] for Konva.Line
     private projectPoints(coords: number[][]): number[] {
         const pts: number[] = [];
@@ -475,7 +459,11 @@ export default class MapViewTopo {
         this.startRiverFlow(true);
         this.mapLayer.batchDraw();
     }
+    // end ===================Terrion & helpers =================================== end 
 
+
+
+    // ========== sprint 2 Neighbor Countries & ocean name =================
     // Neighbor Countries and Border : maplayer
     private drawNeighborCountriesAndBorders() {
         const countriesFC: any = feature(
@@ -657,8 +645,11 @@ export default class MapViewTopo {
         }
         this.labelsLayer.batchDraw();
     }
+    // end ========== sprint 2 Neighbor Countries & ocean name ================= end 
 
-    // Sprint 2 Tooltip helpers ===================================
+
+
+    // ==== Sprint 2 Tooltip helpers ===================================
     private showTooltip(text: string, clientX: number, clientY: number) {
         this.tooltipText.text(text);
         this.tooltipBg.width(this.tooltipText.width() + 12);
@@ -683,6 +674,7 @@ export default class MapViewTopo {
         this.tooltipGroup.visible(false);
         this.uiLayer.batchDraw();
     }
+    // end ====== Tooltip helpers =================================== end
 
     // Convert browser client coords → Konva stage coords
     private toStagePos(clientX: number, clientY: number) {
@@ -693,24 +685,20 @@ export default class MapViewTopo {
             y: (clientY - rect.top) / scale.y,
         };
     }
-
     // Cal the label group base Y (vertical centering)
     private getTinyBaseY(count: number): number {
         const total = count * CHIP_ROW;
         const h = this.stage.height();
         return Math.max(12, Math.floor((h - total) / 2));
     }
-
     // ---- centralize state lookup & forwarding ----
     private getStateFor(code: string): USState {
         return this.byCode.get(code) ?? { code, name: code, status: StateStatus.NotStarted };
     }
-
     private forwardStateClick(code: string) {
         const s = this.getStateFor(code);
         this.opts.onStateClick?.(s);
     }
-
     // An external label with a leader polyline to the state's centroid
     private addExternalLabelForTinyState(
         code: string,
@@ -815,7 +803,6 @@ export default class MapViewTopo {
 
         this.chipsByCode.set(code, { group, rect });
     }
-
     // resizeAndRedraw():
     private resizeAndRedraw() {
         const size = this.getContainerSize();
@@ -829,11 +816,16 @@ export default class MapViewTopo {
         this.drawAll(false);
     }
 
-    // =======Main ========  drawAll():
+
+
+    // =======Main ========  drawAll():  =======Main ========
     // - Full draw (isRedraw=false): rebuild everything.
     // - Incremental (isRedraw=true): only update fills.
     private drawAll(isRedraw = false) {
+        //incremental redraw
         if (!isRedraw) {
+            // Only update fills on existing shapes
+            // Rebuild terrain
             this.mapLayer.destroyChildren();
             this.labelsLayer.destroyChildren();
             
@@ -848,8 +840,11 @@ export default class MapViewTopo {
             this.akhiUnderlayGroup = new Konva.Group({ name: "akhi-rect-underlay", listening: false });
             this.mapLayer.add(this.akhiUnderlayGroup);
 
-        } else {
-            // Update fills only
+        }
+        // full draw 
+        else {
+            
+            // Clears mapLayer and labelsLayer, Rebuilds all state shapes
             this.byCode.forEach((state, code) => {
                 //US States shapes
                 const shape = this.shapesByCode.get(code);
@@ -862,6 +857,7 @@ export default class MapViewTopo {
             
             this.buildTerrain(); // river and mountina
             this.placeOceanLabels(); 
+
             this.riversGroup?.moveToTop();
             this.mapLayer.batchDraw();
             this.labelsLayer.batchDraw();
@@ -870,24 +866,28 @@ export default class MapViewTopo {
 
         const byCode = this.byCode;
 
-        // Tiny-state labeling strategy (collect first, then render right column)
+        // Tiny-state labeling strategy 
+        // (collect first, then render right column)
         const tinyQueue: Array<{ code: string; full: string; center: [number, number] }> = [];
 
+        // draw each States
         this.geoFeatures.forEach((f: any) => {
+            // 1 f.id to states name like "CA"
             const idRaw = (f as any).id ?? (f as any).properties?.STATEFP;
             const fips = Number(idRaw);
-            if (TERRITORY_FIPS.has(fips)) return;
 
+                // skip the territory land
+            if (TERRITORY_FIPS.has(fips)) return;
             const code = usStateIdToCode(Number(idRaw));
             if (!code) return;
 
             const s = byCode.get(code);
             const stateToDraw = s ?? { code, name: code, status: StateStatus.NotStarted };
 
+            // 2 Generate a drawable path
             const pathData = this.geoPath(f);
             if (!pathData) return;
-
-            // get top x and y form AK & HI 
+                // get top x and y form AK & HI 
             if (code === "AK" || code === "HI") {
                 const [[x0, y0], [x1, y1]] = this.geoPath.bounds(f) as [[number, number], [number, number]];
                 const rect = new Konva.Rect({
@@ -913,12 +913,12 @@ export default class MapViewTopo {
                 hitStrokeWidth: HIT_STROKE_WIDTH,
                 shadowEnabled: false
             });
+                // redraw(): change the color only.
             this.mapLayer.add(shape);
             this.shapesByCode.set(code, shape);
 
-            // label or collect tiny
+            // 3 cal centro and create non tiny States Text label
             const [cx, cy] = this.geoPath.centroid(f) as [number, number];
-            
             if (!TINY_STATES.has(code as any)) {
                 const abbrev = new Konva.Text({
                     x: cx, y: cy, text: code,
@@ -937,7 +937,7 @@ export default class MapViewTopo {
                 tinyQueue.push({ code, full: codeToFullName(code), center: [cx, cy] });
             }
 
-            // States' mouse events
+            // 4 add States' mouse events
             shape.on("mouseenter", (evt) => {
                 this.stage.container().style.cursor = "pointer";
                 shape.stroke(HOVER_STROKE);
@@ -963,7 +963,9 @@ export default class MapViewTopo {
             this.shapesByCode.set(code, shape);
         });
 
-        // Tiny states: render right column (north -> south), centered vertically
+
+        // Tiny states:  draw each tiny states
+        // render right column (north -> south), centered vertically
         tinyQueue.sort((a, b) => a.center[1] - b.center[1]);
         const baseY = this.getTinyBaseY(tinyQueue.length);
         tinyQueue.forEach((item, idx) => {
@@ -979,6 +981,9 @@ export default class MapViewTopo {
         this.mapLayer.draw();
     }
 
+
+
+    // ===================== interface =====================
     public getStage(): Konva.Stage {
         return this.stage;
     }
@@ -1011,5 +1016,21 @@ export default class MapViewTopo {
         this.stage.visible(false);
         this.containerEl.style.display = "none";
         this.drawAll();
+    }
+    
+    // destroy(): Cleanup resources & listeners to prevent leaks 
+    //      (disconnect ResizeObserver, destroy Stage).
+    public destroy() {
+        this.ro.disconnect();
+        this.stage.destroy();
+        this.riverAnim?.stop();
+        this.riverAnim = undefined;
+    }
+
+    // redraw(states): Incremental redraw based on new state (update fills only), no geometry/projection rebuild.
+    public redraw(states: USState[]) {
+        this.opts = { ...this.opts, states };
+        this.byCode = new Map(states.map(s => [s.code, s]));
+        this.drawAll(true);
     }
 }
