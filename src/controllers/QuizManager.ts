@@ -27,6 +27,7 @@ import { TimerController } from "./TimerController";
 import { ScreenSwitcher, Screens } from "../utils/types";
 import { MapController } from "./MapController";
 import { StateStatus } from "../models/State";
+import { LeaderboardService } from '../services/LeaderboardService';
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
@@ -38,6 +39,7 @@ export class QuizManager {
     private timer?: TimerController;
     private switcher: ScreenSwitcher;
     private map?: MapController;
+    private gameStartTime?: number;
 
     constructor(switcher: ScreenSwitcher) {
         this.hasInit = false;
@@ -85,6 +87,7 @@ export class QuizManager {
         let typeString: string = "";
         // adapter for json key to QuestionType
         let qType: QuestionType = QuestionType.Capital;
+        let useDateFormat = false;
         switch (randomType) {
             case "capitalQuestions":
                 qType = QuestionType.Capital;
@@ -98,10 +101,19 @@ export class QuizManager {
                 qType = QuestionType.Abbreviation;
                 typeString = "abbreviation";
                 break;
+            case "dateQuestions":
+                qType = QuestionType.Date;
+                useDateFormat = true;
+                break;
             default:
                 typeString = "no type found"
         }
-        let questionString: string = `What is the ${typeString} for ${randomState}?`;
+        let questionString: string;
+        if (useDateFormat) {   
+            questionString = `What year was ${randomState} added to the union?`;
+        } else {
+            questionString = `What is the ${typeString} for ${randomState}?`;
+        }
 
         let answer: Answer = {
             answerText: questions[randomType][randomState],
@@ -137,6 +149,11 @@ export class QuizManager {
                 answerText: this.questionBank.getQuestions()[type][stateName],
                 status: AnswerStatus.NotSelected
             }
+            if (ans.answerText === this.questionBank.getQuestions()[type][state]) {
+                console.log("duplicate answer found, rerolling");
+                i--;
+                continue;
+            }
             incorrectAnswers.push(ans);
         }
 
@@ -145,11 +162,12 @@ export class QuizManager {
 
     startGame(name: string) {
         this.name = name;
+        this.gameStartTime = Date.now();
         if (this.timer) {
             this.timer.start();
         }
         this.switcher.switchToScreen(Screens.Map);
-        setTimeout(() => {this.handleNextAction()}, 200);
+        this.handleNextAction();
     }
 
     public getStatus(): boolean {
@@ -163,6 +181,14 @@ export class QuizManager {
         return null;
     }
 
+    public getScore(): number {
+        return this.stats?.getPoints() || 0;
+    }
+    
+    public getName(): string | undefined {
+        return this.name;
+    }
+
     public restartGame(): void {
         Object.keys(FULL_NAME_BY_CODE).forEach(key => {
             this.map?.getStore().setStatus(key, StateStatus.NotStarted);
@@ -172,6 +198,8 @@ export class QuizManager {
         this.continue = true;
         this.questionBank?.resetRemainingStates();
         this.stats?.resetPoints();
+        // road car dashboard
+        this.ui?.resetRoadTripHud();
     }
 
     public handleNextAction(): void {
@@ -180,18 +208,20 @@ export class QuizManager {
         }
 
         let finishedStatus = this.stats.isFinished();
-        if (this.questionBank.getRemainingStates().length == 0 ||
-                finishedStatus != 0 ||
-                this.timer.isFinished()) {
+        if (this.questionBank.getRemainingStates().length == 0 || finishedStatus != 0) {
             this.continue = false;
         }
+
 
         if (this.continue) {
             this.ui.goToQuestionsFor();
         } else {
+            this.ui?.disableMap();
+            // this.timer?.stop(); <-- uncomment this once timer alerts are fixed
             switch (finishedStatus) {
                 case 1:
                     console.log("victory royale")
+                    this.ui?.triggerFireworks();
                     break;
                 case 0:
                     console.log("probably ran out of time")
@@ -200,7 +230,23 @@ export class QuizManager {
                     console.log("this is loss")
                     break
             }
-            this.switcher.switchToScreen(Screens.Leaderboard);
+            
+            // Save score to database before showing leaderboard
+            if (this.name && this.stats) {
+                const finalScore = this.stats.getPoints();
+                const gameDuration = this.gameStartTime 
+                    ? Math.floor((Date.now() - this.gameStartTime) / 1000) 
+                    : null;
+
+                LeaderboardService.saveScore(this.name, finalScore, gameDuration)
+                    .then(success => {
+                        if (success) {
+                            console.log('Score saved successfully!');
+                        }
+                    });
+            }
+
+            setTimeout(() => {this.switcher.switchToScreen(Screens.Leaderboard)}, 5000);
         }
     }
 }

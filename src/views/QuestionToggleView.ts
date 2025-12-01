@@ -28,6 +28,9 @@ import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 
 const BUTTON_WIDTH = 300;
 const HEIGHT_SCALAR = 12;
+const CORNER_RADIUS = 10;
+const BOX_BG = "#eee";
+const STROKE_COLOR = "black";
 
 export interface Toggles {
     [key: string]: boolean
@@ -61,27 +64,31 @@ export class QuestionToggleView {
         const capitalToggle = simpleLabelFactory(w / 2, 3 * h / HEIGHT_SCALAR, "Toggle Capitals", () => toggleHandler("capitalQuestions"));
         const flowersToggle = simpleLabelFactory(w / 2, 4 * h / HEIGHT_SCALAR, "Toggle Flowers", () => toggleHandler("flowerQuestions"));
         const abbreviationToggle = simpleLabelFactory(w / 2, 5 * h / HEIGHT_SCALAR, "Toggle Abbreviations", () => toggleHandler("abbreviationQuestions"));
-        const saveButton = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
+        const dateToggle = simpleLabelFactory(w / 2, 6 * h / HEIGHT_SCALAR, "Toggle Creation Dates", () => toggleHandler("dateQuestions"));
+        const saveButton = simpleLabelFactory(w / 2, 7 * h / HEIGHT_SCALAR, "Save", () => saveHandler());
 
         const rect = new Konva.Rect({
             x: w / 4,
             y: h / 8,
             width: w / 2,
             height: 5 * h / 8,
-            fill: 'gray',
-            stroke: 'black',
-            strokeWidth: 1
+            fill: BOX_BG,
+            stroke: STROKE_COLOR,
+            strokeWidth: 1,
+            cornerRadius: CORNER_RADIUS
         })
 
         capitalToggle.width(BUTTON_WIDTH);
         flowersToggle.width(BUTTON_WIDTH);
         abbreviationToggle.width(BUTTON_WIDTH);
+        dateToggle.width(BUTTON_WIDTH);
 
         this.init(rect, this.toggleButtonGroup);
         this.init(backLabel, this.toggleButtonGroup);
         this.init(capitalToggle, this.toggleButtonGroup);
         this.init(flowersToggle, this.toggleButtonGroup);
         this.init(abbreviationToggle, this.toggleButtonGroup);
+        this.init(dateToggle, this.toggleButtonGroup);
         this.init(saveButton, this.toggleButtonGroup);
 
         this.layer.add(this.toggleButtonGroup);
@@ -112,7 +119,7 @@ export class QuestionToggleView {
                         subnode.getChildren().forEach(node => {
                             node.x(Math.max(10, w / 2 ));
                         });
-                    } else if (subnode instanceof Konva.Rect) {
+                    } else if (subnode instanceof Konva.Rect && subnode.getAttr('centerOffset')) {
                         subnode.x(Math.max(10, w / 2 - subnode
                             .getAttr('centerOffset')));
                     }

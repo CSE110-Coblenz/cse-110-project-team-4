@@ -1,20 +1,24 @@
 // src/controllers/UIController.ts
 /*=============================
   UI BUS / NAV LAYER:
-  Minimal UI facade for frist demos.
-    Logs navigation intent (visual panel)
-    Updates location hash (observable effect for tests)
+  Minimal UI facade.
+    - Manages the "In-Game" UI layer (Questions, Overlay, Effects).
+    - Coordinates between QuizManager, Stats, and Dashboard views.
 
-A minimal UI bus,just for test: only one method to navigate to the Questions screen.
-Later replace this with a real router / ScreenSwitcher.
+  Sprint 3 updates (Nov 2025):
+  - Updated mount() to pass Stage to QuestionCardView for resizing.
+  - Integrated RoadTripDashboardView for bottom-center HUD updates.
+  - Added resetRoadTripHud() for game restarts.
 
-API:
-  + constructor(mapController: MapController)
-  + mount(stage: Konva.Stage, manager: QuizManager): void
+  Public API:
+  + constructor(mapController: MapController, stats: GameStatsController, manager: QuizManager)
+  + mount(stage: Konva.Stage): void
   + goToQuestionsFor(state: USState): void
-  + answerResponse(correct: boolean)
-  + openQuestion(q: SimpleQuestion): void
+  + answerResponse(correct: boolean): void
+  + openQuestion(q: Question): void
   + closeQuestion(): void
+  + attachRoadTripDashboard(view: RoadTripDashboardView): void
+  + resetRoadTripHud(): void
   + dispose(): void
 ==============================================================================*/
 
@@ -34,6 +38,8 @@ import { QuizManager } from "./QuizManager";
 import { CODE_BY_FULL_NAME } from "../data/maps/UsNameToCode";
 import { FeedbackCardView } from "../views/FeedbackCardView";
 
+import { RoadTripDashboardView } from "../views/RoadTripDashboardView";
+
 export class UIController {
 	private stage!: Konva.Stage;
 	private card!: QuestionCardView;
@@ -42,6 +48,9 @@ export class UIController {
 	private manager!: QuizManager;
 	private currentState: USState | null;
 	private feedback?: FeedbackCardView;
+	private lastQuestion?: Question;
+
+	private roadTripDashboard?: RoadTripDashboardView;
 
 	constructor(private mapController: MapController, statsController: GameStatsController, manager: QuizManager) {
 		this.statsController = statsController;
@@ -59,16 +68,18 @@ export class UIController {
 		});
 		this.overlay.mount();
 
-		this.card = new QuestionCardView();
+		this.card = new QuestionCardView(this.stage);
 		this.feedback = new FeedbackCardView(stage, this.overlay);
 
 		this.card.onConfirm((correct: boolean) => {this.answerResponse(correct)});
 
 		this.card.getLayer().visible(false);
 		this.stage.add(this.card.getLayer());
+		this.card.resize(); // let question resize to fit the stage size.
 
 		this.overlay.moveToTop();
 		this.card.getLayer().moveToTop();
+
 		// fire works:
 		// FX effect layer + FireworksView
 		this.fxLayer = new Konva.Layer({ listening: false });
@@ -99,11 +110,15 @@ export class UIController {
 		nextQuestion.setIncorrectAnswers(incorrectAnswers);
         
         this.openQuestion(nextQuestion);
+		this.lastQuestion = nextQuestion;
 		location.hash = `#questions/${state.code}`; 
 	}
 
 	public answerResponse(correct: boolean) {
 		this.feedback?.show(correct, this.card);
+		if (!correct) {
+			this.card.highlightCorrect();
+		}
 
 		if (this.mapController && this.currentState && this.mapController.getSelectedState) {
 			const currentState = this.mapController.getSelectedState?.(); // use for diff mode later?
@@ -114,10 +129,16 @@ export class UIController {
 			}
 		}			
 
+		// New notice the car action: ture-get star, false get roadblocks
+		if (this.roadTripDashboard) {
+  	    	this.roadTripDashboard.handleStateResult(correct);
+    	}
+
 		setTimeout(() => {
 			this.feedback?.hide();
+			this.card.clearHighlights();
 			this.closeQuestion();
-			setTimeout(() => {this.manager.handleNextAction()}, 1000);
+			setTimeout(() => {this.manager.handleNextAction()}, 500);
 		}, 1000)
 	}
 
@@ -126,7 +147,9 @@ export class UIController {
 		if (!this.overlay || !this.card) return;
 
 		this.mapController.setInteractive(false);
-		if (q) this.card.setQuestion(q as any);
+		if (q) {
+			this.card.setQuestion(q as any);
+		}
 
 		this.overlay.show();
 		this.card.getLayer().visible(true);
@@ -134,7 +157,6 @@ export class UIController {
 
 		this.stage.batchDraw();
 	}
-
 	public closeQuestion() {
 		if (!this.overlay || !this.card) return;
 
@@ -150,12 +172,24 @@ export class UIController {
 		this.overlay?.dispose();
 	}
 
+	public disableMap() {
+		this.mapController.setInteractive(false);
+	}
+
 	// fireworks effect
 	private fxLayer?: Konva.Layer; 
 	private fireworks?: FireworksView; 
-	public triggerFireworksTest = () => {
+	public triggerFireworks = () => {
 		this.fxLayer?.moveToTop();
 		this.fireworks?.startFireworks();
 		this.stage?.batchDraw();
 	};
+
+	//roadTrip dashborad
+	public attachRoadTripDashboard(view: RoadTripDashboardView): void {
+        this.roadTripDashboard = view;
+    }
+	public resetRoadTripHud(): void {
+ 	   this.roadTripDashboard?.reset();
+ 	}
 }

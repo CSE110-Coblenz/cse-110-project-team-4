@@ -18,12 +18,12 @@ import { getDims } from "../utils/ViewUtils";
 const TEXT_COLOR = "#000000ff";
 
 // title constants
-const TITLE_Y = 100; // Y position of the title text
+const TITLE_Y = 80; // Y position of the title text
 
 // entry constants
-const START_Y = TITLE_Y + 80; // Y position of first entry
-const ENTRY_SPACING = 40; // vertical spacing between entries
-const ENTRY_FONTSIZE = 32;
+const START_Y = TITLE_Y + 100; // Y position of first entry
+const ENTRY_SPACING = 45; // vertical spacing between entries
+const ENTRY_FONTSIZE = 35;
 const ENTRY_COLOR_1ST = "#d4a91aff";
 const ENTRY_COLOR_2ND = "#686868ff";
 const ENTRY_COLOR_3RD = "#9d6226ff";
@@ -49,7 +49,7 @@ export class LeaderboardView {
 			x: w / 2, // TEMP EDIT: "w" used to be STAGE_WIDTH
 			y: TITLE_Y,
 			text: "High Scores",
-			fontSize: 48,
+			fontSize: 42,
 			fill: TEXT_COLOR,
 			align: "center",
 		});
@@ -76,7 +76,7 @@ export class LeaderboardView {
             const text = new Konva.Text({
                 x: w / 2, // TEMP EDIT: "w" used to be STAGE_WIDTH
                 y: y,
-                text: `${index + 1}. ${entry.player.name} - ${entry.score}`,
+                text: `${index + 1}. ${entry.player.name} - ${entry.score} pts (${entry.timestamp})`,
                 fontSize: ENTRY_FONTSIZE,
                 fill: fillColor,
                 align: "center",
