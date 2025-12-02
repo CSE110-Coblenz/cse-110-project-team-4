@@ -30,13 +30,13 @@ export class MapController {
     private mapLayer?: Konva.Layer;          // was: Konva.Layer
     private selectedState: USState | null = null;
 
-    public setUIBus(bus: { goToQuestionsFor: (s: USState) => void }) {
+    public setUIBus(bus: { openQuestion: (q: any) => void }) {
         this.uiBus = bus; // allow late wiring
     }
 
     constructor(
         private store: StateStore,
-        private uiBus: { goToQuestionsFor: (state: USState) => void } // UI bus (navigation)
+        private uiBus: { openQuestion: (q: any) => void } // UI bus (navigation)
     ) {}
 
     /**
@@ -50,27 +50,34 @@ export class MapController {
             containerId,
             states: this.store.getAll(),
 
-            onStateClick: (s) => {
-                // Demo:================================== 
-                // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
-                const next =
-                    s.status === StateStatus.NotStarted ? StateStatus.Partial :
-                    s.status === StateStatus.Partial    ? StateStatus.Complete : 
-                                                            StateStatus.NotStarted;
-                // update the store; subscribers (e.g., the View) will redraw with new fills.
-                this.store.setStatus(s.code, next);
-                // store which state was clicked
-                this.selectedState = s;
-                if (this.uiBus && this.uiBus.goToQuestionsFor) {
-                    this.uiBus.goToQuestionsFor(s);
+            onStateClick: () => {
+                if (this.uiBus && this.uiBus.openQuestion) {
+                    this.uiBus.openQuestion(null)
                 } else {
-                    console.error("UI Bus not properly initialized!");
+                    console.error("UI Bus not properly initialized!")
                 }
+                // // Demo:================================== 
+                // // Cycle state on click for demo (NotStarted → Partial → Complete → NotStarted).
+                // const next =
+                //     s.status === StateStatus.NotStarted ? StateStatus.Partial :
+                //     s.status === StateStatus.Partial    ? StateStatus.Complete : 
+                //                                             StateStatus.NotStarted;
+                // // update the store; subscribers (e.g., the View) will redraw with new fills.
+                // this.store.setStatus(s.code, next);
+                // // store which state was clicked
+                // this.selectedState = s;
+                // if (this.uiBus && this.uiBus.goToQuestionsFor) {
+                //     this.uiBus.goToQuestionsFor(s);
+                // } else {
+                //     console.error("UI Bus not properly initialized!");
+                // }
 
-                // Emit a global CustomEvent
-                window.dispatchEvent(new CustomEvent("usmap:stateClick", {
-                    detail: { code: s.code, nextStatus: next }
-                }));
+                // // Emit a global CustomEvent
+                // window.dispatchEvent(new CustomEvent("usmap:stateClick", {
+                //     detail: { code: s.code, nextStatus: next }
+                // }));
+
+                // Clicks are now ignored. Hover effects remain functional.
             }
         });
         

@@ -23,21 +23,27 @@ Related
 
 import { QuestionToggleView, Toggles } from "../views/QuestionToggleView";
 import { QuestionBankModel } from "../models/QuestionBankModel";
+import { PopUpView } from "../views/PopUpView";
 import Konva from "konva";
 
 export class QuestionToggleController {
     private model: QuestionBankModel;
     private view: QuestionToggleView;
     private currentToggled: Toggles;
+    private popup: PopUpView;
+    private onBackCallback?: () => void
 
-    constructor(stage: Konva.Stage, id: string) {
+    constructor(stage: Konva.Stage, id: string, onBackCallback?: () => void) {
+        this.onBackCallback = onBackCallback;
         this.currentToggled = { 
             "capitalQuestions": false, 
             "flowerQuestions": false, 
-            "abbreviationQuestions": false 
+            "abbreviationQuestions": false,
+            "dateQuestions": false 
         }
         this.view = new QuestionToggleView(this.handleBack, this.toggleOption, this.saveOptions, stage, id);
         this.model = new QuestionBankModel();
+        this.popup = new PopUpView(this.view.getLayer(), "Please enable at least one question type.");
     }
 
     // handler function when a back button is clicked to hide popup
@@ -47,6 +53,10 @@ export class QuestionToggleController {
             inputEl.style.display = "block";
         }
         this.view.hide();
+
+        if (this.onBackCallback) {
+            this.onBackCallback();
+        }
     }
 
     // handler function to update when a toggle button is clicked, updates options
@@ -59,8 +69,8 @@ export class QuestionToggleController {
     saveOptions = () => {
         let options: string[] = Object.keys(this.currentToggled).filter((x) => this.currentToggled[x]);
         if (options.length === 0) {
-            // temporary alert, should eventually make it display some text for x seconds i think
-            alert("please select at least one question type (temp message)")
+            this.popup.show()
+            setTimeout(() => {this.popup.hide()}, 3000)
             return;
         }
         this.model.setQuestions(options);
@@ -78,6 +88,7 @@ export class QuestionToggleController {
 
     handleResize(): void {
         this.view.resize();
+        this.popup.resize();
     }
 
     initDefault(): void {

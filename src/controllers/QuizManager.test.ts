@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ScreenSwitcher } from "../utils/types";
 import { QuizManager } from "./QuizManager"
 import { TimerController } from "./TimerController";
@@ -13,14 +13,15 @@ import { StateStore } from "../models/StateStore";
 import { StateStatus } from "../models/State";
 import Konva from "konva"
 
+// Mock ResizeObserver meant for Konva
 class ResizeObserverMock {
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
+// Seed data
 const seed: USState[] = Object.keys({
     WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
     MT:1, WY:1, ND:1, SD:1, NE:1, KS:1, OK:1, TX:1,
@@ -35,27 +36,62 @@ const seed: USState[] = Object.keys({
 }));
 
 describe("main screen controller", () => {
-    const mockEl = document.createElement("div");
-    const inputEl = document.createElement("input");
-    mockEl.id = "main-menu-container";
-    inputEl.id = "nameInput";
-    document.body.appendChild(mockEl);
-    document.body.appendChild(inputEl);
+    // Declare variables at the top level
+    let stage: Konva.Stage;
+    let switcher: ScreenSwitcher;
+    let quiz: QuizManager;
+    let store: StateStore;
+    let bank: QuestionBankModel;
+    let map: MapController;
+    let stats: GameStatsController;
+    let timer: TimerController;
+    let ui: UIController;
 
-    let stage = new Konva.Stage({container: "main-menu-container"})
-    let switcher: ScreenSwitcher = new ScreenSwitcher();
-    let quiz: QuizManager = new QuizManager(switcher);
-    let store: StateStore = new StateStore(seed);
+    beforeEach(() => {
+        // 1. Setup Fake Timers
+        vi.useFakeTimers();
 
-    let bank = new QuestionBankModel();
-    bank.setQuestions(["capitalQuestions"]);
-    let map = new MapController(
-                store,
-                { goToQuestionsFor: (_s: USState) => {} }
-            );
-    let stats = new GameStatsController(map);
-    let timer = new TimerController(new TimerModel(), new TimerViewCorner(stage), switcher)
-    let ui = new UIController(map, stats, quiz);
+        // 2. Create fresh DOM elements
+        document.body.innerHTML = '';
+        const mockEl = document.createElement("div");
+        const inputEl = document.createElement("input");
+        mockEl.id = "main-menu-container";
+        inputEl.id = "nameInput";
+        document.body.appendChild(mockEl);
+        document.body.appendChild(inputEl);
+
+        // 3. Initialize Instances
+        stage = new Konva.Stage({
+            container: mockEl, 
+            width: 800,
+            height: 600,
+        });
+
+        switcher = new ScreenSwitcher();
+        quiz = new QuizManager(switcher);
+        store = new StateStore(seed);
+        bank = new QuestionBankModel();
+        bank.setQuestions(["capitalQuestions"]);
+        
+        map = new MapController(
+            store,
+            { openQuestion: (q: any) => {} }
+        );
+        
+        stats = new GameStatsController(map);
+        timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher);
+        ui = new UIController(map, stats, quiz);
+    });
+
+    afterEach(() => {
+        // 4. CRITICAL: Destroy stage to stop Konva from trying to draw on null canvas
+        if (stage) {
+            stage.destroy();
+        }
+        // 5. Clear timers
+        vi.clearAllTimers();
+        vi.useRealTimers();
+    });
 
     it("should start unitialized", () => {
         expect(quiz.getStatus()).toBeFalsy();
@@ -70,9 +106,12 @@ describe("main screen controller", () => {
     })
 
     it("should be able to return questions", () => {
+        // Fix here: Init the quiz so it has data
+        quiz.init(bank, stats, ui, timer, map);
+
         expect(quiz.getNextQuestion() === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("California", "capitalQuestions") === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("", "")).toBeNull();
         expect(quiz.getQuestionBank() === null).toBeFalsy();
     })
-})
+});

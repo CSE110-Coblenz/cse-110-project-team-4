@@ -6,6 +6,13 @@ describe("question toggle controller", () => {
     const mockEl = document.createElement("div");
     mockEl.id = "main-menu-container";
     document.body.appendChild(mockEl);
+
+    const stage = new Konva.Stage({
+        container: mockEl,
+        width: 400,
+        height: 300,
+    });
+
     let QTC = new QuestionToggleController(new Konva.Stage({container: mockEl.id}), "main-menu-container");
 
     it("should initialize a view and model", () => {

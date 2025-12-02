@@ -1,39 +1,29 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>US Geography Game</title>
-
-    <!-- Minimal global styles (import via main.ts or enable a <link> here) -->
-    <link rel="stylesheet" href="/src/styles/app.css">
+    <title>US Geography Game Adventure</title> <link rel="stylesheet" href="/src/styles/app.css">
 
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
     <div id="app-root" class="app-shell">
-      <!-- Top-left toolbar group (kept simple; add buttons later) -->
-      <header id="tool-bar" class="tool-bar">
-        <!-- RESERVED: back/home, settings, help -->
-        <a href="minigame.html" class="button-class">Play Minigame</a>
-      </header>
-
-      <!-- Center map area (stable map mount) -->
       <div id="main-area" class="main-area">
         <div id="map-root" class="map-stage"></div>
 
-        <!-- Center Q&A box (overlayed, toggled by JS) -->
         <div id="qa-box" class="qa-box" hidden>
-          <!-- RESERVED: question text, options, submit -->
-        </div>
+          </div>
       </div>
 
-      <!-- Bottom-left score/progress (reserved) -->
-      <aside id="hud" class="hud">
-        <!-- RESERVED: score, progress, timer -->
-      </aside>
+      <div id="hud-row" class="map-width">
+        <div id="score-hub" class="hud-box"></div>
+        <div id="roadtrip-hub" class="hud-box"></div>
+        <div id="timer-hub" class="hud-box"></div>
+      </div>
 
-      <!-- Views/pages (simple router via [hidden]) -->
       <div id="views">
         <div id="welcome-root" data-view="welcome"></div>
         <div id="leaderboard-root" data-view="leaderboard"></div>
@@ -43,9 +33,5 @@
       </div>
     </div>
 
-    <!-- Functional reserve layers (singletons) -->
-    <div id="portal-root" class="portal-root"></div>   <!-- modals/drawers -->
-    <div id="toast-root" class="toast-root"></div>     <!-- toasts/alerts  -->
-    <div id="overlay-root" class="overlay-root" hidden></div> <!-- full overlay -->
-  </body>
+    <div id="portal-root" class="portal-root"></div>   <div id="toast-root" class="toast-root"></div>     <div id="overlay-root" class="overlay-root" hidden></div> </body>
 </html>

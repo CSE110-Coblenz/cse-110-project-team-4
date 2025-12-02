@@ -23,10 +23,42 @@ const BACK_BG = "#daafafff"
 const STROKE_COLOR = "black"
 const FONT_FAMILY = "Arial"
 
-const HOW_TO_PLAY = "HOW TO PLAY:\n\nLorem Ipsum Dolor\n\n Sit Amet\n\nHello World\n\n\n\n\n\n\n\n\n\n\n\n\n\npadding"
+const HOW_TO_PLAY: string =
+"Welcome to the US Map Quiz Game, where YOU race the clock to prove how\n" +
+  "much you know about the states!\n\n" +
+  "1. Getting Started\n" +
+  "* You’ll start on the Welcome Screen.\n" +
+  "* Type in your name so the game knows who’s playing.\n" +
+  "* Choose what you want to do:\n" +
+  "    * Start Game, How to Play, or Options (where you pick the kinds of questions you want)\n\n" +
+  "2. Pick Your Question Types\n" +
+  "Head to Options to choose what you want to be quizzed on:\n" +
+  "* Capitals (ex: “What’s the capital of California?”)\n" +
+  "* Abbreviations (ex: “What’s CA stand for?”)\n" +
+  "* State Flowers (Yep, every state has one!)\n" +
+  "* Year the state was founded (added to the Union)\n" +
+  "Make sure you hit Save! If you don’t pick anything, the game will default to capital questions.\n\n" +
+  "3. Gameplay Basics\n" +
+  "Hit Start Game, and you’ll jump into the US map!\n" +
+  "Timer: You get 15 minutes to play. When time’s up, game over.\n" +
+  "How it works\n" +
+  "1. Click a state on the map.\n" +
+  "2. A question pops up with four choices.\n" +
+  "3. Pick your answer, and click OK to lock it in.\n" +
+  "Scoring\n" +
+  "* Correct? +10 points and the state turns green.\n" +
+  "* Wrong? The state turns red (and you can only get 3 wrong answers before the game ends!).\n\n" +
+  "4. When the Game Ends\n" +
+  "The game stops when:\n" +
+  "* You get all 50 states correct, OR\n" +
+  "* The timer hits zero, OR\n" +
+  "* You hit 3 incorrect answers.\n" +
+  "You’ll then see the Leaderboard, showing your results.\n" +
+  "Want another round? Hit Restart Game to reset everything and try again!\n\n" +
+  "Ready? Let’s see how well YOU know the USA!";
 
 const CORNER_RADIUS = 10
-const ALIGN_STYLE = "center"
+const ALIGN_STYLE = "left"
 
 import Konva from "konva";
 import { getDims } from "../utils/ViewUtils";
@@ -46,32 +78,50 @@ export class InfoCardView {
         this.textGroup = new Konva.Group({});
         this.backGroup = new Konva.Group({});
         let text: Konva.Text = new Konva.Text({
-            x: w / 4,
-            y: h / 4,
+            x: w / 4 + 20,
+            y: h / 4 + 20,
             text: HOW_TO_PLAY,
             fontSize: 20,
             fontFamily: FONT_FAMILY,
-            width: w / 2,
-            align: ALIGN_STYLE
+            width: w / 2 - 40,
+            align: ALIGN_STYLE,
+            lineHeight: 1.08,
         });
         let backButton: Konva.Text = new Konva.Text({
             x: w / 3.8,
-            y: h / 3.8 - 100,
+            y: h / 3.8 - 50,
             text: "Go Back",
             width: 80,
             fontSize: 18,
             fontFamily: FONT_FAMILY,
             align: ALIGN_STYLE
         });
+
+        //top padding
+        const topPadding = 20;
+        // bottom padding below text
+        const bottomPadding = 20;
+        // calculate rect height
+        const calculatedHeight = topPadding + text.height() + bottomPadding;
+
         let largeRect: Konva.Rect = new Konva.Rect({
             x: w / 4,
-            y: h / 4.2 - 100,
+            y: (h / 2) - (calculatedHeight / 2), // center vertically
             width: w / 2,
-            height: text.height() * 1.2 + 100,
+            height: calculatedHeight,
             cornerRadius: CORNER_RADIUS,
             fill: BOX_BG,
             stroke: STROKE_COLOR
         });
+
+        text.y(largeRect.y() + topPadding);
+        text.x(largeRect.x() + topPadding);
+        text.width(largeRect.width() - topPadding * 2);
+
+        const buttonPadding = 15;
+        backButton.x(largeRect.x() + largeRect.width() - backButton.width() - buttonPadding);
+        backButton.y(largeRect.y() + buttonPadding);
+
         let smallRect: Konva.Rect = new Konva.Rect({
             x: backButton.x() - 5,
             y: backButton.y() - 5,

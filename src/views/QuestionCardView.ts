@@ -1,21 +1,37 @@
 // src/views/QuestionCardView.ts
-// 
-// 
 /*=============================
   VIEW LAYER:
-  - Use Konva to define and draw a question card
-  - helper functions such as view, hide, and setQuestion included
-  - Exposes onConfirm() callback for external controllers to hook answer submission
-  - Manages answer selection state and visual feedback
-  
+  - Use Konva to define and draw a question card.
+  - Manages answer selection state and visual feedback.
+  - Implements "Global Scaling" to ensure the card fits any screen size.
+
+  Sprint 3 updates (Nov 2025):
+  - Added global scaling logic via resize().
+  - Constructor now requires Konva.Stage to calculate responsive dimensions.
+  - Implemented ResizeObserver pattern (via main window listener) for auto-scaling.
+
+  Public API:
+  + constructor(stage: Konva.Stage)
+  + show(): void
+  + hide(): void
+  + setQuestion(question: Question): void
+  + onConfirm(callback: (correct: boolean) => void): void
+  + resize(): void  <-- New core method for responsive layout
+  + getLayer(): Konva.Layer
+
+  History:
   Sprint 2 updates (Nov 2025):
   - Added onConfirm() callback registration for UIController integration
   - Callback fires on confirm button click to enable stats/feedback updates
-
 ==============================*/
 
 import Konva from "konva";
 import { Answer, Question } from "../models/Questions"
+
+import click from "../data/sfx/click.wav";
+import correctClick from "../data/sfx/correct.wav";
+import incorrectClick from "../data/sfx/incorrect.wav";
+
 
 // question card constants:
 // box size 
@@ -23,9 +39,10 @@ const WIDTH_Q = 400;
 const HEIGHT_Q = 420;
 const RAD_Q = 10;
 const STROKEWIDTH = 3;
+const HIGHLIGHT_STROKEWIDTH = 10;
 
 // box positioning
-const X_Q = 250;
+const X_Q = 435;
 const Y_Q = 50;
 
 // text params
@@ -52,6 +69,7 @@ const yPositions = [TOP_Y_A, BOTTOM_Y_A];
 const COLOR_Q = '#f5f0e0d5';
 const COLORS_A = ['#ff6767ff', '#6a6cffff', '#62ff6aff', '#fdf66aff'];
 const black = '#000000ff';
+const CORRECT_HIGHLIGHT = '#28722cff'
 const CONFIRM_TRUE = '#ffffffff';
 const CONFIRM_FALSE = '#585858ff';
 const FONTSIZE_A = 25;
@@ -62,10 +80,69 @@ export class QuestionCardView {
   private selectedAnswerIndex: number | null = null;
   private onConfirmCallback?: (correct: boolean) => void;
   private correctIndex: number;
+  private answerCards: Konva.Group[] | null[];
 
-  constructor() {
+  // SFX [11/26 Phillip]
+  private clickAudio: HTMLAudioElement;
+  private correctAudio: HTMLAudioElement;
+  private incorrectAudio: HTMLAudioElement;
+
+  // [new 11/23 Dennis] 
+  private stage: Konva.Stage;
+
+  constructor(stage: Konva.Stage) {
+    this.answerCards = [null, null, null, null];
+    this.stage = stage;
     this.layer = this.drawQuestionCard();
     this.correctIndex = -1;
+    // [new 11/23 Dennis] Listen for window size changes and trigger scaling.
+    // Use requestAnimationFrame to avoid frequent triggering
+    window.addEventListener('resize', () => {
+        this.resize();
+    });
+    
+    // Execute once during initialization
+    this.resize();
+
+    // Initialize all click sfx [11/26 Phillip]
+    this.clickAudio = new Audio(click);
+    this.clickAudio.preload = "auto";
+
+    this.correctAudio = new Audio(correctClick);
+    this.correctAudio.preload = "auto";
+
+    this.incorrectAudio = new Audio(incorrectClick);
+    this.incorrectAudio.preload = "auto";
+  }
+
+  //[new 11/23 Dennis]
+  public resize() {
+    if (!this.stage || this.stage.width() === 0) return;
+    const w = this.stage.width();
+    const h = this.stage.height();
+    
+    // 1. Define the "safe zone" of the original answer sheet design
+    // Based on constants: the card is approximately 400 wide and 420 high. 
+    // With the confirmation button and shadow, it will occupy approximately 500x550 space.
+    // The origin is around (450, 260) (250+200, 50+210).
+    const DESIGN_W = 450;
+    const DESIGN_H = 600;
+    
+    // 2. Calculate the scaling ratio: Fit the card to the screen, 
+    // but do not exceed its original size (1.0).
+    // 0.85 leaving some margin.
+    let scale = Math.min(
+        (w / DESIGN_W) * 0.9, 
+        (h / DESIGN_H) * 0.85
+    );
+    
+    // 3. apply change
+    // Set the origin as the geometric center of the card (based on an estimated value of the original constant).
+    this.layer.offset({ x: 450, y: 260 }); 
+    this.layer.position({ x: w / 2, y: h / 2 }); // Move to the center of the screen
+    this.layer.scale({ x: scale, y: scale });
+    
+    this.layer.batchDraw();
   }
 
   getLayer(): Konva.Layer {
@@ -78,6 +155,7 @@ export class QuestionCardView {
 
   show() {
     this.layer.show();
+    this.resize();
   }
 
   setQuestion(question: Question) {
@@ -92,6 +170,7 @@ export class QuestionCardView {
     for (let i = 0; i < 4; i++) {
       const answerText = this.layer.findOne(`.answer-text-${i}`) as Konva.Text;
       answerText.text(answers[i].answerText);
+      this.fitTextToWidth(answerText, WIDTH_A - 10, FONTSIZE_A);
     }
 
     // redraw and update parameters
@@ -177,8 +256,8 @@ export class QuestionCardView {
     });
 
     const text = new Konva.Text({
-      x: -WIDTH_A / 2,
-      y: -HEIGHT_A / 2 + HEIGHT_A / 3,
+      x: 0,
+      y: 0,
       width: WIDTH_A,
       text: `${i + 1}`,           // just a placeholder
       fontSize: FONTSIZE_A,
@@ -186,6 +265,8 @@ export class QuestionCardView {
       align: 'center',
       name: `answer-text-${i}`,
     });
+
+    this.fitTextToWidth(text, WIDTH_A - 10, FONTSIZE_A); 
 
     group.add(rect, text);
 
@@ -205,7 +286,7 @@ export class QuestionCardView {
     // update selected answer and confirm button functionality on click
     group.on('click', () => {
       this.selectedAnswerIndex = i;
-
+      this.playClick(this.clickAudio);
       group.scale({ x: 1, y: 1 });
 
       const confirmCircle = layer.findOne('.confirm-circle') as Konva.Circle;
@@ -213,8 +294,30 @@ export class QuestionCardView {
       layer.draw();
     });
 
+    this.answerCards[i] = group;
     layer.add(group);
   }
+
+  // 11/26/25 drawAnswerCard helper method
+  private fitTextToWidth(textNode: Konva.Text, maxWidth: number, maxFontSize: number) {
+    let fontSize = maxFontSize;
+    textNode.fontSize(fontSize);
+
+    // Remove any existing width constraint for measuring true width
+    textNode.width(undefined);
+
+    while (textNode.width() > maxWidth && fontSize > 5) {
+        fontSize -= 1;
+        textNode.fontSize(fontSize);
+    }
+
+      textNode.x(-textNode.width() / 2);
+
+      // Vertically center inside the answer card
+      const groupHeight = HEIGHT_A;
+      const textHeight = textNode.height();
+      textNode.y(-textHeight / 2);
+    }
 
   private drawConfirmButton(layer: Konva.Layer): void {
     const confirmButton = new Konva.Group({
@@ -268,6 +371,14 @@ export class QuestionCardView {
         // Don't allow confirmation without selecting an answer
         return;
       }
+
+      if (this.selectedAnswerIndex === this.correctIndex) {
+          this.playClick(this.correctAudio);
+      } else {
+          this.playClick(this.incorrectAudio);
+      }
+
+
       confirmButton.scale({ x: 1, y: 1 });
       layer.draw();
       layer.getStage().container().style.cursor = 'default';
@@ -277,6 +388,39 @@ export class QuestionCardView {
     });
 
     layer.draw();
+  }
+
+  highlightCorrect() {
+    let cardGroup = this.answerCards[this.correctIndex];
+    if (cardGroup === null) {
+      return;
+    }
+    let border = cardGroup.findOne('Rect')
+    if (border instanceof Konva.Rect) {
+      border.strokeWidth(HIGHLIGHT_STROKEWIDTH);
+      border.stroke(CORRECT_HIGHLIGHT)
+    }
+    cardGroup.moveToTop();
+    cardGroup.draw();
+  }
+
+  clearHighlights() {
+    this.answerCards.forEach(cardGroup => {
+      if (cardGroup === null) {
+        return;
+      }
+      let border = cardGroup.findOne('Rect')
+      if (border instanceof Konva.Rect) {
+        border.strokeWidth(STROKEWIDTH)
+        border.stroke(black)
+      }
+      cardGroup.draw();
+    })
+  }
+
+  private playClick(audio: HTMLAudioElement) { 
+    audio.currentTime = 0; 
+    audio.play().catch(err => console.error(err)); 
   }
 
 }

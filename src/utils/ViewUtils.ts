@@ -1,5 +1,16 @@
 import Konva from "konva";
 import { QuestionType } from "../models/Questions";
+import click from "../data/sfx/click.wav";
+
+const clickAudio = new Audio(click);
+clickAudio.preload = "auto";
+clickAudio.load();
+clickAudio.volume = 0.4;
+
+function playClick() {
+    clickAudio.currentTime = 0;
+    clickAudio.play();
+}
 
 export function getDims(clampX: number, clampY: number, id: string) {
     let containerEl = document.getElementById(id);
@@ -32,7 +43,7 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
     let rect = new Konva.Rect({
         x: xPos,
         y: yPos - 5,
-        opacity: 0.75,
+        opacity: 1,
         cornerRadius: 10,
         fill: "#daafafff",
         stroke: "black",
@@ -54,6 +65,9 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
     });
 
     out.on("click", (e) => {
+        // play audio
+        playClick();
+        
         // toggle the checkbox if the button text has one
         let target = e.target
         let txt: string = "";
@@ -73,6 +87,21 @@ export function simpleLabelFactory(xPos: number, yPos: number, labelText: string
         } else if (txt.includes("\u2610") && typeof newTarget != "undefined") {
             newTarget.setAttrs({text: txt.substring(0, txt.length - 1) + "\u2611"});
         }
+
+        // grey-out effect
+        const rectNode = out.findOne('Rect');
+        if (rectNode && rectNode instanceof Konva.Rect) {
+            const rect = rectNode as Konva.Rect; // type cast
+            const originalFill = rect.fill();
+            rect.fill('#b38fa0ff'); // darker color of button
+            rect.getLayer()?.batchDraw();
+
+            setTimeout(() => {
+                rect.fill(originalFill); // restore original color
+                rect.getLayer()?.batchDraw();
+            }, 300); // duration the color lasts
+        }
+
         handler();
     });
     return out;

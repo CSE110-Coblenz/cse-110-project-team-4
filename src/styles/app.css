@@ -1,57 +1,291 @@
-/*src/styles/app.css*/
+/* src/styles/app.css */
+/* Game Fonts */
+
+@font-face {
+  font-family: 'GameFont';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../assets/fonts/archivo-black-v23-latin-regular.woff2') format('woff2'); 
+}
+
+
+/* ==============================
+   Global CSS variables & Theme
+   ============================== */
 :root {
-  --bg: #efedba;
-  --panel: #f9fbfa;
-  --text: #020202;
-  --border: #000000;
+  /* --- New Game Theme Palette --- */
+  --theme-accent-blue: #2c5d72; 
+  --theme-warm-tan: #e8dcb5;    
+  --theme-ui-panel: #fdf8e8;    
+  --theme-border-brown: #5a4632; 
+  --theme-text-dark: #3d2b1f;   
+  --theme-shadow: rgba(61, 43, 31, 0.4);
 
-  --map-min-w: 640px; /* map-root-Minimum & Max width */
-  --map-max-w: 1280px;
-  --map-ratio: 27/12; /*Map-root ratio, 13:8 */
+  /* Mapping old variables to new theme */
+  --bg: var(--theme-warm-tan);
+  --panel: var(--theme-ui-panel);
+  --text: var(--theme-text-dark);
+  --border: var(--theme-border-brown);
+
+  /* Map root setup */
+  --map-min-w: 400px;
+  --map-max-w: 1600px;
+
+  /* Map Aspect Ratio (16 : 8.5) */
+  --map-ratio: 1.882; /* ~16/8.5 */
+  --map-height-factor: 0.531; /* 1 / 1.882 */
+
+
+  /* Vertical Budget 
+    The CSS settings for #hud-row and #map-root below must match exactly. */
+  --space-top: 20px;      
+  --space-gap: 15px; 
+  --space-bottom: 20px;
+
+  /* HUD height = 
+    Content (110) + Top and bottom padding (10*2) + Top and bottom borders (3*2) 
+    = 136px */
+  --hud-content-h: 110px;
+  --hud-deco-h: 26px;     /* Padding 20px + Border 6px */
+  --hud-total-h: calc(var(--hud-content-h) + var(--hud-deco-h));
+
+  /* Calculate the total vertical space occupied */
+  --vertical-reserved: calc(
+    var(--space-top) + 
+    var(--space-gap) + 
+    var(--hud-total-h) + 
+    var(--space-bottom)
+  );
+
+  /* 5.Calculate map width*/
+  /* The map width cannot exceed the screen width, and the map height cannot push the HUD off the screen. */
+  --map-width-clamp: min(
+    /* Limitation A: Screen width minus left and right margins (32px) */
+    calc(100vw - 32px),
+    
+    /* Limit B: (Screen height - occupied vertical space) * Map scale */
+    calc((100vh - var(--vertical-reserved)) * var(--map-ratio)),
+    
+    /* Limit C: Maximum design width */
+    var(--map-max-w)
+  );
+
+  /* To prevent the calculation of negative or excessively small values */
+  --final-map-width: max(var(--map-width-clamp), var(--map-min-w));
 }
 
-html, body, #app-root, #views { height: 100%; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-}
-
-/* Simple three-areas shell:
-   - toolbar anchored top-left
-   - hud anchored bottom-left
-   - main area fills the rest (map centered) */
-.app-shell {
-  overflow-x: auto; /* scroll horizontally on smaller screens */
-  position: relative;
+/* ==============================
+   Base layout & Background Pattern
+   ============================== */
+html,
+body,
+#app-root,
+#views {
   height: 100%;
 }
 
-/* Top-left toolbar */
-.tool-bar {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 30px;
-  padding: 12px 16px;
-  min-width: 160px;
-  z-index: 1300;
+body {
+  overflow: hidden;
+  margin: 0;
+  background-color: var(--bg);
+  background-image: url('../assets/old-map.png');
+  background-repeat: repeat;
+  color: var(--text);
+  font-family: 'GameFont', 'Segoe UI Black', Roboto, system-ui, sans-serif;
 }
 
-/* Bottom-left HUD (score/progress) */
-.hud {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 30px;
-  padding: 12px 16px;
-  min-width: 160px;
+/* Main app shell */
+.app-shell {
+  overflow: hidden;
+  
+  position: relative;
+  height: 100%;
+  box-shadow: inset 0 0 150px rgba(0,0,0,0.2);
 }
+
+.map-width {
+  width: var(--map-width-clamp);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==============================
+   Map + bottom HUD row
+   ============================== */
+
+#map-root {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Apply the calculated clamped width */
+  width: var(--map-width-clamp);
+  aspect-ratio: var(--map-ratio);
+
+  top: var(--space-top);
+  z-index: 10;
+
+  /* decorate */
+  box-shadow: 0 8px 25px var(--theme-shadow);
+  border-radius: 16px;
+  border: 4px solid var(--theme-border-brown);
+  box-sizing: border-box; /* Ensure border doesn't add to width */
+  background: #9de3f3;    /* Ocean color fallback */
+}
+
+#hud-row {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--final-map-width);
+
+  top: calc(
+    var(--space-top) + 
+    (var(--final-map-width) * var(--map-height-factor)) + 
+    var(--space-gap)  
+  );
+
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1.2fr;
+  gap: 16px;
+  z-index: 10;
+
+  /* HUD BG */
+  height: var(--hud-total-h); 
+  padding: 10px;              /* top and down 10px -> total 20 */
+  border: 3px solid var(--theme-border-brown); /* top and bottom 3px -> total 6 */
+  
+  box-sizing: border-box;     /* padding be included in height  */
+  background: rgba(44, 93, 114, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* single hud style */
+.hud-box {
+  height: var(--hud-height);
+  border-radius: 16px;
+  border: 3px solid var(--theme-border-brown);
+  background: var(--panel);
+  /* wall paper */
+  background-image: url('src/assets/paper-fibers.png');
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.1), 0 4px 10px var(--theme-shadow);
+  box-sizing: border-box;
+  overflow: hidden;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#roadtrip-hub > canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  /* Add an inner glow effect to the central Canvas, like a dashboard screen. */
+  box-shadow: inset 0 0 20px rgba(44, 93, 114, 0.3);
+  background: #e0e0e0; 
+}
+
+
+/* ==============================
+   HUD Internal element styles (left and right sides)
+   ============================== */
+
+/* --- Left side: Score and navigation --- */
+.hud-content-split {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.hud-stats-area {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px 10px;
+  border-bottom: 2px dashed var(--theme-border-brown);
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.stat-item span {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--theme-accent-blue);
+}
+
+.hud-nav-area {
+  flex: 1;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  background: rgba(0,0,0,0.05);
+}
+
+.game-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid var(--theme-border-brown);
+  background: var(--theme-accent-blue);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--theme-border-brown); /* 3d button */
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.game-btn:active {
+  transform: translateY(4px); /* btn pushdonw*/
+  box-shadow: 0 0 0 var(--theme-border-brown);
+}
+
+
+/* --- Right side: Timer and information --- */
+.hud-timer-area {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #333; /* Dark background analog electronic clock */
+  color: #66ff99;   /* Fluorescent green text */
+  font-family: 'Courier New', monospace;
+  font-size: 2.5rem;
+  font-weight: bold;
+  border-bottom: 3px solid var(--theme-border-brown);
+  text-shadow: 0 0 10px rgba(102, 255, 153, 0.5);
+}
+
+.hud-info-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--theme-border-brown);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.icon-pin {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+
+/* ==============================
+   Main map area & QA overlay
+   ============================== */
 
 /* Center map area */
 .main-area {
@@ -92,64 +326,73 @@ body {
 }
 
 /* Views container (kept simple; toggle sections via [hidden]) */
-#views section[hidden] { display: none !important; }
+#views section[hidden] {
+  display: none !important;
+}
 
-#welcome-root, #leaderboard-root {
+#welcome-root,
+#leaderboard-root {
   height: 100%;
   width: 100%;
 }
 
-/* Functional reserve layers */
-.portal-root, .toast-root, .overlay-root {
+/* ==============================
+   Portals / Toast / Overlay
+   ============================== */
+
+.portal-root,
+.toast-root,
+.overlay-root {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 1000;
 }
 
-/* Minigame container (holds the minigame stage and cards) */
+/* ==============================
+   Minigame layout
+   ============================== */
+
 #minigame {
   display: flex;
   flex-direction: column;
 }
 
-.minigame-stage{
+.minigame-stage {
   display: grid;
   justify-content: center;
   align-items: center;
-  grid-template-columns: repeat(4, 1fr);                                        /* 4 columns */
+  grid-template-columns: repeat(4, 1fr);  /* 4 columns */
   gap: 1rem;
   padding: 1rem;
-  background: #35654d ;
+  background: #35654d;
   border: 1px solid var(--border);
   border-radius: 12px;
   width: 85%;
   height: 85%;
-  
+
   position: absolute;
-  inset: 50% auto auto 50%; 
-  transform: translate(-50%, -50%);  
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
 }
 
 .card {
-  width: 100%;                                                                  /* fill up the grid column cell with card-like shape*/
+  width: 100%;               /* fill up the grid column cell with card-like shape */
   border-radius: 20px;
-  border-color: var(--border);
-  
-  display: flex;                                                                /* To center the emoji string */
+  border: 2px solid var(--border);
+
+  display: flex;             /* center the emoji string */
   align-items: center;
   justify-content: center;
   font-size: 6rem;
-  color: transparent;    
-  border: 2px solid var(--border);
-  border-color: var(--border);                                                       /* hide the emoji when not flipped */       
+  color: transparent;        /* hide the emoji when not flipped */
 
-  background-image: url('../data/img/card-facedown.jpg');                              /* card back image */
+  background-image: url('../data/img/card-facedown.jpg'); /* card back image */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 
-  cursor: pointer;                                                              /* changes mouse to cursor when above the card */
+  cursor: pointer;           /* changes mouse to cursor when above the card */
   transition: transform 0.2s ease;
 }
 
@@ -158,10 +401,24 @@ body {
   background-image: none;
   background-color: white;
   border: 2px solid var(--border);
-  border-color: var(--border);
   color: black;
 }
 
 #score {
   padding: 1rem;
+}
+
+/* ==============================
+   Welcome screen
+   ============================== */
+
+#welcome-root {
+  position: relative;
+  overflow: hidden;
+
+  /* BG setup */
+  background-image: url("../assets/welcome-bg.png");  /* src/assets/welcome-bg */
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: auto 100%; /* width 100%，auto height */
 }
