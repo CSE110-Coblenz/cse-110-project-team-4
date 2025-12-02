@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Matching Minigame</title>
     <link rel="stylesheet" href="/src/styles/app.css">
-    <script src="src/minigame/Minigame.js"></script>
+    <script type="module" src="src/minigame/Minigame.ts"></script>
 </head>
 <body id="minigame">
-    <h3>Score:<span id="score">0</span></h3>
-    <div class = "minigame-stage"></div>
+    <div id="timer-container" style="position: absolute; top: 0; right: 0; width: 100%; height: 100px; pointer-events: none; z-index: 100;"></div>
+    
+    <h3>Score: <span id="score">0</span></h3>
+    <div class="minigame-stage"></div>
+    
+    <script type="module" src="/src/minigame/Minigame.ts"></script>
 </body>
 </html>
