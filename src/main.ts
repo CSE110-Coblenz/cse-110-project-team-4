@@ -43,10 +43,10 @@ import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import { QuizManager } from "./controllers/QuizManager";
 import { ResultScreenController } from "./controllers/ResultScreenController";
 import { supabase } from "./supabaseClient";
+import { ConfigurationModel } from "./models/ConfigurationModel";
 
 import { RoadTripDashboardView } from './views/RoadTripDashboardView';
 import Konva from "konva";
-import { MAX_ERRORS } from "./utils/constants";
 
 //=================   2) Compose Models & Services (no UI/DOM here)
 //	  Put: initial data sources, services, singletons (pure logic).
@@ -92,6 +92,8 @@ class Application extends ScreenSwitcher {
     private manager: QuizManager;
     private leaderboard: ResultScreenController;
 
+    private config: ConfigurationModel;
+
     // NEW: reference to bottom HUD row, so we can hide it on Welcome/Leaderboard
     private roadTripDashboard?: RoadTripDashboardView;
     private hudRowEl: HTMLElement | null;
@@ -99,15 +101,24 @@ class Application extends ScreenSwitcher {
     // initialize most controllers
     constructor(store: StateStore) {
         super();
+        this.config = new ConfigurationModel();
+
         this.manager = new QuizManager(this);
         this.map = new MapController(
             store,
             { openQuestion: (q: any) => {} }
         );
 
-        this.stats = new GameStatsController(this.map);
+        this.stats = new GameStatsController(this.map, this.config);
+
         this.ui = new UIController(this.map, this.stats, this.manager);
-        this.menu = new WelcomeScreenController("welcome-root", this.manager);
+        this.menu = new WelcomeScreenController(
+            "welcome-root",
+            this.manager,
+            this.config,
+            this.stats,
+            this.ui
+        );
         this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
 
         // =====bottom HUD row container (score + car + time)
@@ -185,7 +196,7 @@ class Application extends ScreenSwitcher {
             if (roadTripContainer) {
                 this.roadTripDashboard = new RoadTripDashboardView(
                     "roadtrip-hub",
-                    MAX_ERRORS
+                    this.config.getMaxErrors()
                 );
                 this.roadTripDashboard.init();
 

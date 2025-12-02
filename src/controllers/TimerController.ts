@@ -15,7 +15,7 @@ export class TimerController {
     console.log("TimerController: Starting timer");
     this.model.startTimer(
       (s) => {
-        console.log("TimerController: Tick - seconds remaining:", s);
+        // console.log("TimerController: Tick - seconds remaining:", s);
         this.view.updateTimer(s);
       },
       () => {

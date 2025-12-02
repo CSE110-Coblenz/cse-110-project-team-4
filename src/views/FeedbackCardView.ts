@@ -17,7 +17,7 @@ import { CORRECT_POINT_VALUE } from "../utils/constants";
 
 const FILL_CORRECT = '#43A047';
 const STROKE_CORRECT = '#2E7D32';
-const TEXT_CORRECT = 'CORRECT! \n+' + CORRECT_POINT_VALUE + " POINTS!"
+// const TEXT_CORRECT = 'CORRECT! \n+' + CORRECT_POINT_VALUE + " POINTS!"
 
 const FILL_WRONG = '#be1a1aff'
 const STROKE_WRONG = '#841313ff'
@@ -56,7 +56,7 @@ export class FeedbackCardView {
 		const feedbackText = new Konva.Text({
 			width: WIDTH,
 			height: HEIGHT,
-			text: TEXT_CORRECT,
+			text: 'CORRECT!', 
 			fontSize: 36,
 			fontStyle: 'bold',
 			fill: 'white',
@@ -70,10 +70,11 @@ export class FeedbackCardView {
         overlay.getLayer().add(this.feedbackGroup);
     }
 
-    show(correct: boolean, card: QuestionCardView) {
+    show(correct: boolean, card: QuestionCardView, deltaPoints?: number) {
         let text, fill, stroke
         if (correct) {
-            text = TEXT_CORRECT
+            const pts = deltaPoints ?? CORRECT_POINT_VALUE;
+            text = `CORRECT!\n+${pts} POINTS!`;
             fill = FILL_CORRECT
             stroke = STROKE_CORRECT
         } else {

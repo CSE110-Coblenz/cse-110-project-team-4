@@ -33,7 +33,9 @@ import Konva from "konva";
 import GameStatsLightbox from "../views/GameStatsLightbox"; // ADDED: Reuse the existing lightbox view from the PR.
 import { MapController } from "./MapController"; // ADDED: We need access to map.getStage() (already provided in MapController).
 import { StateStatus } from "../models/State"; //ADDED: import to check color/status
-import { MAX_ERRORS, CORRECT_POINT_VALUE } from "../utils/constants";
+
+import { BASE_POINTS_PER_QUESTION } from "../utils/constants";
+import { ConfigurationModel } from "../models/ConfigurationModel";
 
 // new : Navigation processor type
 type NavHandlers = {
@@ -46,21 +48,26 @@ export class GameStatsController {
 	private layer: Konva.Layer;
 	private lightbox: GameStatsLightbox;
 	private points = 0;
-	
+
 	//new Navigation
 	private navHandlers: NavHandlers = {};
 
 	// ADDED: Accept the MapController so we can safely grab the Stage without re-querying DOM.
-	constructor(private map: MapController) {
+	constructor(
+		private map: MapController,
+		private config: ConfigurationModel
+	) {
 		this.layer = new Konva.Layer({ listening: false });
 		const { grey, green, red } = this.getColorCounts();
+    	const maxErrors = this.config.getMaxErrors();
 
 		this.lightbox = new GameStatsLightbox({
 			greyCount: grey,
 			greenCount: green,
 			redCount: red,
 			points: this.points,
-		});	
+			maxErrors,
+		});
 
 		// Add lightbox to the layer
 		this.layer.add(this.lightbox.getGroup());
@@ -86,19 +93,37 @@ export class GameStatsController {
 	}
 
 	// update counts + points live
-	public updateCounts(grey: number, green: number, red: number, points: number): void {
+	public updateCounts(
+		grey: number, 
+		green: number, 
+		red: number, 
+		points: number
+	): void {
 		this.points = points;
 		this.lightbox.updateCounts(grey, green, red, points);
 		this.layer.draw();
 	}
 
+	public computeDeltaPointsForCorrect(): number {
+		const difficulty = this.config.getDifficultyLevel();
+
+		const factor = Math.pow(11 - difficulty, 2);
+		const deltaPoints = factor * BASE_POINTS_PER_QUESTION;
+
+		return deltaPoints;
+  	}
+
 	// call this when a state is correctly answered
 	public onCorrect(stateCode: string) {
 		this.map.getStore().setStatus(stateCode, StateStatus.Complete);
-		this.points += CORRECT_POINT_VALUE;
+
+		const deltaPoints = this.computeDeltaPointsForCorrect();
+		this.points += deltaPoints;
+
 
 		const { grey, green, red } = this.getColorCounts();
 		this.updateCounts(grey, green, red, this.points);
+		return deltaPoints;
 	}
 
 	public onIncorrect(stateCode: string) {
@@ -115,7 +140,9 @@ export class GameStatsController {
 
 	public isFinished() {
 		let { grey, green, red } = this.getColorCounts();
-		if (red >= MAX_ERRORS) {
+		const maxErrorsAllowed = this.config.getMaxErrors();
+
+		if (red >= maxErrorsAllowed) {
 			return -1
 		} else if (grey === 0) {
 			return 1
@@ -124,6 +151,7 @@ export class GameStatsController {
 		}
 	}
 
+	
 	public resetPoints() {
 		this.points = 0;
 	}
@@ -131,12 +159,17 @@ export class GameStatsController {
 	public getPoints(): number {
 		return this.points;
 	}
-
+	public updateMaxErrors(maxErrors: number): void {
+		this.config.setMaxErrors(maxErrors);
+		this.lightbox.setMaxErrors(maxErrors);
+	}
 	public attachHudStage(stage: Konva.Stage): void {
 		this.layer = new Konva.Layer();
 		stage.add(this.layer);
+		
 		this.lightbox.destroy();
 		const { grey, green, red } = this.getColorCounts();
+		const maxErrors = this.config.getMaxErrors();
 /* 		this.lightbox = new GameStatsLightbox(
 			{ greyCount: grey, greenCount: green, redCount: red, points: this.points },
 			stage.width(),
@@ -145,12 +178,13 @@ export class GameStatsController {
 		
 		// new : Inject navigation callbacks during creation.
 		this.lightbox = new GameStatsLightbox(
-			{ 
-				greyCount: grey, 
-				greenCount: green, 
-				redCount: red, 
+			{
+				greyCount: grey,
+				greenCount: green,
+				redCount: red,
 				points: this.points,
-				...this.navHandlers // inject handlers
+				maxErrors,
+				...this.navHandlers, // navigation callbacks
 			},
 			stage.width(),
 			stage.height()
@@ -164,6 +198,7 @@ export class GameStatsController {
 
 /**
  * ORIGINAL (for reference only; now encapsulated in this controller):
+ * // src/controllers/GameStatsController.ts
  * import Konva from "konva";
  * 
  * const layer = new Konva.Layer();
@@ -181,4 +216,4 @@ export class GameStatsController {
  *   layer.draw();
  * }
  */
-// src/controllers/GameStatsController.ts
+

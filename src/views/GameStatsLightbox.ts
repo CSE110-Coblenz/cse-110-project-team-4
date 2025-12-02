@@ -27,13 +27,16 @@
         - Styled points text in blue with bold font.
 ==============================*/
 import Konva from "konva";
-import {MAX_ERRORS} from "../utils/constants";
+// import {MAX_ERRORS} from "../utils/constants";
 
 export type GameStatsLightboxOptions = {
   greyCount: number;
   greenCount: number;
   redCount: number;
   points: number;
+
+  maxErrors: number;
+
   onHome?: () => void;
   onOptions?: () => void;
   onHelp?: () => void;
@@ -59,10 +62,15 @@ export default class GameStatsLightbox {
   private labelLeft: Konva.Text;
 
   private resizeObserver: ResizeObserver | null = null;
+  private maxErrors: number;
 
-  constructor(private opts: GameStatsLightboxOptions, width: number = 450, height: number = 110) {
-    const { greyCount, greenCount, redCount, points} = opts;
-
+  constructor(
+    private opts: GameStatsLightboxOptions, 
+    width: number = 450, 
+    height: number = 110
+  ) {
+    const { greyCount, greenCount, redCount, points, maxErrors} = opts;
+    this.maxErrors = maxErrors;
     this.group = new Konva.Group({ listening: true });
 
     this.background = new Konva.Rect({
@@ -102,7 +110,7 @@ export default class GameStatsLightbox {
     // --- top right: ERRORS (red) ---
     this.labelErrors = new Konva.Text({
       x: col2X, y: row1Y,
-      text: `ERRORS: ${redCount}/${MAX_ERRORS}`,
+      text: `ERRORS: ${redCount}/${this.maxErrors}`,
       fontSize: baseFontSize,
       fontFamily: STYLE.font,
       fill: STYLE.red, //red 
@@ -196,8 +204,17 @@ export default class GameStatsLightbox {
   public updateCounts(grey: number, green: number, red: number, points: number): void {
     this.labelScore.text(`SCORE: ${points}`);
     this.labelFound.text(`FOUND: ${green}`);
-    this.labelErrors.text(`ERRORS: ${red}/${MAX_ERRORS}`);
+    this.labelErrors.text(`ERRORS: ${red}/${this.maxErrors}`); 
     this.labelLeft.text(`LEFT: ${grey}`);
+    this.group.getLayer()?.batchDraw();
+  }
+
+  public setMaxErrors(maxErrors: number): void {
+    this.maxErrors = maxErrors;
+    const currentText = this.labelErrors.text();
+    const match = currentText.match(/ERRORS:\s+(\d+)/);
+    const currentRed = match ? parseInt(match[1], 10) : 0;
+    this.labelErrors.text(`ERRORS: ${currentRed}/${this.maxErrors}`);
     this.group.getLayer()?.batchDraw();
   }
 

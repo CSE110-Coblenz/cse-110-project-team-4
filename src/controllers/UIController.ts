@@ -75,7 +75,7 @@ export class UIController {
 
 		this.card.getLayer().visible(false);
 		this.stage.add(this.card.getLayer());
-		this.card.resize(); // let question resize to fit the stage size.
+
 
 		this.overlay.moveToTop();
 		this.card.getLayer().moveToTop();
@@ -88,6 +88,7 @@ export class UIController {
 		this.fireworks = new FireworksView(this.fxLayer);
 
 		this.stage.draw();
+		this.card.resize(); // let question resize to fit the stage size.
 	}
 
 	// for now, go to a random question. later (next sprint?), i think i'll add an optional parameter for manual vs. auto mode
@@ -115,19 +116,23 @@ export class UIController {
 	}
 
 	public answerResponse(correct: boolean) {
-		this.feedback?.show(correct, this.card);
-		if (!correct) {
-			this.card.highlightCorrect();
-		}
+		let deltaPoints = 0;
 
 		if (this.mapController && this.currentState && this.mapController.getSelectedState) {
-			const currentState = this.mapController.getSelectedState?.(); // use for diff mode later?
+			const currentState = this.mapController.getSelectedState?.(); 
 			if (correct) {
-				this.statsController.onCorrect(this.currentState.code);
+
+				deltaPoints = this.statsController.onCorrect(this.currentState.code);
 			} else {
 				this.statsController.onIncorrect(this.currentState.code);
 			}
-		}			
+		}
+
+		this.feedback?.show(correct, this.card, deltaPoints);
+
+		if (!correct) {
+			this.card.highlightCorrect();
+		}
 
 		// New notice the car action: ture-get star, false get roadblocks
 		if (this.roadTripDashboard) {
@@ -145,6 +150,14 @@ export class UIController {
 	// public API called when a state is clicked or quiz begins
 	public openQuestion(q: any) {
 		if (!this.overlay || !this.card) return;
+		const container = this.stage.container();
+		const rect = container.getBoundingClientRect();
+		if (rect.width && rect.height) {
+			this.stage.width(rect.width);
+			this.stage.height(rect.height);
+		}
+
+		this.card.resize();
 
 		this.mapController.setInteractive(false);
 		if (q) {
@@ -189,6 +202,11 @@ export class UIController {
 	public attachRoadTripDashboard(view: RoadTripDashboardView): void {
         this.roadTripDashboard = view;
     }
+	public updateMaxErrors(maxErrors: number): void {
+ 	   this.roadTripDashboard?.setMaxHits(maxErrors);
+  	}
+
+
 	public resetRoadTripHud(): void {
  	   this.roadTripDashboard?.reset();
  	}

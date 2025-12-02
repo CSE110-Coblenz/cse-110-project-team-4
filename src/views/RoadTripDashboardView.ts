@@ -27,7 +27,7 @@
         - Implemented ResizeObserver for responsive canvas scaling.
 ==============================*/
 import Konva from 'konva';
-import { MAX_ERRORS } from "../utils/constants";
+//import { MAX_ERRORS } from "../utils/constants";
 
 // BG PNG for road
 import bgUrl from '../assets/us-roadtrip-panorama.png'; 
@@ -109,7 +109,7 @@ export class RoadTripDashboardView {
 
     // Game State
     private totalStarsGoal: number;
-    private maxHits = MAX_ERRORS;
+    private maxHits: number;   
     private starCount = 0;
     private hitCount = 0;
     private progress = 0; 
@@ -135,9 +135,10 @@ export class RoadTripDashboardView {
     private starLabel: Konva.Text | null = null;
     private damageLabel: Konva.Text | null = null;
 
-    constructor(containerId: string, totalStarsGoal: number, onCarBroken?: () => void) {
+    constructor(containerId: string, maxHits: number, onCarBroken?: () => void) {
         this.containerId = containerId;
-        this.totalStarsGoal = totalStarsGoal > 10 ? totalStarsGoal : 50;
+        this.totalStarsGoal = maxHits > 10 ? maxHits : 50;
+        this.maxHits = maxHits;
         this.onCarBrokenCallback = onCarBroken || null;
     }
 
@@ -677,6 +678,14 @@ export class RoadTripDashboardView {
         if (this.starLabel) this.starLabel.text(`${CONFIG.EMOJI.POINTS} ${this.starCount}`);
         if (this.damageLabel) this.damageLabel.text(`${CONFIG.EMOJI.OBSTACLE} ${this.hitCount}/${this.maxHits}`);
     }
+    
+    public setMaxHits(maxHits: number): void {
+        this.maxHits = maxHits;
+        if (this.damageLabel) {
+            this.damageLabel.text(`${CONFIG.EMOJI.OBSTACLE} ${this.hitCount}/${this.maxHits}`);
+            this.hudLayer?.batchDraw();
+        }
+    }
 
     private spawnSmoke(): void {
         if (!this.carGroup || !this.entityLayer) return;
@@ -799,5 +808,10 @@ export class RoadTripDashboardView {
         if (type === 'plane') this.triggerPlaneFlyover(true);
         if (type === 'star') this.spawnItemOnRoad('star');
         if (type === 'hit') this.spawnItemOnRoad('obstacle');
+    }
+
+    public updateMaxHits(maxHits: number): void {
+        this.maxHits = maxHits;
+        this.updateHud();
     }
 }

@@ -131,6 +131,9 @@ body {
   border: 4px solid var(--theme-border-brown);
   box-sizing: border-box; /* Ensure border doesn't add to width */
   background: #9de3f3;    /* Ocean color fallback */
+  background-image: url('../assets/water-pattern.png'); /* Path to your subtle water pattern image */
+  background-repeat: repeat; /* Repeat the pattern */
+  background-blend-mode: soft-light;   /*overlay soft-light multiply*/
 }
 
 #hud-row {
@@ -304,7 +307,14 @@ body {
   width: clamp(var(--map-min-w), 100%, var(--map-max-w));
   aspect-ratio: var(--map-ratio);
   box-sizing: border-box;
-  background: #9de3f3;
+
+  /* background: #9de3f3; - REMOVE or COMMENT OUT this line */
+  background-color: #9de3f3; /* Base ocean color */
+  background-image: url('../assets/water-pattern.png'); /* Path to your subtle water pattern image */
+  background-repeat: repeat; /* Repeat the pattern */
+  background-blend-mode: soft-light; /* Blend with the base color for a subtle effect */
+
+  border: 1px solid var(--border);
   border: 1px solid var(--border);
   border-radius: 12px;
   min-width: 0;

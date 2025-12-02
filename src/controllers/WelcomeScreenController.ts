@@ -28,6 +28,10 @@ import { PopUpView } from "../views/PopUpView";
 import { getDims } from "../utils/ViewUtils";
 import { QuizManager } from "./QuizManager";
 import { sanitize } from "../utils/NameValidator";
+import { ConfigurationModel } from "../models/ConfigurationModel";
+import { GameStatsController } from "../controllers/GameStatsController";
+import { UIController } from "../controllers/UIController";
+
 
 export class WelcomeScreenController {
     private view: WelcomeScreenView;
@@ -37,10 +41,31 @@ export class WelcomeScreenController {
     private containerID: string;
     private quiz: QuizManager;
     private popup: PopUpView;
+    private config: ConfigurationModel;
+    private stats: GameStatsController;
+    private ui: UIController;
 
-    constructor(container: string, quiz: QuizManager) {
+    constructor(
+        container: string,
+        quiz: QuizManager,
+        config: ConfigurationModel,
+        stats: GameStatsController,
+        ui: UIController
+    )  {
         this.view = new WelcomeScreenView(this.handleStart, this.handleInfo, this.handleOptions, container);
-        this.toggleController = new QuestionToggleController(this.view.getStage(), container, () => this.view.getLayer().show());
+        this.config = config;
+        this.stats = stats;
+        this.ui = ui;
+
+        this.toggleController = new QuestionToggleController(
+            this.view.getStage(),
+            container,
+            this.config,
+            this.stats,
+            this.ui,
+            () => this.view.getLayer().show()
+        );
+        
         this.infoView = new InfoCardView(this.view.getStage(), container, this.hideInfo);
         this.popup = new PopUpView(this.view.getLayer(), "Please enter your name\n in the input box below.");
         this.ro = new ResizeObserver(this.handleResize);
