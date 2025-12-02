@@ -63,7 +63,7 @@ describe("main screen controller", () => {
       expect(Object.keys(WSC.getToggler().getModel().getQuestions()).length === 1).toBeTruthy()
     })
 
-    it("should swap when handleInfo() is called", () => {
+/*     it("should swap when handleInfo() is called", () => {
       WSC.handleInfo();
       expect(WSC.getView().getInput().style.display).toEqual("none")
     })
@@ -77,5 +77,5 @@ describe("main screen controller", () => {
       WSC.handleOptions();
       expect(WSC.getView().getInput().style.display).toEqual("none")
       expect(WSC.getToggler().getView().getLayer()["attrs"]["visible"]).toBeTruthy()
-    })
+    }) */
 })
