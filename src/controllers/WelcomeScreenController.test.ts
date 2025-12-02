@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from "vitest";
 import { WelcomeScreenController } from "./WelcomeScreenController";
 import { ScreenSwitcher } from "../utils/types";
 import { QuizManager } from "./QuizManager"
+import { ConfigurationModel } from "../models/ConfigurationModel";
+import { UIController } from "./UIController";
+import { MapController } from "./MapController";
+import { GameStatsController } from "./GameStatsController";
 
 class ResizeObserverMock {
   observe = vi.fn();
@@ -14,13 +18,38 @@ vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 describe("main screen controller", () => {
     const mockEl = document.createElement("div");
     const inputEl = document.createElement("input");
+    const config = new ConfigurationModel();
+
     mockEl.id = "main-menu-container";
     inputEl.id = "nameInput";
+
     document.body.appendChild(mockEl);
     document.body.appendChild(inputEl);
-    let switcher: ScreenSwitcher = new ScreenSwitcher();
-    let quiz: QuizManager = new QuizManager(switcher);
-    let WSC = new WelcomeScreenController("main-menu-container", quiz);
+    const switcher: ScreenSwitcher = new ScreenSwitcher();
+    const quiz: QuizManager = new QuizManager(switcher);
+    
+    const dummyMap = {
+      getStore: () => ({
+        getAll: () => [],
+      }),
+      getStage: () => null,
+    } as unknown as MapController;
+
+    const ui = {
+      updateMaxErrors: vi.fn(),
+      attachRoadTripDashboard: vi.fn(),
+      resetRoadTripHud: vi.fn(),
+    } as unknown as UIController;
+
+    const stats = new GameStatsController(dummyMap, config);
+
+    const WSC = new WelcomeScreenController(
+    "main-menu-container",
+      quiz,
+      config,
+      stats,
+      ui
+    );
 
     it("should initialize a view and togglecontroller", () => {
         expect(WSC.getView()).toBeDefined();

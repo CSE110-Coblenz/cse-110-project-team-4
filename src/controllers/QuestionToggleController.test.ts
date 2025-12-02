@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect,vi } from "vitest";
 import { QuestionToggleController } from "./QuestionToggleController";
 import Konva from "konva";
+import { ConfigurationModel } from "../models/ConfigurationModel";
+import { GameStatsController } from "./GameStatsController";
+import { UIController } from "./UIController";
+
 
 describe("question toggle controller", () => {
     const mockEl = document.createElement("div");
@@ -8,12 +12,27 @@ describe("question toggle controller", () => {
     document.body.appendChild(mockEl);
 
     const stage = new Konva.Stage({
-        container: mockEl,
+        container: mockEl.id,
         width: 400,
         height: 300,
     });
+    const config = new ConfigurationModel(); 
+    const statsMock = {
+        updateMaxErrors: vi.fn(),
+    } as unknown as GameStatsController;
 
-    let QTC = new QuestionToggleController(new Konva.Stage({container: mockEl.id}), "main-menu-container");
+    const uiMock = {
+        updateMaxErrors: vi.fn(),
+    } as unknown as UIController;
+
+    let QTC = new QuestionToggleController(
+        stage,
+        "main-menu-container",
+        config,
+        statsMock,
+        uiMock,
+        () => {} // onBackCallback
+    );
 
     it("should initialize a view and model", () => {
         expect(QTC.getView()).toBeDefined();
