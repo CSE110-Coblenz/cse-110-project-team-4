@@ -6,6 +6,7 @@ import { ConfigurationModel } from "../models/ConfigurationModel";
 import { UIController } from "./UIController";
 import { MapController } from "./MapController";
 import { GameStatsController } from "./GameStatsController";
+import Konva from "konva";
 
 class ResizeObserverMock {
   observe = vi.fn();
@@ -14,6 +15,12 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
+const rectDrawSceneSpy = vi
+  .spyOn(Konva.Rect.prototype as any, "drawScene")
+  .mockImplementation(() => {
+    return;
+  });
 
 describe("main screen controller", () => {
     const mockEl = document.createElement("div");
@@ -63,7 +70,7 @@ describe("main screen controller", () => {
       expect(Object.keys(WSC.getToggler().getModel().getQuestions()).length === 1).toBeTruthy()
     })
 
-/*     it("should swap when handleInfo() is called", () => {
+    it("should swap when handleInfo() is called", () => {
       WSC.handleInfo();
       expect(WSC.getView().getInput().style.display).toEqual("none")
     })
@@ -77,5 +84,5 @@ describe("main screen controller", () => {
       WSC.handleOptions();
       expect(WSC.getView().getInput().style.display).toEqual("none")
       expect(WSC.getToggler().getView().getLayer()["attrs"]["visible"]).toBeTruthy()
-    }) */
+    }) 
 })
