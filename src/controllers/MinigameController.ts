@@ -48,9 +48,10 @@ export class MinigameController {
     scoreDisplay.innerText = "0";
 
     const btn = document.getElementById("minigame-button");
-    if (btn) {
-      btn.hidden = true;
-    }
+    // if (btn) {
+    //   btn.hidden = true;
+    //   console.log("Hiding minigame button");
+    // }
 
     this.timer.attachSecondaryDisplay((seconds) => {
       timerDisplay.innerText = this.formatMiniGameTime(seconds);
@@ -186,5 +187,20 @@ export class MinigameController {
     const m = Math.floor(s / 60);
     const ss = (s % 60).toString().padStart(2, "0");
     return `${m}:${ss}`;
+  }
+
+  public restart(): void {
+    console.log("Restarting minigame");
+    if (!this.container) {
+      return;
+    }
+
+    if (this.cardElements) { //Make the cards interactive again
+      this.cardElements.forEach((card) => {
+        card.style.pointerEvents = "auto";
+      });
+    }
+
+    this.initializeGame();
   }
 }

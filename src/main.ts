@@ -276,7 +276,8 @@ class Application extends ScreenSwitcher {
         this.stats,
         this.ui,
         timerCtrl,
-        this.map
+        this.map,
+        this.minigame
       );
       this.ui.mount(stageForUI);
       this.map.setUIBus(this.ui); // hand real UI bus back to MapController
@@ -285,7 +286,8 @@ class Application extends ScreenSwitcher {
         this.stats,
         this.ui,
         timerCtrl,
-        this.map
+        this.map,
+        this.minigame
       );
     }
 
@@ -375,6 +377,7 @@ app.init();
 const minigameButton = document.getElementById("minigame-button");
 if (minigameButton) {
   minigameButton.addEventListener("click", () => {
+    minigameButton.hidden = true;
     app.switchToScreen(Screens.Minigame);
   });
 }

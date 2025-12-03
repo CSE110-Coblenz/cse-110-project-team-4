@@ -62,6 +62,10 @@ export class ResultScreenController {
 
   handleRestart = () => {
     this.quiz.restartGame();
+    const btn = document.getElementById("minigame-button");
+    if (btn) { //Makes the minigame btn visible again after pressing "Restart Game"
+      btn.hidden = false;
+    }
     this.switcher.switchToScreen(Screens.Welcome);
   };
 
