@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   var pickedCards: PickedCards[] = [];
 
-  const grid = document.querySelector(".minigame-stage") as HTMLDivElement; // the playing field
+  const grids = document.querySelector(".minigame-stage") as HTMLDivElement; // the playing field
   let scoreResult = 0;
 
   // Shuffle cards

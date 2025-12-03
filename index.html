@@ -1,37 +1,49 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>US Geography Game Adventure</title> <link rel="stylesheet" href="/src/styles/app.css">
 
-    <script type="module" src="/src/main.ts"></script>
-  </head>
-  <body>
-    <div id="app-root" class="app-shell">
-      <div id="main-area" class="main-area">
-        <div id="map-root" class="map-stage"></div>
+<head>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>US Geography Game Adventure</title>
+  <link rel="stylesheet" href="/src/styles/app.css">
 
-        <div id="qa-box" class="qa-box" hidden>
-          </div>
-      </div>
+  <script type="module" src="/src/main.ts"></script>
+</head>
 
-      <div id="hud-row" class="map-width">
-        <div id="score-hub" class="hud-box"></div>
-        <div id="roadtrip-hub" class="hud-box"></div>
-        <div id="timer-hub" class="hud-box"></div>
-      </div>
+<body>
+  <div id="app-root" class="app-shell">
+    <div id="main-area" class="main-area">
+      <button id="minigame-button">Play Minigame</button>
+      <div id="map-root" class="map-stage"></div>
 
-      <div id="views">
-        <div id="welcome-root" data-view="welcome"></div>
-        <div id="leaderboard-root" data-view="leaderboard"></div>
-        <section data-view="settings" hidden>
-          <div id="settings-root"></div>
-        </section>
+      <div id="qa-box" class="qa-box" hidden>
       </div>
     </div>
 
-    <div id="portal-root" class="portal-root"></div>   <div id="toast-root" class="toast-root"></div>     <div id="overlay-root" class="overlay-root" hidden></div> </body>
+    <div id="hud-row" class="map-width">
+      <div id="score-hub" class="hud-box"></div>
+      <div id="roadtrip-hub" class="hud-box"></div>
+      <div id="timer-hub" class="hud-box"></div>
+    </div>
+
+    <div id="views">
+      <div id="welcome-root" data-view="welcome"></div>
+      <div id="leaderboard-root" data-view="leaderboard"></div>
+      <div id="minigame-root" data-view="minigame" hidden>
+        <h3>Score: <span id="score">0</span> | Timer: <span id="minigame-timer">0:00</span></h3>
+        <div class="minigame-stage"></div>
+      </div>
+      <section data-view="settings" hidden>
+        <div id="settings-root"></div>
+      </section>
+    </div>
+  </div>
+
+  <div id="portal-root" class="portal-root"></div>
+  <div id="toast-root" class="toast-root"></div>
+  <div id="overlay-root" class="overlay-root" hidden></div>
+</body>
+
 </html>

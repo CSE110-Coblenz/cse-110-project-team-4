@@ -200,6 +200,8 @@ export class QuizManager {
         this.stats?.resetPoints();
         // road car dashboard
         this.ui?.resetRoadTripHud();
+
+        this.timer?.restartTimer();
     }
 
     public handleNextAction(): void {

@@ -1,8 +1,8 @@
 import { GAME_DURATION_MIN } from "../utils/constants";
 
 export class TimerModel {
-  private timerId: (number | null); //setInterval ID
-  private endAt: number;                      
+  private timerId: number | null; //setInterval ID
+  private endAt: number;
   private onTick?: (secondsLeft: number) => void;
   private onDone?: () => void;
 
@@ -11,8 +11,9 @@ export class TimerModel {
     this.timerId = null;
     this.endAt = 0;
   }
-  
-  public get isRunning(): boolean { // Checks if timerId is active, otherwise it is null
+
+  public get isRunning(): boolean {
+    // Checks if timerId is active, otherwise it is null
     return this.timerId !== null;
   }
 
@@ -54,15 +55,18 @@ export class TimerModel {
   }
 
   reset(durationSeconds?: number): void {
-  if (durationSeconds !== undefined) {
-    this.durationSeconds = durationSeconds;
+    if (durationSeconds !== undefined) {
+      this.durationSeconds = durationSeconds;
+    }
+    if (this.isRunning) {
+      // If timer still runs, stop it
+      if (this.timerId !== null) {
+        clearInterval(this.timerId);
+      }
+      this.timerId = null;
+    }
+    if (this.onTick && this.onDone) {
+      this.startTimer(this.onTick, this.onDone);
+    }
   }
-  if (this.isRunning) {   // IF timer still runs, stop it
-    this.stopTimer();
-  }
-  if (this.onTick && this.onDone) {
-    this.startTimer(this.onTick, this.onDone);
-  }
-}
-
 }

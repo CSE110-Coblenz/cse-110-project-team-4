@@ -22,7 +22,6 @@ BOOT ORDER — Application Startup Sequence
   - Pass GameStatsController into UIController for point/count updates on answers
 ==============================*/
 
-
 //=================   1) Import runtime deps & types
 //	  Put: type definitions / state store / controllers / UI bus.
 //	  Example in this project:
@@ -34,17 +33,18 @@ import { StateStore } from "./models/StateStore";
 import { MapController } from "./controllers/MapController";
 import { UIController } from "./controllers/UIController";
 import { GameStatsController } from "./controllers/GameStatsController";
-import './styles/app.css';
+import "./styles/app.css";
 import { TimerModel } from "./models/TimerModel";
 import TimerViewCorner from "./views/TimerDisplayView";
 import { TimerController } from "./controllers/TimerController";
 import { ScreenSwitcher, Screens } from "./utils/types";
 import { WelcomeScreenController } from "./controllers/WelcomeScreenController";
 import { QuizManager } from "./controllers/QuizManager";
+import { MinigameController } from "./controllers/MinigameController";
 import { ResultScreenController } from "./controllers/ResultScreenController";
 import { supabase } from "./supabaseClient";
 
-import { RoadTripDashboardView } from './views/RoadTripDashboardView';
+import { RoadTripDashboardView } from "./views/RoadTripDashboardView";
 import Konva from "konva";
 import { MAX_ERRORS } from "./utils/constants";
 
@@ -58,20 +58,65 @@ import { MAX_ERRORS } from "./utils/constants";
 //		- Card matching (minigame): `import { CardStateManager } from "./models/CardStateManager";`
 //		  const cardState = new CardStateManager();
 
-/* TEST-seed: minimal demo data for all 50 states. 
+/* TEST-seed: minimal demo data for all 50 states.
  * Replace with persisted data if we finish the data part. */
 
 const seed: USState[] = Object.keys({
-	WA:1, OR:1, CA:1, ID:1, NV:1, AZ:1, UT:1, CO:1, NM:1,
-	MT:1, WY:1, ND:1, SD:1, NE:1, KS:1, OK:1, TX:1,
-	MN:1, IA:1, MO:1, WI:1, IL:1, AR:1, LA:1,
-	MI:1, IN:1, KY:1, TN:1, MS:1, AL:1, GA:1, FL:1, SC:1, NC:1,
-	VA:1, WV:1, OH:1, PA:1, NY:1, NJ:1, MD:1, DE:1, CT:1, RI:1, MA:1, VT:1, NH:1, ME:1, DC:1,
-	AK:1, HI:1
-}).map(code => ({
-	code,
-	name: code,
-	status: StateStatus.NotStarted
+  WA: 1,
+  OR: 1,
+  CA: 1,
+  ID: 1,
+  NV: 1,
+  AZ: 1,
+  UT: 1,
+  CO: 1,
+  NM: 1,
+  MT: 1,
+  WY: 1,
+  ND: 1,
+  SD: 1,
+  NE: 1,
+  KS: 1,
+  OK: 1,
+  TX: 1,
+  MN: 1,
+  IA: 1,
+  MO: 1,
+  WI: 1,
+  IL: 1,
+  AR: 1,
+  LA: 1,
+  MI: 1,
+  IN: 1,
+  KY: 1,
+  TN: 1,
+  MS: 1,
+  AL: 1,
+  GA: 1,
+  FL: 1,
+  SC: 1,
+  NC: 1,
+  VA: 1,
+  WV: 1,
+  OH: 1,
+  PA: 1,
+  NY: 1,
+  NJ: 1,
+  MD: 1,
+  DE: 1,
+  CT: 1,
+  RI: 1,
+  MA: 1,
+  VT: 1,
+  NH: 1,
+  ME: 1,
+  DC: 1,
+  AK: 1,
+  HI: 1,
+}).map((code) => ({
+  code,
+  name: code,
+  status: StateStatus.NotStarted,
 }));
 const store = new StateStore(seed);
 
@@ -85,208 +130,255 @@ const store = new StateStore(seed);
 
 // application class stores controllers, modeled after lab design
 class Application extends ScreenSwitcher {
-    private ui: UIController;
-    private map: MapController;
-    private menu: WelcomeScreenController;
-    private stats: GameStatsController;
-    private manager: QuizManager;
-    private leaderboard: ResultScreenController;
+  private ui: UIController;
+  private map: MapController;
+  private menu: WelcomeScreenController;
+  private stats: GameStatsController;
+  private manager: QuizManager;
+  private leaderboard: ResultScreenController;
+  private timerCtrl!: TimerController;
+  private minigame!: MinigameController;
 
-    // NEW: reference to bottom HUD row, so we can hide it on Welcome/Leaderboard
-    private roadTripDashboard?: RoadTripDashboardView;
-    private hudRowEl: HTMLElement | null;
+  // NEW: reference to bottom HUD row, so we can hide it on Welcome/Leaderboard
+  private roadTripDashboard?: RoadTripDashboardView;
+  private hudRowEl: HTMLElement | null;
 
-    // initialize most controllers
-    constructor(store: StateStore) {
-        super();
-        this.manager = new QuizManager(this);
-        this.map = new MapController(
-            store,
-            { openQuestion: (q: any) => {} }
+  // initialize most controllers
+  constructor(store: StateStore) {
+    super();
+    this.manager = new QuizManager(this);
+    this.map = new MapController(store, { openQuestion: (q: any) => {} });
+
+    this.stats = new GameStatsController(this.map);
+    this.ui = new UIController(this.map, this.stats, this.manager);
+    this.menu = new WelcomeScreenController("welcome-root", this.manager);
+    this.leaderboard = new ResultScreenController(
+      this.manager,
+      this,
+      "leaderboard-root"
+    );
+
+    // =====bottom HUD row container (score + car + time)
+    this.hudRowEl = document.getElementById("hud-row");
+  }
+
+  // move to uicontrol soon, just for testing Dennis
+  // helper: Control the visibility of the three bottom HUD panels.
+  private setHudVisible(visible: boolean): void {
+    if (!this.hudRowEl) return;
+    this.hudRowEl.style.display = visible ? "grid" : "none";
+  }
+
+  // finish initializations that have certain dependencies
+  // mount views onto divs
+  init() {
+    this.map.mount("map-root");
+    this.map.getView()?.hide();
+    this.menu.getView().show();
+
+    // The initial screen is Welcome:
+    // the three hubs at the bottom are all hidden.
+    this.setHudVisible(false);
+
+    const stageForUI = this.map.getStage();
+    if (stageForUI) {
+      this.ui.mount(stageForUI);
+      this.map.setUIBus(this.ui);
+
+      // [new 12/23 Dennis]
+      // Logic for binding navigation buttons to the bottom left corner HUD
+      this.stats.bindNavigation({
+        onHome: () => {
+          console.log("Nav: Home");
+          this.switchToScreen(Screens.Welcome);
+          // To reset the game when returning to the homepage,
+          // uncomment the following:
+          // this.manager.restartGame();
+        },
+        onOptions: () => {
+          console.log("Nav: Options");
+          this.switchToScreen(Screens.Welcome);
+          // Call WelcomeController to display the options layer
+          this.menu.handleOptions();
+        },
+        onHelp: () => {
+          console.log("Nav: Help");
+          this.switchToScreen(Screens.Welcome);
+          // Call WelcomeController to display the help layer
+          this.menu.handleInfo();
+        },
+      });
+
+      // ========== left hub "score-hub"： GameStatsLightbox.ts ==========
+      const scoreContainer = document.getElementById("score-hub");
+      if (!scoreContainer) {
+        console.error(
+          "Score HUD container #score-hub not found; score HUD will stay on map stage if attached."
         );
-
-        this.stats = new GameStatsController(this.map);
-        this.ui = new UIController(this.map, this.stats, this.manager);
-        this.menu = new WelcomeScreenController("welcome-root", this.manager);
-        this.leaderboard = new ResultScreenController(this.manager, this, "leaderboard-root");
-
-        // =====bottom HUD row container (score + car + time)
-        this.hudRowEl = document.getElementById("hud-row");
-    }
-
-    // move to uicontrol soon, just for testing Dennis
-    // helper: Control the visibility of the three bottom HUD panels.
-    private setHudVisible(visible: boolean): void {
-        if (!this.hudRowEl) return;
-        this.hudRowEl.style.display = visible ? "grid" : "none";
-    }
-
-    // finish initializations that have certain dependencies
-    // mount views onto divs
-    init() {
-        this.map.mount("map-root");
-        this.map.getView()?.hide();
-        this.menu.getView().show();
-
-        // The initial screen is Welcome: 
-        // the three hubs at the bottom are all hidden.
-        this.setHudVisible(false);
-
-        const stageForUI = this.map.getStage();
-        if (stageForUI) {
-            this.ui.mount(stageForUI);
-            this.map.setUIBus(this.ui);
-
-            // [new 12/23 Dennis] 
-            // Logic for binding navigation buttons to the bottom left corner HUD
-            this.stats.bindNavigation({
-                onHome: () => {
-                    console.log("Nav: Home");
-                    this.switchToScreen(Screens.Welcome);
-                    // To reset the game when returning to the homepage, 
-                    // uncomment the following:
-                    // this.manager.restartGame();
-                },
-                onOptions: () => {
-                    console.log("Nav: Options");
-                    this.switchToScreen(Screens.Welcome);
-                    // Call WelcomeController to display the options layer
-                    this.menu.handleOptions();
-                },
-                onHelp: () => {
-                    console.log("Nav: Help");
-                    this.switchToScreen(Screens.Welcome);
-                    // Call WelcomeController to display the help layer
-                    this.menu.handleInfo();
-                }
-            });
-
-            // ========== left hub "score-hub"： GameStatsLightbox.ts ==========
-            const scoreContainer = document.getElementById("score-hub");
-            if (!scoreContainer) {
-                console.error("Score HUD container #score-hub not found; score HUD will stay on map stage if attached.");
-            } else {
-                const rectScore = scoreContainer.getBoundingClientRect();
-                const scoreStage = new Konva.Stage({
-                    container: "score-hub",
-                    width: rectScore.width || 200,
-                    height: rectScore.height || 72,
-                });
-/*                 window.addEventListener("resize", () => {
+      } else {
+        const rectScore = scoreContainer.getBoundingClientRect();
+        const scoreStage = new Konva.Stage({
+          container: "score-hub",
+          width: rectScore.width || 200,
+          height: rectScore.height || 72,
+        });
+        /*                 window.addEventListener("resize", () => {
                     scoreContainer.resizeToStage();
                 }); */
-                // attachHudStage：game stats light box layer mount on the new Stage
-                this.stats.attachHudStage(scoreStage);
+        // attachHudStage：game stats light box layer mount on the new Stage
+        this.stats.attachHudStage(scoreStage);
+      }
 
-            }
+      // ========== mid HUD "roadtrip-hub": RoadTripDashboardView ==========
+      const roadTripContainer = document.getElementById("roadtrip-hub");
+      if (roadTripContainer) {
+        this.roadTripDashboard = new RoadTripDashboardView(
+          "roadtrip-hub",
+          MAX_ERRORS
+        );
+        this.roadTripDashboard.init();
 
-            // ========== mid HUD "roadtrip-hub": RoadTripDashboardView ==========
-            const roadTripContainer = document.getElementById("roadtrip-hub");
-            if (roadTripContainer) {
-                this.roadTripDashboard = new RoadTripDashboardView(
-                    "roadtrip-hub",
-                    MAX_ERRORS
-                );
-                this.roadTripDashboard.init();
+        // inject the roadtrop HUD into UIController
+        this.ui.attachRoadTripDashboard(this.roadTripDashboard);
+      } else {
+        console.error(
+          "RoadTrip HUD container #roadtrip-hub not found; car dashboard will not be shown."
+        );
+      }
 
-                // inject the roadtrop HUD into UIController
-                this.ui.attachRoadTripDashboard(this.roadTripDashboard);
-            } else {
-                console.error("RoadTrip HUD container #roadtrip-hub not found; car dashboard will not be shown.");
-            }
+      // ========== right HUD "timer-hub"：timerDispalyView.ts ==========
+      let timerCtrl: TimerController;
 
-            // ========== right HUD "timer-hub"：timerDispalyView.ts ==========
-            let timerCtrl: TimerController;
-
-            const timerContainer = document.getElementById("timer-hub");
-            if (!timerContainer) {
-                console.error("Timer HUD container #timer-hub not found; falling back to map corner.");
-                const timerView = new TimerViewCorner(stageForUI);
-                timerCtrl = new TimerController(new TimerModel(), timerView, this);
-            } else {
-                const rect = timerContainer.getBoundingClientRect();
-                const timerStage = new Konva.Stage({
-                    container: "timer-hub",
-                    width: rect.width || 200,
-                    height: rect.height || 72,
-                });
-                const timerView = new TimerViewCorner(timerStage);
-                timerCtrl = new TimerController(new TimerModel(), timerView, this);
-            }
-
-            // init QuizManager controlling the whole game life cyclic
-            this.manager.init(
-                this.menu.getToggler().getModel(),
-                this.stats,
-                this.ui,
-                timerCtrl,
-                this.map
-            );
-            this.ui.mount(stageForUI)
-            this.map.setUIBus(this.ui);      // hand real UI bus back to MapController
-            this.manager.init(this.menu.getToggler().getModel(), this.stats, this.ui, timerCtrl, this.map);
-        }
-
-        // ====== Testing debug & Supabase  ======
-        window.addEventListener("keydown", (ev) => {
-            if (ev.ctrlKey) {
-                if (ev.key.toLowerCase() === "f") {
-                    store.getAll().forEach(s => store.setStatus(s.code, StateStatus.Complete));
-                }
-                if (ev.key.toLowerCase() === "r") {
-                    store.getAll().forEach(s => store.setStatus(s.code, StateStatus.NotStarted));
-                    this.ui.resetRoadTripHud(); 
-                }
-                if (ev.key.toLowerCase() === 'o') {
-                    this.ui.triggerFireworks();
-                }
-                if (ev.key.toLowerCase() === "t") {
-                    console.log("Test: Plane Flyover");
-                    (this.ui as any).roadTripDashboard?.debugTrigger('plane');
-                }
-                if (ev.key.toLowerCase() === "y") {
-                    console.log("Test: Correct Answer Effect");
-                    (this.ui as any).roadTripDashboard?.debugTrigger('star');
-                }
-                if (ev.key.toLowerCase() === "u") {
-                    console.log("Test: Wrong Answer Effect");
-                    (this.ui as any).roadTripDashboard?.debugTrigger('hit');
-                }
-            }
+      const timerContainer = document.getElementById("timer-hub");
+      if (!timerContainer) {
+        console.error(
+          "Timer HUD container #timer-hub not found; falling back to map corner."
+        );
+        const timerView = new TimerViewCorner(stageForUI);
+        timerCtrl = new TimerController(new TimerModel(), timerView, this);
+      } else {
+        const rect = timerContainer.getBoundingClientRect();
+        const timerStage = new Konva.Stage({
+          container: "timer-hub",
+          width: rect.width || 200,
+          height: rect.height || 72,
         });
+        const timerView = new TimerViewCorner(timerStage);
+        timerCtrl = new TimerController(new TimerModel(), timerView, this);
+      }
+      // Store shared timer on the Application instance
+      this.timerCtrl = timerCtrl;
+      this.minigame = new MinigameController(this.stats, this, this.timerCtrl);
 
-        console.log("Fetching users table from Supabase...");
-        testSupabaseUsers();
+      // init QuizManager controlling the whole game life cyclic
+      this.manager.init(
+        this.menu.getToggler().getModel(),
+        this.stats,
+        this.ui,
+        timerCtrl,
+        this.map
+      );
+      this.ui.mount(stageForUI);
+      this.map.setUIBus(this.ui); // hand real UI bus back to MapController
+      this.manager.init(
+        this.menu.getToggler().getModel(),
+        this.stats,
+        this.ui,
+        timerCtrl,
+        this.map
+      );
     }
 
-
-    // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
-    public switchToScreen(screen: Screens): void {
-        this.leaderboard.getView().hide();
-        this.map.getView()!.hide();
-        this.menu.getView().hide();
-
-        this.setHudVisible(false);
-
-        switch (screen) {
-            case Screens.Map:
-                this.map.getView()!.show();
-                this.setHudVisible(true);
-                break;
-            case Screens.Welcome:
-                this.menu.getView().show();
-                break;
-            case Screens.Leaderboard:
-                this.leaderboard.refreshLeaderboard();
-                this.leaderboard.getView().show();
-                break;
-            default: 
+    // ====== Testing debug & Supabase  ======
+    window.addEventListener("keydown", (ev) => {
+      if (ev.ctrlKey) {
+        if (ev.key.toLowerCase() === "f") {
+          store
+            .getAll()
+            .forEach((s) => store.setStatus(s.code, StateStatus.Complete));
         }
+        if (ev.key.toLowerCase() === "r") {
+          store
+            .getAll()
+            .forEach((s) => store.setStatus(s.code, StateStatus.NotStarted));
+          this.ui.resetRoadTripHud();
+        }
+        if (ev.key.toLowerCase() === "o") {
+          this.ui.triggerFireworks();
+        }
+        if (ev.key.toLowerCase() === "t") {
+          console.log("Test: Plane Flyover");
+          (this.ui as any).roadTripDashboard?.debugTrigger("plane");
+        }
+        if (ev.key.toLowerCase() === "y") {
+          console.log("Test: Correct Answer Effect");
+          (this.ui as any).roadTripDashboard?.debugTrigger("star");
+        }
+        if (ev.key.toLowerCase() === "u") {
+          console.log("Test: Wrong Answer Effect");
+          (this.ui as any).roadTripDashboard?.debugTrigger("hit");
+        }
+      }
+    });
+
+    console.log("Fetching users table from Supabase...");
+    testSupabaseUsers();
+  }
+
+  // to be called for "big" screen switch, e.g. welcome -> map, or map <-> minigame
+  public switchToScreen(screen: Screens): void {
+    this.leaderboard.getView().hide();
+    this.map.getView()!.hide();
+    this.menu.getView().hide();
+
+    const minigameRoot = document.getElementById("minigame-root");
+    if (minigameRoot) {
+      minigameRoot.hidden = true;
     }
+
+    this.setHudVisible(false);
+
+    switch (screen) {
+      case Screens.Map:
+        this.map.getView()!.show();
+        this.setHudVisible(true);
+        break;
+      case Screens.Welcome:
+        this.menu.getView().show();
+        break;
+      case Screens.Leaderboard:
+        this.leaderboard.refreshLeaderboard();
+        this.leaderboard.getView().show();
+        break;
+      case Screens.Minigame:
+        if (minigameRoot) {
+          minigameRoot.hidden = false;
+
+          const alreadyMounted = (minigameRoot as any)._mounted;
+          if (!alreadyMounted) {
+            this.minigame.mount("minigame-root");
+            (minigameRoot as any)._mounted = true;
+          }
+        } else {
+          console.error("#minigame-root not found in DOM.");
+        }
+        break;
+      default:
+    }
+  }
 }
 
 const app = new Application(store);
 app.init();
+
+//Button to switch screen to Minigame
+const minigameButton = document.getElementById("minigame-button");
+if (minigameButton) {
+  minigameButton.addEventListener("click", () => {
+    app.switchToScreen(Screens.Minigame);
+  });
+}
+
 
 //=================    4) Mount Views
 //	  Put: attach views to HTML containers only.
@@ -320,16 +412,11 @@ app.init();
 //		- Questions panel view: `questionsView.mount("questions-container")`
 //		- Leaderboard view: `leaderboardView.mount("leaderboard-container")`
 
-
-
-
 //=================    5) Seed / Demo Hooks (removable)
 //	  Put: quick local demo helpers (timers, shortcuts). Do NOT ship to prod.
 //	  Where teammates can test quickly:
 //		- Preload a quiz for CA: `quiz.loadFor("CA")`
 //		- Bump score for demo: `leaderBoard.addPoints("player1", 10)`
-
-
 
 //=================    6) Navigation & UI Bus Wiring (router/modals)
 //	  Put: connections to router or modal/dialog system (keep outside Controller/Store).
@@ -345,9 +432,7 @@ app.init();
 
 async function testSupabaseUsers() {
   try {
-    const { data, error } = await supabase
-      .from('users') 
-      .select('*');
+    const { data, error } = await supabase.from("users").select("*");
 
     if (error) {
       console.error("Error fetching users:", error);
