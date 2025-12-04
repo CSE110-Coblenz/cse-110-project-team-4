@@ -41,7 +41,7 @@ export class WelcomeScreenView {
     {
         this.id = id;
 
-        let [w, h] = getDims(360, 360, id);
+        let [w, h] = getDims(id);
         this.stage = new Konva.Stage({
             container: id,
             width: w,
@@ -85,7 +85,7 @@ export class WelcomeScreenView {
         this.toggleButtonGroup = new Konva.Group();
 
         let menuEl = document.getElementById(id);
-        const textBox = document.createElement("textarea");
+        const textBox = document.createElement("input"); // input so the text doesn't display as courier + keep text to one line
         textBox.id = "nameInput";
         textBox.style.top = h / 4 + 210 + "px";
         textBox.style.width = "200px";
@@ -141,7 +141,7 @@ export class WelcomeScreenView {
     }
 
     public resize(): void {
-        let [w, h] = getDims(360, 360, this.id);
+        let [w, h] = getDims(this.id);
     
         this.titleGroup.x(w / 2);
         this.titleGroup.offsetX(this.titleGroup.width() / 2);

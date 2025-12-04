@@ -421,4 +421,5 @@ body {
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: auto 100%; /* width 100%，auto height */
+  overflow-y: auto;
 }
