@@ -58,11 +58,21 @@ export class WelcomeScreenView {
         });
         let titleText = new Konva.Text({
             text: " WELCOME to the \n U.S. Geography Game!",
-            fill: 'black',
-            fontSize: 40,
+            fill: 'white',
+            fontSize: 60,
             fontStyle: "bold",
             padding: 4,
-            align: "center"      
+            align: "center",
+            // --- (Border/Stroke) ---
+            stroke: 'rgba(255, 255, 255, 0.5)',
+            strokeWidth: 1,
+
+            // --- (Shadow) ---
+            shadowColor: 'black', 
+            shadowBlur: 5,
+            shadowOffsetX: 4, 
+            shadowOffsetY: 4,
+            shadowOpacity: 0.8
         });
         titleText.offsetX(titleText.width() / 2);
         this.titleGroup.add(titleText);
@@ -78,13 +88,14 @@ export class WelcomeScreenView {
             this.layer.batchDraw();
         });
 
-        const startLabel = simpleLabelFactory(w / 2, h / 4 + 110, "Start Game", startHandler);
-        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 310, "How To Play", infoHandler);
-        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 410, "Options", optionsHandler);
+        const startLabel = simpleLabelFactory(w / 2, h / 4 + 270, "Start Game", startHandler);
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 390, "How To Play", infoHandler);
+        const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 450, "Options", optionsHandler);
 
         this.toggleButtonGroup = new Konva.Group();
 
         let menuEl = document.getElementById(id);
+
         const textBox = document.createElement("textarea");
         textBox.id = "nameInput";
         textBox.style.top = h / 4 + 210 + "px";
