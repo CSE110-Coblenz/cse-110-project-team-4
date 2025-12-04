@@ -376,7 +376,7 @@ app.init();
 //Button to switch screen to Minigame
 const minigameButton = document.getElementById("minigame-button");
 if (minigameButton) {
-  minigameButton.addEventListener("click", () => {
+  minigameButton.addEventListener("click", () => { // When you click the minigame btn, it hids it when you enter minigame screen
     minigameButton.hidden = true;
     app.switchToScreen(Screens.Minigame);
   });

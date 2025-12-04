@@ -11,6 +11,7 @@ import { MapController } from "./MapController";
 import { USState } from "../models/State";
 import { StateStore } from "../models/StateStore";
 import { StateStatus } from "../models/State";
+import { MinigameController } from "./MinigameController";
 import Konva from "konva"
 
 // Mock ResizeObserver meant for Konva
@@ -46,6 +47,7 @@ describe("main screen controller", () => {
     let stats: GameStatsController;
     let timer: TimerController;
     let ui: UIController;
+    let minigame: MinigameController;
 
     beforeEach(() => {
         // 1. Setup Fake Timers
@@ -81,6 +83,8 @@ describe("main screen controller", () => {
         stats = new GameStatsController(map);
         timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher);
         ui = new UIController(map, stats, quiz);
+        // Provide a simple stub for MinigameController to ensure `minigame` is assigned before use
+        minigame = {} as unknown as MinigameController;
     });
 
     afterEach(() => {
@@ -101,13 +105,13 @@ describe("main screen controller", () => {
     })
 
     it("should be initialized after calling init", () => {
-        quiz.init(bank, stats, ui, timer, map);
+        quiz.init(bank, stats, ui, timer, map, minigame);
         expect(quiz.getStatus()).toBeTruthy();
     })
 
     it("should be able to return questions", () => {
         // Fix here: Init the quiz so it has data
-        quiz.init(bank, stats, ui, timer, map);
+        quiz.init(bank, stats, ui, timer, map, minigame);
 
         expect(quiz.getNextQuestion() === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("California", "capitalQuestions") === null).toBeFalsy();
