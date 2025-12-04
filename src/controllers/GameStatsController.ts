@@ -37,135 +37,148 @@ import { MAX_ERRORS, CORRECT_POINT_VALUE } from "../utils/constants";
 
 // new : Navigation processor type
 type NavHandlers = {
-	onHome?: () => void;
-	onOptions?: () => void;
-	onHelp?: () => void;
+  onHome?: () => void;
+  onOptions?: () => void;
+  onHelp?: () => void;
 };
 
 export class GameStatsController {
-	private layer: Konva.Layer;
-	private lightbox: GameStatsLightbox;
-	private points = 0;
-	
-	//new Navigation
-	private navHandlers: NavHandlers = {};
+  private layer: Konva.Layer;
+  private lightbox: GameStatsLightbox;
+  private points = 0;
 
-	// ADDED: Accept the MapController so we can safely grab the Stage without re-querying DOM.
-	constructor(private map: MapController) {
-		this.layer = new Konva.Layer({ listening: false });
-		const { grey, green, red } = this.getColorCounts();
+  //new Navigation
+  private navHandlers: NavHandlers = {};
 
-		this.lightbox = new GameStatsLightbox({
-			greyCount: grey,
-			greenCount: green,
-			redCount: red,
-			points: this.points,
-		});	
+  // ADDED: Accept the MapController so we can safely grab the Stage without re-querying DOM.
+  constructor(private map: MapController) {
+    this.layer = new Konva.Layer({ listening: false });
+    const { grey, green, red } = this.getColorCounts();
 
-		// Add lightbox to the layer
-		this.layer.add(this.lightbox.getGroup());
-	}
+    this.lightbox = new GameStatsLightbox({
+      greyCount: grey,
+      greenCount: green,
+      redCount: red,
+      points: this.points,
+    });
 
-	// new Methods for binding navigation logic
-	public bindNavigation(handlers: NavHandlers) {
-		this.navHandlers = handlers;
-	}
+    // Add lightbox to the layer
+    this.layer.add(this.lightbox.getGroup());
+  }
 
-	private getColorCounts() {
-		const all = this.map.getStore().getAll();
-		let grey = 0,
-			green = 0,
-			red = 0;
+  // new Methods for binding navigation logic
+  public bindNavigation(handlers: NavHandlers) {
+    this.navHandlers = handlers;
+  }
 
-		for (const s of all) {
-			if (s.status === StateStatus.NotStarted) grey++;
-			else if (s.status === StateStatus.Complete) green++;
-			else if (s.status === StateStatus.Partial) red++;
-		}
-		return { grey, green, red };
-	}
+  private getColorCounts() {
+    const all = this.map.getStore().getAll();
+    let grey = 0,
+      green = 0,
+      red = 0;
 
-	// update counts + points live
-	public updateCounts(grey: number, green: number, red: number, points: number): void {
-		this.points = points;
-		this.lightbox.updateCounts(grey, green, red, points);
-		this.layer.draw();
-	}
+    for (const s of all) {
+      if (s.status === StateStatus.NotStarted) grey++;
+      else if (s.status === StateStatus.Complete) green++;
+      else if (s.status === StateStatus.Partial) red++;
+    }
+    return { grey, green, red };
+  }
 
-	// call this when a state is correctly answered
-	public onCorrect(stateCode: string) {
-		this.map.getStore().setStatus(stateCode, StateStatus.Complete);
-		this.points += CORRECT_POINT_VALUE;
+  // update counts + points live
+  public updateCounts(
+    grey: number,
+    green: number,
+    red: number,
+    points: number
+  ): void {
+    this.points = points;
+    this.lightbox.updateCounts(grey, green, red, points);
+    this.layer.draw();
+  }
 
-		const { grey, green, red } = this.getColorCounts();
-		this.updateCounts(grey, green, red, this.points);
-	}
+  // call this when a state is correctly answered
+  public onCorrect(stateCode: string) {
+    this.map.getStore().setStatus(stateCode, StateStatus.Complete);
+    this.points += CORRECT_POINT_VALUE;
 
-	public onIncorrect(stateCode: string) {
-		this.map.getStore().setStatus(stateCode, StateStatus.Partial);
+    const { grey, green, red } = this.getColorCounts();
+    this.updateCounts(grey, green, red, this.points);
+  }
 
-		const { grey, green, red } = this.getColorCounts();
-		this.updateCounts(grey, green, red, this.points);
-	}
+  public onIncorrect(stateCode: string) {
+    this.map.getStore().setStatus(stateCode, StateStatus.Partial);
 
-	public attemptReconnect() {
-		this.map.getStage()?.add(this.layer);
-		this.layer.draw();
-	}
+    const { grey, green, red } = this.getColorCounts();
+    this.updateCounts(grey, green, red, this.points);
+  }
 
-	public isFinished() {
-		let { grey, green, red } = this.getColorCounts();
-		if (red >= MAX_ERRORS) {
-			return -1
-		} else if (grey === 0) {
-			return 1
-		} else {
-			return 0
-		}
-	}
+  public attemptReconnect() {
+    this.map.getStage()?.add(this.layer);
+    this.layer.draw();
+  }
 
-	public resetPoints() {
-		this.points = 0;
-	}
+  public isFinished() {
+    let { grey, green, red } = this.getColorCounts();
+    if (red >= MAX_ERRORS) {
+      return -1;
+    } else if (grey === 0) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
 
-	public getPoints(): number {
-		return this.points;
-	}
+  public resetPoints() {
+    this.points = 0;
+  }
 
-	public attachHudStage(stage: Konva.Stage): void {
-		this.layer = new Konva.Layer();
-		stage.add(this.layer);
-		this.lightbox.destroy();
-		const { grey, green, red } = this.getColorCounts();
-/* 		this.lightbox = new GameStatsLightbox(
+  public getPoints(): number {
+    return this.points;
+  }
+
+  public addPoints(num: number): void {
+    if (num === 0) {
+      return;
+    }
+    this.points += num;
+
+    const { grey, green, red } = this.getColorCounts();
+    this.updateCounts(grey, green, red, this.points);
+  }
+
+  public attachHudStage(stage: Konva.Stage): void {
+    this.layer = new Konva.Layer();
+    stage.add(this.layer);
+    this.lightbox.destroy();
+    const { grey, green, red } = this.getColorCounts();
+    /* 		this.lightbox = new GameStatsLightbox(
 			{ greyCount: grey, greenCount: green, redCount: red, points: this.points },
 			stage.width(),
 			stage.height()
 		); */
-		
-		// new : Inject navigation callbacks during creation.
-		this.lightbox = new GameStatsLightbox(
-			{ 
-				greyCount: grey, 
-				greenCount: green, 
-				redCount: red, 
-				points: this.points,
-				...this.navHandlers // inject handlers
-			},
-			stage.width(),
-			stage.height()
-		);
-		this.layer.add(this.lightbox.getGroup());
-		this.layer.draw();
-	}
 
+    // new : Inject navigation callbacks during creation.
+    this.lightbox = new GameStatsLightbox(
+      {
+        greyCount: grey,
+        greenCount: green,
+        redCount: red,
+        points: this.points,
+        ...this.navHandlers, // inject handlers
+      },
+      stage.width(),
+      stage.height()
+    );
+    this.layer.add(this.lightbox.getGroup());
+    this.layer.draw();
+  }
 }
-
 
 /**
  * ORIGINAL (for reference only; now encapsulated in this controller):
  * import Konva from "konva";
- * 
+ *
  * const layer = new Konva.Layer();
  * const lightbox = new GameStatsLightbox({
  *   greyCount: 10,

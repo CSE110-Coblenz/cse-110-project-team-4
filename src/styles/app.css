@@ -336,6 +336,29 @@ body {
   width: 100%;
 }
 
+#minigame-button {
+  position: fixed;
+  top: 1rem;
+  right: 1.5rem;
+  z-index: 900;
+
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  border: 3px solid var(--theme-border-brown);
+  background: var(--theme-warm-tan);
+  color: var(--theme-text-dark);
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--theme-border-brown); /* 3d button */
+  transition: all 0.1s;
+}
+
+#minigame-button:active{
+  transform: translateY(4px); /* btn pushdown*/
+  box-shadow: 0 0 0 var(--theme-border-brown);
+}
+
 /* ==============================
    Portals / Toast / Overlay
    ============================== */
@@ -404,7 +427,7 @@ body {
   color: black;
 }
 
-#score {
+#score, #minigame-timer {
   padding: 1rem;
 }
 

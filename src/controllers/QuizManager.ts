@@ -28,6 +28,7 @@ import { ScreenSwitcher, Screens } from "../utils/types";
 import { MapController } from "./MapController";
 import { StateStatus } from "../models/State";
 import { LeaderboardService } from '../services/LeaderboardService';
+import { MinigameController } from "./MinigameController";
 
 export class QuizManager {
     private questionBank?: QuestionBankModel;
@@ -40,6 +41,7 @@ export class QuizManager {
     private switcher: ScreenSwitcher;
     private map?: MapController;
     private gameStartTime?: number;
+    private minigame?: MinigameController;
 
     constructor(switcher: ScreenSwitcher) {
         this.hasInit = false;
@@ -52,7 +54,8 @@ export class QuizManager {
         stats: GameStatsController, 
         ui: UIController, 
         timer: TimerController,
-        map: MapController) 
+        map: MapController,
+        minigame: MinigameController) 
     {
         this.hasInit = true;
         this.questionBank = questionBank;
@@ -61,6 +64,7 @@ export class QuizManager {
         this.continue = true;
         this.timer = timer;
         this.map = map;
+        this.minigame = minigame;
     }
 
     /** gets and returns info necessary for one question, removing that state from the pool
@@ -200,6 +204,9 @@ export class QuizManager {
         this.stats?.resetPoints();
         // road car dashboard
         this.ui?.resetRoadTripHud();
+
+        this.timer?.restartTimer();
+        this.minigame?.restart(); // Works and restarts the minigame functions
     }
 
     public handleNextAction(): void {

@@ -32,7 +32,10 @@ export default class TimerViewCorner {
   private font = '"GameFont", "Segoe UI Black", monospace';
   private color = "#3d2b1f";
 
-  constructor(public TimerStage: Konva.Stage, existingLayer?: Konva.Layer) {
+  constructor(
+    public TimerStage: Konva.Stage,
+    existingLayer?: Konva.Layer
+  ) {
     this.timerLayer = existingLayer ?? new Konva.Layer({ listening: false });
 
     // 1. Time display (smaller font size to prevent it from filling the entire height)
@@ -41,22 +44,22 @@ export default class TimerViewCorner {
       fontSize: 32, // Font 40 -> 32
       fontFamily: this.font,
       fill: this.color,
-      align: 'center',
-      fontStyle: 'bold',
+      align: "center",
+      fontStyle: "bold",
       shadowColor: "rgba(0,0,0,0.1)",
-      shadowOffset: {x: 1, y: 1}
+      shadowOffset: { x: 1, y: 1 },
     });
 
     // 2. Regional Information Group
     this.regionGroup = new Konva.Group({});
     // locaton pin shape
     const pinIcon = new Konva.Path({
-      data: 'M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z',
-      fill: '#a63e3e',
-      scaleX: 1,   // Scale 1.2 -> 1
+      data: "M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z",
+      fill: "#a63e3e",
+      scaleX: 1, // Scale 1.2 -> 1
       scaleY: 1,
       x: 0,
-      y: 0
+      y: 0,
     });
 
     this.regionText = new Konva.Text({
@@ -66,13 +69,13 @@ export default class TimerViewCorner {
       fill: "#5a4632",
       x: 20,
       y: 2,
-      fontStyle: 'bold'
+      fontStyle: "bold",
     });
 
     this.regionGroup.add(pinIcon, this.regionText);
 
     this.bg = new Konva.Rect({
-      fill: 'transparent',
+      fill: "transparent",
       stroke: "",
     });
 
@@ -81,14 +84,15 @@ export default class TimerViewCorner {
 
     this.timerLayer.add(this.group);
     if (!existingLayer) this.TimerStage.add(this.timerLayer);
-    
+
     this.relayout();
     this.timerLayer.draw();
   }
 
   updateTimer(seconds: number) {
-    this.timeLabel.text(this.format(seconds));
-    this.relayout(); 
+    const formatted = this.format(seconds);
+    this.timeLabel.text(formatted);
+    this.relayout();
     this.timerLayer.batchDraw();
   }
 
@@ -102,15 +106,15 @@ export default class TimerViewCorner {
     // 1. Centering time show
     const timeW = this.timeLabel.width();
     this.timeLabel.position({
-        x: (stageW - timeW) / 2,
-        y: 10 
+      x: (stageW - timeW) / 2,
+      y: 10,
     });
 
     // 2. Information on the central area
-    const regionContentW = this.regionText.x() + this.regionText.width(); 
+    const regionContentW = this.regionText.x() + this.regionText.width();
     this.regionGroup.position({
-        x: (stageW - regionContentW) / 2,
-        y: 50
+      x: (stageW - regionContentW) / 2,
+      y: 50,
     });
   }
 
@@ -121,7 +125,6 @@ export default class TimerViewCorner {
     return `${m}:${ss}`;
   }
 }
-
 
 /* 
 import Konva from "konva";
