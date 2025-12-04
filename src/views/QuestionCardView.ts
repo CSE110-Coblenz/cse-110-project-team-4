@@ -117,9 +117,17 @@ export class QuestionCardView {
 
   //[new 11/23 Dennis]
   public resize() {
-    if (!this.stage || this.stage.width() === 0) return;
-    const w = this.stage.width();
-    const h = this.stage.height();
+    if (!this.stage) return;
+    const container = this.stage.container() as HTMLDivElement; 
+    const rect = container.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    if (w === 0 || h === 0) {
+      return;
+    }
+
+  this.stage.size({ width: w, height: h });
     
     // 1. Define the "safe zone" of the original answer sheet design
     // Based on constants: the card is approximately 400 wide and 420 high. 

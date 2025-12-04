@@ -13,6 +13,7 @@ import { StateStore } from "../models/StateStore";
 import { StateStatus } from "../models/State";
 import { MinigameController } from "./MinigameController";
 import Konva from "konva"
+import { MinigameController } from "./MinigameController";
 
 // Mock ResizeObserver meant for Konva
 class ResizeObserverMock {
@@ -21,6 +22,11 @@ class ResizeObserverMock {
   disconnect = vi.fn();
 }
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
+// Mock class for MinigameController to satisfy the type check
+const mockMinigame: MinigameController = {
+    restart: vi.fn(), 
+} as unknown as MinigameController;
 
 // Seed data
 const seed: USState[] = Object.keys({
@@ -83,8 +89,7 @@ describe("main screen controller", () => {
         stats = new GameStatsController(map);
         timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher);
         ui = new UIController(map, stats, quiz);
-        // Provide a simple stub for MinigameController to ensure `minigame` is assigned before use
-        minigame = {} as unknown as MinigameController;
+        minigame = mockMinigame;
     });
 
     afterEach(() => {

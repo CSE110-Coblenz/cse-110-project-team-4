@@ -3,6 +3,8 @@ import { QuestionType } from "../models/Questions";
 import click from "../data/sfx/click.wav";
 
 const clickAudio = new Audio(click);
+const clampX = 360;
+const clampY = 600;
 clickAudio.preload = "auto";
 clickAudio.load();
 clickAudio.volume = 0.4;
@@ -12,7 +14,7 @@ function playClick() {
     clickAudio.play();
 }
 
-export function getDims(clampX: number, clampY: number, id: string) {
+export function getDims(id: string) {
     let containerEl = document.getElementById(id);
     if (containerEl == null) {
         return [ clampX, clampY ];

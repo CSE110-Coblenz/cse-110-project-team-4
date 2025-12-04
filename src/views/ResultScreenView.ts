@@ -22,6 +22,8 @@ Related
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 
+const RESTART_Y = 450;
+
 export class ResultScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
@@ -29,7 +31,7 @@ export class ResultScreenView {
     private id: string;
 
     constructor(restartHandler: () => void, id: string) {
-        let [w, h] = getDims(360, 360, id);
+        let [w, h] = getDims(id);
         this.stage = new Konva.Stage({
             container: id, 
             width: w,
@@ -40,7 +42,7 @@ export class ResultScreenView {
         this.restartGroup = new Konva.Group({});
         this.id = id;
         
-        const restartLabel = simpleLabelFactory(w / 2, h - 450, "Restart Game", restartHandler);
+        const restartLabel = simpleLabelFactory(w / 2, RESTART_Y, "Restart Game", restartHandler);
         this.restartGroup.add(restartLabel);
 
         this.layer.add(this.restartGroup);
@@ -69,7 +71,7 @@ export class ResultScreenView {
     }
 
     resize() {
-        let [w, h] = getDims(360, 360, this.id);
+        let [w, h] = getDims(this.id);
         this.layer.getChildren().forEach((group) => {
             if (group instanceof Konva.Group) {
                 group.getChildren().forEach(subgroup => {

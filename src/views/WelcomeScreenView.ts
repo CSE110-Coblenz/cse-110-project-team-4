@@ -41,7 +41,7 @@ export class WelcomeScreenView {
     {
         this.id = id;
 
-        let [w, h] = getDims(360, 360, id);
+        let [w, h] = getDims(id);
         this.stage = new Konva.Stage({
             container: id,
             width: w,
@@ -58,12 +58,20 @@ export class WelcomeScreenView {
         });
         let titleText = new Konva.Text({
             text: " WELCOME to the \n U.S. Geography Game!",
-            fill: 'black',
-            fontSize: 40,
+            fill: 'white',
+            fontSize: 50,
             fontStyle: "bold",
             padding: 4,
-            align: "center"      
+            align: "center",
+
+            stroke: 'rgba(255, 255, 255, 0.7)',
+            strokeWidth: 2,
+            shadowColor: 'black',
+            shadowBlur: 5,
+            shadowOffsetX: 4,
+            shadowOffsetY: 4  
         });
+
         titleText.offsetX(titleText.width() / 2);
         this.titleGroup.add(titleText);
 
@@ -78,14 +86,14 @@ export class WelcomeScreenView {
             this.layer.batchDraw();
         });
 
-        const startLabel = simpleLabelFactory(w / 2, h / 4 + 110, "Start Game", startHandler);
-        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 310, "How To Play", infoHandler);
+        const startLabel = simpleLabelFactory(w / 2, h / 4 + 270, "Start Game", startHandler);
+        const infoLabel = simpleLabelFactory(w / 2, h / 4 + 350, "How To Play", infoHandler);
         const optionsLabel = simpleLabelFactory(w / 2, h / 4 + 410, "Options", optionsHandler);
 
         this.toggleButtonGroup = new Konva.Group();
 
         let menuEl = document.getElementById(id);
-        const textBox = document.createElement("textarea");
+        const textBox = document.createElement("input"); // input so the text doesn't display as courier + keep text to one line
         textBox.id = "nameInput";
         textBox.style.top = h / 4 + 210 + "px";
         textBox.style.width = "200px";
@@ -141,7 +149,7 @@ export class WelcomeScreenView {
     }
 
     public resize(): void {
-        let [w, h] = getDims(360, 360, this.id);
+        let [w, h] = getDims(this.id);
     
         this.titleGroup.x(w / 2);
         this.titleGroup.offsetX(this.titleGroup.width() / 2);

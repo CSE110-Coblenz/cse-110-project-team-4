@@ -87,7 +87,7 @@ export class WelcomeScreenController {
     }
 
     handleResize = () => {
-        let [w, h] = getDims(360, 360, this.containerID);
+        let [w, h] = getDims(this.containerID);
         this.view.resize();
         this.toggleController.handleResize();
         this.infoView.resize();
