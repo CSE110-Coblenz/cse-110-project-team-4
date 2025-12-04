@@ -60,6 +60,9 @@ const HOW_TO_PLAY: string =
 const CORNER_RADIUS = 10
 const ALIGN_STYLE = "left"
 
+const LARGE_RECT_MIN_WIDTH = 175;
+const BUTTON_PADDING = 15;
+
 import Konva from "konva";
 import { getDims } from "../utils/ViewUtils";
 
@@ -81,8 +84,6 @@ export class InfoCardView {
         this.textGroup = new Konva.Group({});
         this.backGroup = new Konva.Group({});
         let text: Konva.Text = new Konva.Text({
-            x: w / 4 + 20,
-            y: h / 4 + 20,
             text: HOW_TO_PLAY,
             fontSize: 20,
             fontFamily: FONT_FAMILY,
@@ -91,10 +92,7 @@ export class InfoCardView {
             lineHeight: 1.08,
         });
         let backButton: Konva.Text = new Konva.Text({
-            x: w / 3.8,
-            y: h / 3.8 - 50,
             text: "Go Back",
-            width: 80,
             fontSize: 18,
             fontFamily: FONT_FAMILY,
             align: ALIGN_STYLE
@@ -105,14 +103,13 @@ export class InfoCardView {
         // bottom padding below text
         const bottomPadding = 20;
         // calculate rect height
-        const calculatedHeight = topPadding + text.height() + bottomPadding;
-        this.calculatedHeight = calculatedHeight;
+        this.calculatedHeight = topPadding + text.height() + bottomPadding;
 
         let largeRect: Konva.Rect = new Konva.Rect({
             x: w / 4,
-            y: Math.max(10, (h / 2) - (calculatedHeight / 2)), // center vertically
-            width: Math.max(175, w / 2),
-            height: calculatedHeight,
+            y: Math.max(10, (h / 2) - (this.calculatedHeight / 2)), // center vertically
+            width: Math.max(LARGE_RECT_MIN_WIDTH, w / 2),
+            height: this.calculatedHeight,
             cornerRadius: CORNER_RADIUS,
             fill: BOX_BG,
             stroke: STROKE_COLOR
@@ -122,9 +119,8 @@ export class InfoCardView {
         text.x(largeRect.x() + topPadding);
         text.width(largeRect.width() - topPadding * 2);
 
-        const buttonPadding = 15;
-        backButton.x(largeRect.x() + largeRect.width() - backButton.width() - buttonPadding);
-        backButton.y(largeRect.y() + buttonPadding);
+        backButton.x(largeRect.x() + largeRect.width() - backButton.width() - BUTTON_PADDING);
+        backButton.y(largeRect.y() + BUTTON_PADDING);
 
         let smallRect: Konva.Rect = new Konva.Rect({
             x: backButton.x() - 5,

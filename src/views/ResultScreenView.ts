@@ -22,6 +22,8 @@ Related
 import Konva from "konva";
 import { getDims, simpleLabelFactory } from "../utils/ViewUtils";
 
+const RESTART_Y = 450;
+
 export class ResultScreenView {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
@@ -40,7 +42,7 @@ export class ResultScreenView {
         this.restartGroup = new Konva.Group({});
         this.id = id;
         
-        const restartLabel = simpleLabelFactory(w / 2, 450, "Restart Game", restartHandler);
+        const restartLabel = simpleLabelFactory(w / 2, RESTART_Y, "Restart Game", restartHandler);
         this.restartGroup.add(restartLabel);
 
         this.layer.add(this.restartGroup);
