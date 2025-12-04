@@ -279,21 +279,10 @@ class Application extends ScreenSwitcher {
         this.map,
         this.minigame
       );
-      this.ui.mount(stageForUI);
-      this.map.setUIBus(this.ui); // hand real UI bus back to MapController
-      this.manager.init(
-        this.menu.getToggler().getModel(),
-        this.stats,
-        this.ui,
-        timerCtrl,
-        this.map,
-        this.minigame
-      );
     }
 
     // ====== Testing debug & Supabase  ======
     window.addEventListener("keydown", (ev) => {
-      if (ev.ctrlKey) {
         if (ev.key.toLowerCase() === "f") {
           store
             .getAll()
@@ -320,7 +309,7 @@ class Application extends ScreenSwitcher {
           console.log("Test: Wrong Answer Effect");
           (this.ui as any).roadTripDashboard?.debugTrigger("hit");
         }
-      }
+
     });
 
     console.log("Fetching users table from Supabase...");
@@ -339,23 +328,27 @@ class Application extends ScreenSwitcher {
     }
 
     this.setHudVisible(false);
+    if (minigameButton) minigameButton.hidden = true;
 
     switch (screen) {
       case Screens.Map:
         this.map.getView()!.show();
         this.setHudVisible(true);
+        if (minigameButton) minigameButton.hidden = false;
         break;
       case Screens.Welcome:
         this.menu.getView().show();
+        if (minigameButton) minigameButton.hidden = true;
         break;
       case Screens.Leaderboard:
         this.leaderboard.refreshLeaderboard();
         this.leaderboard.getView().show();
+        if (minigameButton) minigameButton.hidden = true;
         break;
       case Screens.Minigame:
         if (minigameRoot) {
           minigameRoot.hidden = false;
-
+          if (minigameButton) minigameButton.hidden = true;
           const alreadyMounted = (minigameRoot as any)._mounted;
           if (!alreadyMounted) {
             this.minigame.mount("minigame-root");

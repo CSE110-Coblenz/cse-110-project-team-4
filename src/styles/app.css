@@ -354,6 +354,8 @@ body {
   transition: all 0.1s;
 }
 
+
+
 #minigame-button:active{
   transform: translateY(4px); /* btn pushdown*/
   box-shadow: 0 0 0 var(--theme-border-brown);
@@ -381,6 +383,8 @@ body {
   flex-direction: column;
 }
 
+
+
 .minigame-stage {
   display: grid;
   justify-content: center;
@@ -392,7 +396,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 12px;
   width: 85%;
-  height: 85%;
+  height: 80%;
 
   position: absolute;
   inset: 50% auto auto 50%;
@@ -429,6 +433,14 @@ body {
 
 #score, #minigame-timer {
   padding: 1rem;
+}
+
+#minigame-back-button {
+  margin-top: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  position: relative;
+  z-index: 999;
 }
 
 /* ==============================

@@ -12,6 +12,7 @@ import { USState } from "../models/State";
 import { StateStore } from "../models/StateStore";
 import { StateStatus } from "../models/State";
 import Konva from "konva"
+import { MinigameController } from "./MinigameController";
 
 // Mock ResizeObserver meant for Konva
 class ResizeObserverMock {
@@ -20,6 +21,11 @@ class ResizeObserverMock {
   disconnect = vi.fn();
 }
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
+// Mock class for MinigameController to satisfy the type check
+const mockMinigame: MinigameController = {
+    restart: vi.fn(), 
+} as unknown as MinigameController;
 
 // Seed data
 const seed: USState[] = Object.keys({
@@ -46,6 +52,7 @@ describe("main screen controller", () => {
     let stats: GameStatsController;
     let timer: TimerController;
     let ui: UIController;
+    let minigame: MinigameController;
 
     beforeEach(() => {
         // 1. Setup Fake Timers
@@ -81,6 +88,7 @@ describe("main screen controller", () => {
         stats = new GameStatsController(map);
         timer = new TimerController(new TimerModel(300), new TimerViewCorner(stage), switcher);
         ui = new UIController(map, stats, quiz);
+        minigame = mockMinigame;
     });
 
     afterEach(() => {
@@ -101,13 +109,13 @@ describe("main screen controller", () => {
     })
 
     it("should be initialized after calling init", () => {
-        quiz.init(bank, stats, ui, timer, map);
+        quiz.init(bank, stats, ui, timer, map, minigame);
         expect(quiz.getStatus()).toBeTruthy();
     })
 
     it("should be able to return questions", () => {
         // Fix here: Init the quiz so it has data
-        quiz.init(bank, stats, ui, timer, map);
+        quiz.init(bank, stats, ui, timer, map, minigame);
 
         expect(quiz.getNextQuestion() === null).toBeFalsy();
         expect(quiz.getIncorrectAnswers("California", "capitalQuestions") === null).toBeFalsy();

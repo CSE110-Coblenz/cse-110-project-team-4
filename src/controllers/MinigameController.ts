@@ -22,6 +22,18 @@ export class MinigameController {
       return;
     }
     this.container = container;
+    const backButton = container.querySelector(
+      "#minigame-back-button"
+    ) as HTMLButtonElement | null;
+
+    if (backButton) {
+      backButton.onclick = () => {
+        this.switcher.switchToScreen(Screens.Map);
+      };
+    } else {
+      console.warn("#minigame-back-button not found inside minigame-root");
+    }
+
     this.initializeGame();
   }
 
