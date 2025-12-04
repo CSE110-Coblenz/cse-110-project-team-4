@@ -56,7 +56,7 @@ export class QuestionToggleView {
             visible: false
         });
         this.id = id;
-        let [w, h] = getDims(360, 360, id)
+        let [w, h] = getDims(id)
         this.startW = w;
         this.toggleButtonGroup = new Konva.Group();
 
@@ -111,7 +111,7 @@ export class QuestionToggleView {
     }
 
     public resize(): void {
-        let [w, h] = getDims(360, 360, this.id);
+        let [w, h] = getDims(this.id);
         this.layer.getChildren().forEach((group) => {
             if (group instanceof Konva.Group) {
                 group.getChildren().forEach(subnode => {

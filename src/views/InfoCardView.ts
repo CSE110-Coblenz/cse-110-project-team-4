@@ -64,16 +64,19 @@ import Konva from "konva";
 import { getDims } from "../utils/ViewUtils";
 
 export class InfoCardView {
+    private stage: Konva.Stage;
     private layer: Konva.Layer;
     private textGroup: Konva.Group;
     private backGroup: Konva.Group;
     private startW: number;
     private id: string;
+    private calculatedHeight: number;
 
     constructor(stage: Konva.Stage, id: string, hide: () => void) {
-        let [w, h] = getDims(360, 360, id);
+        let [w, h] = getDims(id);
         this.id = id;
         this.startW = w;
+        this.stage = stage;
         this.layer = new Konva.Layer({ visible: false });
         this.textGroup = new Konva.Group({});
         this.backGroup = new Konva.Group({});
@@ -103,11 +106,12 @@ export class InfoCardView {
         const bottomPadding = 20;
         // calculate rect height
         const calculatedHeight = topPadding + text.height() + bottomPadding;
+        this.calculatedHeight = calculatedHeight;
 
         let largeRect: Konva.Rect = new Konva.Rect({
             x: w / 4,
-            y: (h / 2) - (calculatedHeight / 2), // center vertically
-            width: w / 2,
+            y: Math.max(10, (h / 2) - (calculatedHeight / 2)), // center vertically
+            width: Math.max(175, w / 2),
             height: calculatedHeight,
             cornerRadius: CORNER_RADIUS,
             fill: BOX_BG,
@@ -156,11 +160,16 @@ export class InfoCardView {
 
     public show(): void {
         this.layer.visible(true);
+        if (this.calculatedHeight > this.stage.height()) {
+            this.stage.height(this.calculatedHeight);
+        }
         this.layer.draw();
     }
     
     public hide(): void {
         this.layer.visible(false);
+        let [w, h] = getDims(this.id);
+        this.stage.height(h)
         this.layer.draw();
     }
 
@@ -169,7 +178,7 @@ export class InfoCardView {
     }
 
     public resize(): void {
-        let [w, h] = getDims(360, 360, this.id);
+        let [w, h] = getDims(this.id);
         this.layer.getChildren().forEach((group) => {
             if (group instanceof Konva.Group) {
                 group.getChildren().forEach(node => {

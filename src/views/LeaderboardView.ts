@@ -38,7 +38,7 @@ export class LeaderboardView {
     // assumes entries are already sorted
     draw(entries: LeaderboardEntry[]): void {
         // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
-        let [w, h] = getDims(360, 360, "leaderboard-root");
+        let [w, h] = getDims("leaderboard-root");
         // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
 
         // Reset contents
@@ -61,7 +61,7 @@ export class LeaderboardView {
 
     drawEntries(entries: LeaderboardEntry[]): void {
         // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
-        let [w, h] = getDims(360, 360, "leaderboard-root");
+        let [w, h] = getDims("leaderboard-root");
         // TEMP EDIT SO WE CAN DEMO THE LEADERBOARD VIEW
 
         entries.forEach((entry, index) => {

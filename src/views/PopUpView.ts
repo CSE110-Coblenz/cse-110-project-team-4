@@ -70,7 +70,7 @@ export class PopUpView {
     }
 
     resize() {
-        let [w, h] = getDims(360, 360, "welcome-root")
+        let [w, h] = getDims("welcome-root")
         this.popUpGroup.getChildren().forEach((child) => {
             child.x(Math.max(10, w / 2))
         })
