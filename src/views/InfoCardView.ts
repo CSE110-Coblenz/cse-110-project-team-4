@@ -24,7 +24,8 @@ const STROKE_COLOR = "black"
 const FONT_FAMILY = "Arial"
 
 const HOW_TO_PLAY: string =
-"Welcome to the US Map Quiz Game, where YOU race the clock to prove how\n" +
+"Welcome to the US Map Quiz Game!\n" + 
+  "Race the clock to prove how " +
   "much you know about the states!\n\n" +
   "1. Getting Started\n" +
   "* You’ll start on the Welcome Screen.\n" +
